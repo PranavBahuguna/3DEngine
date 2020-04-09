@@ -11,7 +11,6 @@
 const GLint WINDOW_WIDTH = 800, WINDOW_HEIGHT = 600;
 
 bool direction = true;
-float triScale = 0.25f;
 float triOffset = 0.0f;
 float triMaxOffset = 0.7f;
 float triIncrement = 0.0005f;
@@ -106,21 +105,19 @@ int main() {
 
     // Clear window
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     triangleShader.Use();
 
     // Apply transforms to the model
     glm::mat4 model(1.0f);
-    model = glm::translate(model, glm::vec3(triOffset, 0.0f, 0.0f));
-    model = glm::rotate(model, glm::radians(triCurAngle), glm::vec3(0.0f, 0.0f, 1.0f));
+    // model = glm::translate(model, glm::vec3(triOffset, 0.0f, 0.0f));
+    model = glm::rotate(model, glm::radians(triCurAngle), glm::vec3(0.0f, 1.0f, 0.0f));
     model = glm::scale(model, glm::vec3(triScale));
     glUniformMatrix4fv(uModel, 1, GL_FALSE, glm::value_ptr(model));
 
-    triangle.BindVertices();
-    glDrawArrays(GL_TRIANGLES, 0, 3);
-
-    glBindVertexArray(0);
+    // Draw the triangle
+    triangle.Draw();
     glUseProgram(0);
 
     glfwSwapBuffers(mainWindow);

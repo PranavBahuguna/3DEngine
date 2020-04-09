@@ -7,9 +7,10 @@ class Triangle {
 public:
   Triangle();
 
-  void BindVertices() const;
+  void Draw() const;
 
 private:
   GLuint m_VAO;
   GLuint m_VBO;
+  GLuint m_IBO;
 };
