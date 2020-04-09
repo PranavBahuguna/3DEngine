@@ -13,10 +13,10 @@ Triangle::Triangle() : m_VAO(0), m_VBO(0), m_IBO(0) {
   GLfloat height = sqrt(4.0f / 3.0f);
 
   GLfloat vertices[] = {
-    -1.0f, -1.0f, 0.0f, // bottom-left
-    0.0f, 0.0f, height, // above
-    1.0f, -1.0f, 0.0f,  // bottom-right
-    0.0f, 1.0f, 0.0f,   // top
+    -1.0f, 0.0f, -1.0f, // front-left
+    0.0f, height, 0.0f, // top
+    1.0f, 0.0f, -1.0f,  // front-right
+    0.0f, 0.0f, 1.0f,   // back
   };
 
   // Bind vertex array

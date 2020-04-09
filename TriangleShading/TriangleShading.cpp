@@ -93,8 +93,13 @@ int main() {
   // Load and compile the triangle shader
   Shader triangleShader("Triangle");
 
-  // Get model
+  // Get model and projection
   GLint uModel = triangleShader.GetUL("model");
+  GLint uProjection = triangleShader.GetUL("projection");
+
+  // Setup projection
+  glm::mat4 projection =
+      glm::perspective(45.0f, (GLfloat)bufferWidth / (GLfloat)bufferHeight, 0.1f, 100.0f);
 
   // Loop until window closed
   while (!glfwWindowShouldClose(mainWindow)) {
@@ -111,10 +116,13 @@ int main() {
 
     // Apply transforms to the model
     glm::mat4 model(1.0f);
-    // model = glm::translate(model, glm::vec3(triOffset, 0.0f, 0.0f));
-    model = glm::rotate(model, glm::radians(triCurAngle), glm::vec3(0.0f, 1.0f, 0.0f));
+    model = glm::translate(model, glm::vec3(0.0f, 0.0f, -2.5f));
+    model = glm::rotate(model, glm::radians(triCurAngle), glm::vec3(1.0f, 1.0f, 1.0f));
     model = glm::scale(model, glm::vec3(triScale));
+
+    // Set model and projection
     glUniformMatrix4fv(uModel, 1, GL_FALSE, glm::value_ptr(model));
+    glUniformMatrix4fv(uProjection, 1, GL_FALSE, glm::value_ptr(projection));
 
     // Draw the triangle
     triangle.Draw();
