@@ -10,9 +10,11 @@ Shader::Shader(const std::string &name) : m_progId(0), m_vertId(0), m_fragId(0) 
   const std::string fragPath = "Shaders/" + name + ".frag";
 
   // Load shaders from disk and compiles them
-  LoadShader(vertPath, GL_VERTEX_SHADER, m_vertId);
-  LoadShader(fragPath, GL_FRAGMENT_SHADER, m_fragId);
-  CompileShaders();
+  ERROR errCode = load(vertPath, GL_VERTEX_SHADER, m_vertId);
+  if (errCode == ERROR_OK)
+    load(fragPath, GL_FRAGMENT_SHADER, m_fragId);
+  if (errCode == ERROR_OK)
+    compile();
 }
 
 // Destructor
@@ -24,15 +26,10 @@ Shader::~Shader() {
   glDeleteShader(m_fragId);
 }
 
-// Use this shader
-void Shader::Use() const { glUseProgram(m_progId); }
-
-// Get the id of a uniform variable
-GLint Shader::GetUL(const GLchar *name) const { return glGetUniformLocation(m_progId, name); }
-
 // Loads shader from file
-void Shader::LoadShader(const std::string &filename, GLenum type, GLuint &shaderId) {
+ERROR Shader::load(const std::string &filename, GLenum type, GLuint &shaderId) {
   // Open the file
+  ERROR errCode = ERROR_OK;
   std::ifstream file(filename.c_str());
 
   if (file) {
@@ -53,24 +50,28 @@ void Shader::LoadShader(const std::string &filename, GLenum type, GLuint &shader
     if (isCompiled) {
       shaderId = id;
     } else {
-      // Print errors and delete the shader
-      printf("Error, unable to compile shader %d!\nSource:%s\n\n", id, cSource);
-      PrintShaderErrorLog(id);
+      errCode = ERROR_SHADER_COMPILE_FAILED;
+      printShaderErrorLog(id, errCode);
       glDeleteShader(id);
     }
   } else {
-    printf("Error, unable to open file! %s\n", filename.c_str());
+    errCode = ERROR_FILE_OPEN_FAILED;
+    printErrorMsg(errCode, 1, filename.c_str());
   }
+
+  return errCode;
 }
 
 // Compiles all loaded shaders into the program
-void Shader::CompileShaders() {
+ERROR Shader::compile() {
   // Create program
+  ERROR errCode = ERROR_OK;
   GLuint progId = glCreateProgram();
 
   if (!progId) {
-    printf("Error, unable to create shader program!\n");
-    return;
+    errCode = ERROR_SHADER_COMPILE_FAILED;
+    printErrorMsg(errCode);
+    return errCode;
   }
 
   // Attach all shaders to the program
@@ -90,31 +91,33 @@ void Shader::CompileShaders() {
     if (isValid) {
       m_progId = progId;
     } else {
-      printf("Error validating program:\n");
-      PrintProgramErrorLog(progId);
+      errCode = ERROR_SHADER_PROGRAM_INVALID;
+      printProgramErrorLog(progId, errCode);
     }
   } else {
-    printf("Error linking program:\n");
-    PrintProgramErrorLog(progId);
+    errCode = ERROR_SHADER_PROGRAM_LINKING_FAILED;
+    printProgramErrorLog(progId, errCode);
   }
+
+  return errCode;
 }
 
 // Prints the error log of a shader
-void Shader::PrintShaderErrorLog(GLuint id) const {
+void Shader::printShaderErrorLog(GLuint id, ERROR errCode) const {
   GLint errorLength = 0;
   glGetShaderiv(id, GL_INFO_LOG_LENGTH, &errorLength);
   std::vector<GLchar> errorLog(errorLength);
   glGetShaderInfoLog(id, errorLength, &errorLength, &errorLog[0]);
 
-  printf("%s\n", &errorLog[0]);
+  printErrorMsg(errCode, 1, &errorLog[0]);
 }
 
 // Prints the error log of the program
-void Shader::PrintProgramErrorLog(GLuint id) const {
+void Shader::printProgramErrorLog(GLuint id, ERROR errCode) const {
   GLint errorLength = 0;
   glGetShaderiv(id, GL_INFO_LOG_LENGTH, &errorLength);
   std::vector<GLchar> errorLog(errorLength);
   glGetProgramInfoLog(id, errorLength, &errorLength, &errorLog[0]);
 
-  printf("%s\n", &errorLog[0]);
+  printErrorMsg(errCode, 1, &errorLog[0]);
 }

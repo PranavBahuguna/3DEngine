@@ -1,21 +1,23 @@
 #pragma once
-#include <GL/glew.h>
+#include "Error.h"
 
 #include <string>
+
+#include <GL/glew.h>
 
 class Shader {
 public:
   Shader(const std::string &name);
   ~Shader();
 
-  void Use() const;
-  GLint GetUL(const GLchar *name) const;
+  void use() const { glUseProgram(m_progId); }
+  GLint getUL(const GLchar *name) const { return glGetUniformLocation(m_progId, name); }
 
 private:
-  void LoadShader(const std::string &filename, GLenum type, GLuint &shaderId);
-  void CompileShaders();
-  void PrintShaderErrorLog(GLuint id) const;
-  void PrintProgramErrorLog(GLuint id) const;
+  ERROR load(const std::string &filename, GLenum type, GLuint &shaderId);
+  ERROR compile();
+  void printShaderErrorLog(GLuint id, ERROR errCode) const;
+  void printProgramErrorLog(GLuint id, ERROR errCode) const;
 
   GLuint m_progId;
   GLuint m_vertId;
