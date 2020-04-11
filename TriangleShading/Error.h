@@ -18,7 +18,7 @@ typedef uint32_t ERROR;
 #define ERROR_SHADER_PROGRAM_INVALID            7
 #define ERROR_SHADER_PROGRAM_LINKING_FAILED     8
 
-static void printErrorMsg(ERROR errCode, int nArgs = 0, ...) {
+static void printErrorMsg(ERROR errCode, ...) {
  
   std::string errHeader = "Error " + std::to_string(errCode) + " - ";
   std::string errBody;
@@ -57,7 +57,7 @@ static void printErrorMsg(ERROR errCode, int nArgs = 0, ...) {
 
   // Add all variadic arguments to be printed
   va_list args;
-  va_start(args, nArgs);
+  va_start(args, errCode);
   vprintf(errMsg.c_str(), args);
   va_end(args);
 }

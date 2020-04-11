@@ -13,8 +13,12 @@ Shader::Shader(const std::string &name) : m_progId(0), m_vertId(0), m_fragId(0) 
   ERROR errCode = load(vertPath, GL_VERTEX_SHADER, m_vertId);
   if (errCode == ERROR_OK)
     load(fragPath, GL_FRAGMENT_SHADER, m_fragId);
+  
   if (errCode == ERROR_OK)
     compile();
+
+  if (errCode != ERROR_OK)
+    throw std::runtime_error("An error occurred during shader construction.");
 }
 
 // Destructor
@@ -51,12 +55,12 @@ ERROR Shader::load(const std::string &filename, GLenum type, GLuint &shaderId) {
       shaderId = id;
     } else {
       errCode = ERROR_SHADER_COMPILE_FAILED;
-      printShaderErrorLog(id, errCode);
+      printErrorMsg(errCode, getShaderErrorLog(id));
       glDeleteShader(id);
     }
   } else {
     errCode = ERROR_FILE_OPEN_FAILED;
-    printErrorMsg(errCode, 1, filename.c_str());
+    printErrorMsg(errCode, filename.c_str());
   }
 
   return errCode;
@@ -66,58 +70,57 @@ ERROR Shader::load(const std::string &filename, GLenum type, GLuint &shaderId) {
 ERROR Shader::compile() {
   // Create program
   ERROR errCode = ERROR_OK;
-  GLuint progId = glCreateProgram();
+  m_progId = glCreateProgram();
 
-  if (!progId) {
+  if (!m_progId) {
     errCode = ERROR_SHADER_COMPILE_FAILED;
     printErrorMsg(errCode);
     return errCode;
   }
 
   // Attach all shaders to the program
-  glAttachShader(progId, m_fragId);
-  glAttachShader(progId, m_vertId);
+  glAttachShader(m_progId, m_fragId);
+  glAttachShader(m_progId, m_vertId);
 
   // Link the program
-  glLinkProgram(progId);
+  glLinkProgram(m_progId);
   GLint isLinked, isValid;
-  glGetProgramiv(progId, GL_LINK_STATUS, &isLinked);
+  glGetProgramiv(m_progId, GL_LINK_STATUS, &isLinked);
 
   if (isLinked) {
     // Validate the program
-    glValidateProgram(progId);
-    glGetProgramiv(progId, GL_VALIDATE_STATUS, &isValid);
+    glValidateProgram(m_progId);
+    glGetProgramiv(m_progId, GL_VALIDATE_STATUS, &isValid);
 
-    if (isValid) {
-      m_progId = progId;
-    } else {
+    if (!isValid)
       errCode = ERROR_SHADER_PROGRAM_INVALID;
-      printProgramErrorLog(progId, errCode);
-    }
   } else {
     errCode = ERROR_SHADER_PROGRAM_LINKING_FAILED;
-    printProgramErrorLog(progId, errCode);
   }
+
+  // Report any errors that occurred
+  if (errCode != ERROR_OK)
+    printErrorMsg(errCode, getProgramErrorLog(m_progId));
 
   return errCode;
 }
 
 // Prints the error log of a shader
-void Shader::printShaderErrorLog(GLuint id, ERROR errCode) const {
+std::string Shader::getShaderErrorLog(GLuint id) const {
   GLint errorLength = 0;
   glGetShaderiv(id, GL_INFO_LOG_LENGTH, &errorLength);
   std::vector<GLchar> errorLog(errorLength);
-  glGetShaderInfoLog(id, errorLength, &errorLength, &errorLog[0]);
+  glGetShaderInfoLog(id, errorLength, &errorLength, errorLog.data());
 
-  printErrorMsg(errCode, 2, id, errorLog.data());
+  return errorLog.data();
 }
 
 // Prints the error log of the program
-void Shader::printProgramErrorLog(GLuint id, ERROR errCode) const {
+std::string Shader::getProgramErrorLog(GLuint id) const {
   GLint errorLength = 0;
   glGetShaderiv(id, GL_INFO_LOG_LENGTH, &errorLength);
   std::vector<GLchar> errorLog(errorLength);
-  glGetProgramInfoLog(id, errorLength, &errorLength, &errorLog[0]);
-
-  printErrorMsg(errCode, 2, id, errorLog.data());
+  glGetProgramInfoLog(id, errorLength, &errorLength, errorLog.data());
+  
+  return errorLog.data();
 }

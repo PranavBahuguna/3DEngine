@@ -16,8 +16,8 @@ public:
 private:
   ERROR load(const std::string &filename, GLenum type, GLuint &shaderId);
   ERROR compile();
-  void printShaderErrorLog(GLuint id, ERROR errCode) const;
-  void printProgramErrorLog(GLuint id, ERROR errCode) const;
+  std::string getShaderErrorLog(GLuint id) const;
+  std::string getProgramErrorLog(GLuint id) const;
 
   GLuint m_progId;
   GLuint m_vertId;

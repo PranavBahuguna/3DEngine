@@ -44,7 +44,6 @@ void CreateTriangle() {
 
 // Updates the motion of a triangle
 void UpdateMotion() {
-
   // Handle left to right motion
   triOffset += direction ? triIncrement : -triIncrement;
   if (abs(triOffset) >= triMaxOffset)
@@ -57,60 +56,64 @@ void UpdateMotion() {
 }
 
 // Handle user input
-static void keyCallback(GLFWwindow *window, int key, int scancode, int action, int mods) {
+void keyCallback(GLFWwindow *window, int key, int scancode, int action, int mods) {
   if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
     glfwSetWindowShouldClose(window, GLFW_TRUE);
 }
 
 int main() {
+  try {
+    // Create a fullscreen window
+    Window window("Test window", 800, 600, true);
+    window.setKeyCallback(keyCallback);
 
-  // Create a fullscreen window
-  Window window("Test window", 800, 600, false);
-  window.setKeyCallback(keyCallback);
+    // Create the triangle in the scene
+    CreateTriangle();
 
-  // Create the triangle in the scene
-  CreateTriangle();
+    // Load and compile the triangle shader
+    Shader triangleShader("Triangle");
 
-  // Load and compile the triangle shader
-  Shader triangleShader("Triangle");
+    // Get MVP parameter from shader
+    GLint uMVP = triangleShader.getUL("mvp");
 
-  // Get MVP parameter from shader
-  GLint uMVP = triangleShader.getUL("mvp");
+    // Setup camera projection and view
+    glm::mat4 projection = glm::perspective(45.0f, window.getAspectRatio(), 0.1f, 100.0f);
+    glm::mat4 view = glm::lookAt(glm::vec3(0.0f, 0.0f, -3.0f), glm::vec3(0.0f, 0.0f, 0.0f),
+                                 glm::vec3(0.0f, 1.0f, 0.0f));
 
-  // Setup camera projection and view
-  glm::mat4 projection = glm::perspective(45.0f, window.getAspectRatio(), 0.1f, 100.0f);
-  glm::mat4 view = glm::lookAt(glm::vec3(0.0f, 0.0f, -3.0f), glm::vec3(0.0f, 0.0f, 0.0f),
-                               glm::vec3(0.0f, 1.0f, 0.0f));
+    // Main program loop
+    while (!window.getShouldClose()) {
+      // Handle user input events
+      glfwPollEvents();
 
-  // Main program loop
-  while (!window.getShouldClose()) {
-    // Handle user input events
-    glfwPollEvents();
+      // Clear window
+      glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+      glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    // Clear window
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+      // Update triangle motion
+      UpdateMotion();
 
-    // Update triangle motion
-    UpdateMotion();
+      // Apply transforms to the model
+      glm::mat4 model(1.0f);
+      // model = glm::translate(model, glm::vec3(0.0f, 0.0f, -0.0f));
+      model = glm::rotate(model, glm::radians(triCurAngle), glm::vec3(1.0f, 1.0f, 1.0f));
+      model = glm::scale(model, glm::vec3(triScale));
 
-    // Apply transforms to the model
-    glm::mat4 model(1.0f);
-    // model = glm::translate(model, glm::vec3(0.0f, 0.0f, -0.0f));
-    model = glm::rotate(model, glm::radians(triCurAngle), glm::vec3(1.0f, 1.0f, 1.0f));
-    model = glm::scale(model, glm::vec3(triScale));
+      // Calculate the MVP matrix and apply to shader
+      glm::mat4 mvp = projection * view * model;
+      glUniformMatrix4fv(uMVP, 1, GL_FALSE, glm::value_ptr(mvp));
 
-    // Calculate the MVP matrix and apply to shader
-    glm::mat4 mvp = projection * view * model;
-    glUniformMatrix4fv(uMVP, 1, GL_FALSE, glm::value_ptr(mvp));
+      // Draw all meshes
+      for (const auto &mesh : meshList)
+        mesh->Render();
 
-    // Draw all meshes
-    for (const auto &mesh : meshList)
-      mesh->Render();
+      triangleShader.use();
 
-    triangleShader.use();
-
-    window.swapBuffers();
+      window.swapBuffers();
+    }
+  } catch (std::exception e) {
+    printf(e.what());
+    return EXIT_FAILURE;
   }
 
   return EXIT_SUCCESS;

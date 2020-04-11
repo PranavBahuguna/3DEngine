@@ -1,5 +1,7 @@
 #include "Window.h"
 
+#include <stdexcept>
+
 // Constructor - defaults to 800 x 600 size window
 Window::Window() : Window("Test Window", 800, 600) {}
 
@@ -9,10 +11,10 @@ Window::Window(const std::string &name, GLint width, GLint height, bool useFulls
       m_mainWindow(nullptr), m_bufferWidth(0), m_bufferHeight(0) {
 
   ERROR errCode = initialize();
+
   if (errCode != ERROR_OK) {
     printErrorMsg(errCode);
-    glfwDestroyWindow(m_mainWindow);
-    glfwTerminate();
+    throw std::runtime_error("An error occurred during shader construction.");
   }
 }
 
@@ -20,11 +22,8 @@ Window::Window(const std::string &name, GLint width, GLint height, bool useFulls
 ERROR Window::initialize() {
 
   // Initialise GLFW
-  if (glfwInit() != GLFW_TRUE) {
-    printf("GLFW initialisation failed");
-    glfwTerminate();
+  if (glfwInit() != GLFW_TRUE)
     return ERROR_GLFW_INIT_FAILED;
-  }
 
   // Setup GFLW window properties
   // OpenGL version
@@ -40,11 +39,8 @@ ERROR Window::initialize() {
   GLFWmonitor *monitor = m_useFullscreen ? glfwGetPrimaryMonitor() : nullptr;
 
   m_mainWindow = glfwCreateWindow(m_width, m_height, "Test Window", monitor, NULL);
-  if (m_mainWindow == nullptr) {
-    printf("GLFW window creation failed!");
-    glfwTerminate();
+  if (m_mainWindow == nullptr)
     return ERROR_GLFW_WINDOW_CREATE_FAILED;
-  }
 
   // Get buffer size information
   glfwGetFramebufferSize(m_mainWindow, &m_bufferWidth, &m_bufferHeight);
@@ -56,17 +52,13 @@ ERROR Window::initialize() {
   glewExperimental = GL_TRUE;
 
   // Initialise GLEW
-  if (glewInit() != GLEW_OK) {
-    printf("GLEW initialisation failed!");
-    glfwDestroyWindow(m_mainWindow);
-    glfwTerminate();
+  if (glewInit() != GLEW_OK)
     return ERROR_GLEW_INIT_FAILED;
-  }
 
   // Setup viewport size
   glViewport(0, 0, m_bufferWidth, m_bufferHeight);
 
-  return 0;
+  return ERROR_OK;
 }
 
 // Destructor - destroy window and terminate
