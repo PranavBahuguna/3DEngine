@@ -54,11 +54,10 @@ static void printErrorMsg(ERROR errCode, int nArgs = 0, ...) {
   }
 
   std::string errMsg = errHeader + errBody + "\n";
-  const char *fmt = errMsg.c_str();
 
   // Add all variadic arguments to be printed
   va_list args;
   va_start(args, nArgs);
-  vfprintf(stderr, fmt, args);
+  vprintf(errMsg.c_str(), args);
   va_end(args);
 }

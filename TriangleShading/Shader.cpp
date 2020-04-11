@@ -109,7 +109,7 @@ void Shader::printShaderErrorLog(GLuint id, ERROR errCode) const {
   std::vector<GLchar> errorLog(errorLength);
   glGetShaderInfoLog(id, errorLength, &errorLength, &errorLog[0]);
 
-  printErrorMsg(errCode, 1, &errorLog[0]);
+  printErrorMsg(errCode, 2, id, errorLog.data());
 }
 
 // Prints the error log of the program
@@ -119,5 +119,5 @@ void Shader::printProgramErrorLog(GLuint id, ERROR errCode) const {
   std::vector<GLchar> errorLog(errorLength);
   glGetProgramInfoLog(id, errorLength, &errorLength, &errorLog[0]);
 
-  printErrorMsg(errCode, 1, &errorLog[0]);
+  printErrorMsg(errCode, 2, id, errorLog.data());
 }
