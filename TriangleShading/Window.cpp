@@ -7,11 +7,10 @@ Window::Window() : Window("Test Window", 800, 600) {}
 
 // Constructor
 Window::Window(const std::string &name, GLint width, GLint height, bool useFullscreen)
-    : m_name(name), m_width(width), m_height(height), m_useFullscreen(useFullscreen),
-      m_mainWindow(nullptr), m_bufferWidth(0), m_bufferHeight(0) {
+    : m_name(name), m_width(width), m_height(height), m_useFullscreen(useFullscreen), m_lastX(0.0f),
+      m_lastY(0.0f) {
 
   ERROR errCode = initialize();
-
   if (errCode != ERROR_OK) {
     printErrorMsg(errCode);
     throw std::runtime_error("An error occurred during shader construction.");
@@ -20,7 +19,6 @@ Window::Window(const std::string &name, GLint width, GLint height, bool useFulls
 
 // Initialises the windows properties
 ERROR Window::initialize() {
-
   // Initialise GLFW
   if (glfwInit() != GLFW_TRUE)
     return ERROR_GLFW_INIT_FAILED;
@@ -58,6 +56,14 @@ ERROR Window::initialize() {
   // Setup viewport size
   glViewport(0, 0, m_bufferWidth, m_bufferHeight);
 
+  // Setup keyboard and mouse handlers
+  glfwSetKeyCallback(m_mainWindow, keyHandler);
+  glfwSetCursorPosCallback(m_mainWindow, mouseHandler);
+  // Remove cursor from screen
+  glfwSetInputMode(m_mainWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
+  glfwSetWindowUserPointer(m_mainWindow, this);
+
   return ERROR_OK;
 }
 
@@ -65,4 +71,41 @@ ERROR Window::initialize() {
 Window::~Window() {
   glfwDestroyWindow(m_mainWindow);
   glfwTerminate();
+}
+
+// Handles key input
+void Window::keyHandler(GLFWwindow *window, int key, int scancode, int action, int mods) {
+
+  Window *thisWindow = static_cast<Window *>(glfwGetWindowUserPointer(window));
+
+  if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
+    glfwSetWindowShouldClose(window, GLFW_TRUE);
+
+  if (key >= 0 && key < 1024) {
+    if (action == GLFW_PRESS)
+      thisWindow->m_keys[key] = true;
+    if (action == GLFW_RELEASE)
+      thisWindow->m_keys[key] = false;
+  }
+}
+
+// Handles mouse input
+void Window::mouseHandler(GLFWwindow *window, double xPos, double yPos) {
+
+  Window *thisWindow = static_cast<Window *>(glfwGetWindowUserPointer(window));
+
+  GLfloat fxPos = static_cast<GLfloat>(xPos);
+  GLfloat fyPos = static_cast<GLfloat>(yPos);
+
+  if (thisWindow->m_mouseFirstMoved) {
+    thisWindow->m_lastX = fxPos;
+    thisWindow->m_lastY = fyPos;
+    thisWindow->m_mouseFirstMoved = false;
+  }
+
+  thisWindow->m_deltaX = fxPos - thisWindow->m_deltaX;
+  thisWindow->m_deltaY = fyPos - thisWindow->m_deltaY;
+
+  thisWindow->m_lastX = fxPos;
+  thisWindow->m_lastY = fyPos;
 }

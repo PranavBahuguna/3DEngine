@@ -18,11 +18,15 @@ public:
   GLfloat getAspectRatio() const { return getBufferWidth() / getBufferHeight(); }
 
   bool getShouldClose() const { return glfwWindowShouldClose(m_mainWindow); }
-  void setKeyCallback(GLFWkeyfun callback) const { glfwSetKeyCallback(m_mainWindow, callback); }
   void swapBuffers() const { glfwSwapBuffers(m_mainWindow); }
+
+  bool* getKeys() { return m_keys; }
 
 private:
   ERROR initialize();
+
+  static void keyHandler(GLFWwindow *window, int key, int scancode, int action, int mods);
+  static void mouseHandler(GLFWwindow *window, double xPos, double yPos);
 
   GLFWwindow *m_mainWindow;
   std::string m_name;
@@ -32,4 +36,12 @@ private:
   GLint m_height;
   GLint m_bufferWidth;
   GLint m_bufferHeight;
+
+  bool m_keys[1024];
+
+  GLfloat m_lastX;
+  GLfloat m_lastY;
+  GLfloat m_deltaX;
+  GLfloat m_deltaY;
+  bool m_mouseFirstMoved;
 };

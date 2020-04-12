@@ -2,7 +2,7 @@
 
 // Constructor
 Mesh::Mesh(std::vector<GLfloat> &vertices, std::vector<unsigned int> &indices)
-    : m_VAO(0), m_VBO(0), m_IBO(0), m_indexCount(indices.size()) {
+    : m_VAO(0), m_VBO(0), m_IBO(0), m_indexCount(static_cast<GLsizei>(indices.size())) {
 
   // Bind vertex array
   glGenVertexArrays(1, &m_VAO);
