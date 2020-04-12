@@ -16,26 +16,36 @@ Camera::~Camera() {}
 
 // Handles key input to the camera
 void Camera::keyControl(bool *keys, GLfloat deltaTime) {
-  // Calculate velocity
-  GLfloat velocity = m_moveSpeed * deltaTime;
 
   if (keys[GLFW_KEY_W])
-    m_position += m_front * velocity;
+    m_position += m_front * m_moveSpeed * deltaTime;
 
   if (keys[GLFW_KEY_S])
-    m_position -= m_front * velocity;
+    m_position -= m_front * m_moveSpeed * deltaTime;
 
   if (keys[GLFW_KEY_D])
-    m_position += m_right * velocity;
+    m_position += m_right * m_moveSpeed * deltaTime;
 
   if (keys[GLFW_KEY_A])
-    m_position -= m_right * velocity;
+    m_position -= m_right * m_moveSpeed * deltaTime;
 
   if (keys[GLFW_KEY_SPACE])
-    m_position += m_up * velocity;
+    m_position += m_up * m_moveSpeed * deltaTime;
 
   if (keys[GLFW_KEY_LEFT_CONTROL])
-    m_position -= m_up * velocity;
+    m_position -= m_up * m_moveSpeed * deltaTime;
+
+  if (keys[GLFW_KEY_RIGHT])
+    m_yaw += m_turnSpeed * deltaTime;
+
+  if (keys[GLFW_KEY_LEFT])
+    m_yaw -= m_turnSpeed * deltaTime;
+
+  if (keys[GLFW_KEY_UP])
+    m_pitch += m_turnSpeed * deltaTime;
+
+  if (keys[GLFW_KEY_DOWN])
+    m_pitch -= m_turnSpeed * deltaTime;
 }
 
 // Handles mouse input to the camera

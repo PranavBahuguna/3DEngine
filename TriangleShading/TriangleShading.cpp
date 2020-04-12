@@ -36,16 +36,13 @@ GLfloat deltaTime = 0.0f;
 GLfloat lastTime = 0.0f;
 
 // Creates a triangle
-Mesh* CreateTriangle() {
-
+Mesh *CreateTriangle() {
   // Initialise vertices and indices
-  GLfloat height = sqrt(3.0f);
-
   std::vector<GLfloat> vertices = {
-      -1.0f, 0.0f,   -1.0f, // front-left
-      0.0f,  height, 0.0f,  // top
-      1.0f,  0.0f,   -1.0f, // front-right
-      0.0f,  0.0f,   1.0f,  // back
+      -1.0f, 0.0f, -1.0f, // front-left
+      0.0f,  1.5f, 0.0f,  // top
+      1.0f,  0.0f, -1.0f, // front-right
+      0.0f,  0.0f, 1.0f,  // back
   };
 
   std::vector<unsigned int> indices = {
