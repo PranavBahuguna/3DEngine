@@ -10,7 +10,7 @@ public:
          GLfloat turnSpeed);
   ~Camera();
 
-  void keyControl(bool *keys);
+  void keyControl(bool *keys, GLfloat deltaTime);
   glm::mat4 calcViewMatrix() { return glm::lookAt(m_position, m_position + m_front, m_up); }
 
 private:

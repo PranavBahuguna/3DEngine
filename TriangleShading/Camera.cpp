@@ -15,25 +15,27 @@ Camera::Camera(glm::vec3 postiion, glm::vec3 up, GLfloat yaw, GLfloat pitch, GLf
 Camera::~Camera() {}
 
 // Handles key input to the camera
-void Camera::keyControl(bool *keys) {
+void Camera::keyControl(bool *keys, GLfloat deltaTime) {
+
+  GLfloat velocity = m_moveSpeed * deltaTime;
 
   if (keys[GLFW_KEY_W])
-    m_position += m_front * m_moveSpeed;
+    m_position += m_front * velocity;
 
   if (keys[GLFW_KEY_S])
-    m_position -= m_front * m_moveSpeed;
+    m_position -= m_front * velocity;
 
   if (keys[GLFW_KEY_D])
-    m_position += m_right * m_moveSpeed;
+    m_position += m_right * velocity;
 
   if (keys[GLFW_KEY_A])
-    m_position -= m_right * m_moveSpeed;
+    m_position -= m_right * velocity;
 
   if (keys[GLFW_KEY_SPACE])
-    m_position += m_up * m_moveSpeed;
+    m_position += m_up * velocity;
 
   if (keys[GLFW_KEY_LEFT_CONTROL])
-    m_position -= m_up * m_moveSpeed;
+    m_position -= m_up * velocity;
 }
 
 // Update the camera's properties

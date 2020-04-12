@@ -17,13 +17,13 @@
 #else
 #define USE_FULLSCREEN true
 #endif
-#define CAMERA_MOVE_SPEED 0.1f
+#define CAMERA_MOVE_SPEED 5.0f
 #define CAMERA_TURN_SPEED 1.0f
 #define FOV 45.0f
 #define NEAR_PLANE 0.1f
 #define FAR_PLANE 100.0f
 
-std::vector<Mesh *> meshList;
+typedef std::vector<Mesh *> MeshList;
 
 glm::vec3 triPos(0.0f, 0.0f, 3.0f);
 glm::vec3 triScale(0.4f);
@@ -32,8 +32,11 @@ float triCurAngle = 0.0f;
 
 glm::vec3 cameraPos(0.0f);
 
-// Creates a triangle and adds it to the mesh list
-void CreateTriangle() {
+GLfloat deltaTime = 0.0f;
+GLfloat lastTime = 0.0f;
+
+// Creates a triangle
+Mesh* CreateTriangle() {
 
   // Initialise vertices and indices
   GLfloat height = sqrt(3.0f);
@@ -52,8 +55,7 @@ void CreateTriangle() {
       0, 1, 2  // front
   };
 
-  // Add to the mesh list
-  meshList.push_back(new Mesh(vertices, indices));
+  return new Mesh(vertices, indices);
 }
 
 // Updates the motion of a triangle
@@ -69,8 +71,9 @@ int main() {
     // Create a fullscreen window
     Window window("Test window", WINDOW_WIDTH, WINDOW_HEIGHT, USE_FULLSCREEN);
 
-    // Create the triangle in the scene
-    CreateTriangle();
+    // Create a triangle in the scene and add to the mesh list
+    MeshList meshList;
+    meshList.push_back(CreateTriangle());
 
     // Load and compile the triangle shader
     Shader triangleShader("Triangle");
@@ -85,9 +88,14 @@ int main() {
 
     // Main program loop
     while (!window.getShouldClose()) {
+      // Get time elapsed since last cycle
+      GLfloat timeNow = static_cast<GLfloat>(glfwGetTime());
+      deltaTime = timeNow - lastTime;
+      lastTime = timeNow;
+
       // Handle user input events
       glfwPollEvents();
-      camera.keyControl(window.getKeys());
+      camera.keyControl(window.getKeys(), deltaTime);
 
       // Clear window
       glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -113,6 +121,7 @@ int main() {
       for (const auto &mesh : meshList)
         mesh->Render();
 
+      // Apply shader
       triangleShader.use();
 
       window.swapBuffers();
