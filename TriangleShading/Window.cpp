@@ -8,7 +8,7 @@ Window::Window() : Window("Test Window", 800, 600) {}
 // Constructor
 Window::Window(const std::string &name, GLint width, GLint height, bool useFullscreen)
     : m_name(name), m_width(width), m_height(height), m_useFullscreen(useFullscreen), m_lastX(0.0f),
-      m_lastY(0.0f) {
+      m_lastY(0.0f), m_mouseFirstMoved(true) {
 
   ERROR errCode = initialize();
   if (errCode != ERROR_OK) {
@@ -73,6 +73,20 @@ Window::~Window() {
   glfwTerminate();
 }
 
+// Obtains and resets change in x-position
+GLfloat Window::getDeltaX() {
+  GLfloat deltaX = m_deltaX;
+  m_deltaX = 0.0f;
+  return deltaX;
+}
+
+// Obtains and resets change in x-position
+GLfloat Window::getDeltaY() {
+  GLfloat deltaY = m_deltaY;
+  m_deltaY = 0.0f;
+  return deltaY;
+}
+
 // Handles key input
 void Window::keyHandler(GLFWwindow *window, int key, int scancode, int action, int mods) {
 
@@ -103,8 +117,8 @@ void Window::mouseHandler(GLFWwindow *window, double xPos, double yPos) {
     thisWindow->m_mouseFirstMoved = false;
   }
 
-  thisWindow->m_deltaX = fxPos - thisWindow->m_deltaX;
-  thisWindow->m_deltaY = fyPos - thisWindow->m_deltaY;
+  thisWindow->m_deltaX = fxPos - thisWindow->m_lastX;
+  thisWindow->m_deltaY = thisWindow->m_lastY - fyPos;
 
   thisWindow->m_lastX = fxPos;
   thisWindow->m_lastY = fyPos;

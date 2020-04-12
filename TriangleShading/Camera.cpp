@@ -8,7 +8,7 @@ Camera::Camera(glm::vec3 postiion, glm::vec3 up, GLfloat yaw, GLfloat pitch, GLf
     : m_position(postiion), m_worldUp(up), m_yaw(yaw), m_pitch(pitch), m_moveSpeed(moveSpeed),
       m_turnSpeed(turnSpeed) {
 
-  update();
+  updateDirection();
 }
 
 // Destructor
@@ -16,7 +16,7 @@ Camera::~Camera() {}
 
 // Handles key input to the camera
 void Camera::keyControl(bool *keys, GLfloat deltaTime) {
-
+  // Calculate velocity
   GLfloat velocity = m_moveSpeed * deltaTime;
 
   if (keys[GLFW_KEY_W])
@@ -38,8 +38,23 @@ void Camera::keyControl(bool *keys, GLfloat deltaTime) {
     m_position -= m_up * velocity;
 }
 
-// Update the camera's properties
-void Camera::update() {
+// Handles mouse input to the camera
+void Camera::mouseControl(GLfloat deltaX, GLfloat deltaY, GLfloat deltaTime) {
+  // Update yaw and pitch
+  m_yaw += deltaX * m_turnSpeed * deltaTime;
+  m_pitch += deltaY * m_turnSpeed * deltaTime;
+
+  // Limit pitch to be under 90 degrees for now
+  if (m_pitch > 89.0f)
+    m_pitch = 89.0f;
+  if (m_pitch < -89.0f)
+    m_pitch = -89.0f;
+
+  updateDirection();
+}
+
+// Update the camera's direction
+void Camera::updateDirection() {
   // Calculate the front vector
   m_front.x = cos(glm::radians(m_yaw)) * cos(glm::radians(m_pitch));
   m_front.y = sin(glm::radians(m_pitch));

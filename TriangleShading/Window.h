@@ -20,6 +20,9 @@ public:
   bool getShouldClose() const { return glfwWindowShouldClose(m_mainWindow); }
   void swapBuffers() const { glfwSwapBuffers(m_mainWindow); }
 
+  GLfloat getDeltaX();
+  GLfloat getDeltaY();
+
   bool* getKeys() { return m_keys; }
 
 private:

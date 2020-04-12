@@ -18,7 +18,7 @@
 #define USE_FULLSCREEN true
 #endif
 #define CAMERA_MOVE_SPEED 5.0f
-#define CAMERA_TURN_SPEED 1.0f
+#define CAMERA_TURN_SPEED 30.0f
 #define FOV 45.0f
 #define NEAR_PLANE 0.1f
 #define FAR_PLANE 100.0f
@@ -96,6 +96,7 @@ int main() {
       // Handle user input events
       glfwPollEvents();
       camera.keyControl(window.getKeys(), deltaTime);
+      camera.mouseControl(window.getDeltaX(), window.getDeltaY(), deltaTime);
 
       // Clear window
       glClearColor(0.0f, 0.0f, 0.0f, 1.0f);

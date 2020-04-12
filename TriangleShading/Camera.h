@@ -11,10 +11,12 @@ public:
   ~Camera();
 
   void keyControl(bool *keys, GLfloat deltaTime);
+  void mouseControl(GLfloat deltaX, GLfloat deltaY, GLfloat deltaTime);
+
   glm::mat4 calcViewMatrix() { return glm::lookAt(m_position, m_position + m_front, m_up); }
 
 private:
-  void update();
+  void updateDirection();
 
   glm::vec3 m_position;
   glm::vec3 m_front;
