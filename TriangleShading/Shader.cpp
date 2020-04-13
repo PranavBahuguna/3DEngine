@@ -18,7 +18,7 @@ Shader::Shader(const std::string &name) : m_progId(0), m_vertId(0), m_fragId(0) 
     compile();
 
   if (errCode != ERROR_OK)
-    throw std::runtime_error("An error occurred during shader construction.");
+    throw std::runtime_error("An error occurred while loading shader.");
 }
 
 // Destructor

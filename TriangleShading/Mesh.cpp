@@ -21,8 +21,11 @@ Mesh::Mesh(std::vector<GLfloat> &vertices, std::vector<unsigned int> &indices)
                GL_STATIC_DRAW);
 
   // Define how to access vertex array data
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(vertices[0]) * m_vertexStride, 0);
   glEnableVertexAttribArray(0);
+  glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(vertices[0]) * m_vertexStride,
+                        (void *)(sizeof(vertices[0]) * 3));
+  glEnableVertexAttribArray(1);
 
   // Unbind vertex array, index buffer and data buffer
   glBindBuffer(GL_ARRAY_BUFFER, 0);

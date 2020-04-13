@@ -8,6 +8,7 @@
 
 typedef uint32_t ERROR;
 
+// clang-format off
 #define ERROR_OK                                0
 #define ERROR_GLFW_INIT_FAILED                  1
 #define ERROR_GLFW_WINDOW_CREATE_FAILED         2
@@ -17,9 +18,11 @@ typedef uint32_t ERROR;
 #define ERROR_SHADER_PROGRAM_CREATE_FAILED      6
 #define ERROR_SHADER_PROGRAM_INVALID            7
 #define ERROR_SHADER_PROGRAM_LINKING_FAILED     8
+#define ERROR_INVALID_BITDEPTH                  9
+// clang-format on
 
 static void printErrorMsg(ERROR errCode, ...) {
- 
+
   std::string errHeader = "Error " + std::to_string(errCode) + " - ";
   std::string errBody;
 
@@ -48,6 +51,9 @@ static void printErrorMsg(ERROR errCode, ...) {
   case ERROR_SHADER_PROGRAM_LINKING_FAILED:
     errBody = "Error in linking program:\n%s";
     break;
+  case ERROR_INVALID_BITDEPTH:
+    errBody = "Error, bitdepth of %d found during texture load is invalid! Bitdepth must be "
+              "between 1 and 4 inclusive.";
   default:
     errBody = "Unknown error";
     break;

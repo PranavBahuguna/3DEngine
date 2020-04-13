@@ -16,4 +16,6 @@ private:
   GLuint m_VBO;
   GLuint m_IBO;
   GLsizei m_indexCount;
+
+  const GLuint m_vertexStride = 5;
 };

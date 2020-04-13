@@ -1,6 +1,7 @@
 #include "Camera.h"
 #include "Mesh.h"
 #include "Shader.h"
+#include "Texture.h"
 #include "Window.h"
 
 #include <vector>
@@ -10,9 +11,10 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+
 #define WINDOW_WIDTH 800
 #define WINDOW_HEIGHT 600
-#ifdef DEBUG
+#ifdef _DEBUG
 #define USE_FULLSCREEN false
 #else
 #define USE_FULLSCREEN true
@@ -37,12 +39,15 @@ GLfloat lastTime = 0.0f;
 
 // Creates a triangle
 Mesh *CreateTriangle() {
+  GLfloat h = (sqrt(6.0f) / 3.0f) * 2.0f;
+
   // Initialise vertices and indices
+  // xyz/uv format
   std::vector<GLfloat> vertices = {
-      -1.0f, 0.0f, -1.0f, // front-left
-      0.0f,  1.5f, 0.0f,  // top
-      1.0f,  0.0f, -1.0f, // front-right
-      0.0f,  0.0f, 1.0f,  // back
+      -1.0f, 0.0f, -1.0f, 0.0f,  0.0f, // front-left
+      0.0f,  h,    0.0f,  0.25f, 0.5f, // top
+      1.0f,  0.0f, -1.0f, 0.5f,  0.0f, // front-right
+      0.0f,  0.0f, 1.0f,  0.75f, 0.5f  // back
   };
 
   std::vector<unsigned int> indices = {
@@ -74,6 +79,7 @@ int main() {
 
     // Load and compile the triangle shader
     Shader triangleShader("Triangle");
+    Texture brickTexture("brick2.png");
 
     // Get MVP parameter from shader
     GLint uMVP = triangleShader.getUL("mvp");
@@ -99,6 +105,10 @@ int main() {
       glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+      // Enable backface culling
+      glEnable(GL_CULL_FACE);
+      glCullFace(GL_BACK);
+
       // Update triangle motion
       UpdateMotion();
 
@@ -116,6 +126,7 @@ int main() {
       glUniformMatrix4fv(uMVP, 1, GL_FALSE, glm::value_ptr(mvp));
 
       // Draw all meshes
+      brickTexture.use();
       for (const auto &mesh : meshList)
         mesh->Render();
 
