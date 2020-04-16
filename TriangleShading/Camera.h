@@ -1,8 +1,8 @@
 #pragma once
 
-#include <GL\glew.h>
-#include <glm\glm.hpp>
-#include <glm\gtc\matrix_transform.hpp>
+#include <GL/glew.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 class Camera {
 public:
@@ -13,7 +13,12 @@ public:
   void keyControl(bool *keys, GLfloat deltaTime);
   void mouseControl(GLfloat deltaX, GLfloat deltaY, GLfloat deltaTime);
 
-  glm::mat4 calcViewMatrix() { return glm::lookAt(m_position, m_position + m_front, m_up); }
+  void setProjection(float fov, float aspectRatio, float near, float far) {
+    m_projection = glm::perspective(fov, aspectRatio, near, far);
+  }
+
+  glm::mat4 getView() const { return glm::lookAt(m_position, m_position + m_front, m_up); }
+  glm::mat4 getProjection() const { return m_projection; }
 
 private:
   void updateDirection();
@@ -23,6 +28,8 @@ private:
   glm::vec3 m_up;
   glm::vec3 m_right;
   glm::vec3 m_worldUp;
+
+  glm::mat4 m_projection;
 
   GLfloat m_yaw;
   GLfloat m_pitch;

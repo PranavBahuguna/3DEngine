@@ -9,7 +9,7 @@ public:
   Mesh(std::vector<GLfloat> &vertices, std::vector<unsigned int> &indices);
   ~Mesh();
 
-  void Render() const;
+  void draw() const;
 
 private:
   GLuint m_VAO;

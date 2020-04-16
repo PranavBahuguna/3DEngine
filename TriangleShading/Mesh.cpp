@@ -35,7 +35,6 @@ Mesh::Mesh(std::vector<GLfloat> &vertices, std::vector<unsigned int> &indices)
 
 // Destructor
 Mesh::~Mesh() {
-
   // Delete all buffers and vertex arrays
   if (m_IBO != 0)
     glDeleteBuffers(1, &m_IBO);
@@ -45,9 +44,8 @@ Mesh::~Mesh() {
     glDeleteVertexArrays(1, &m_VAO);
 }
 
-// Renders the mesh onto the screen
-void Mesh::Render() const {
-
+// Draws the mesh onto the screen
+void Mesh::draw() const {
   // Bind vertex array and index buffer
   glBindVertexArray(m_VAO);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_IBO);

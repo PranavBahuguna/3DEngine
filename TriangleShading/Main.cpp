@@ -1,16 +1,15 @@
 #include "Camera.h"
-#include "Mesh.h"
-#include "Shader.h"
-#include "Texture.h"
+#include "Tetrahedron.h"
 #include "Window.h"
 
+#include <stdexcept>
+#include <string>
 #include <vector>
 
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
-
 
 #define WINDOW_WIDTH 800
 #define WINDOW_HEIGHT 600
@@ -20,74 +19,37 @@
 #define USE_FULLSCREEN true
 #endif
 #define CAMERA_MOVE_SPEED 5.0f
-#define CAMERA_TURN_SPEED 30.0f
+#define CAMERA_TURN_SPEED 50.0f
 #define FOV 45.0f
 #define NEAR_PLANE 0.1f
 #define FAR_PLANE 100.0f
 
-typedef std::vector<Mesh *> MeshList;
-
-glm::vec3 triPos(0.0f, 0.0f, 3.0f);
-glm::vec3 triScale(0.4f);
-glm::vec3 triRotation(1.0f);
-float triCurAngle = 0.0f;
-
-glm::vec3 cameraPos(0.0f);
+typedef std::vector<Object *> ObjList;
 
 GLfloat deltaTime = 0.0f;
 GLfloat lastTime = 0.0f;
-
-// Creates a triangle
-Mesh *CreateTriangle() {
-  GLfloat h = (sqrt(6.0f) / 3.0f) * 2.0f;
-
-  // Initialise vertices and indices
-  // xyz/uv format
-  std::vector<GLfloat> vertices = {
-      -1.0f, 0.0f, -1.0f, 0.0f,  0.0f, // front-left
-      0.0f,  h,    0.0f,  0.25f, 0.5f, // top
-      1.0f,  0.0f, -1.0f, 0.5f,  0.0f, // front-right
-      0.0f,  0.0f, 1.0f,  0.75f, 0.5f  // back
-  };
-
-  std::vector<unsigned int> indices = {
-      0, 3, 1, // back-left
-      1, 3, 2, // back-right
-      2, 3, 0, // bottom
-      0, 1, 2  // front
-  };
-
-  return new Mesh(vertices, indices);
-}
-
-// Updates the motion of a triangle
-void UpdateMotion() {
-  // Handle rotation
-  triCurAngle += 0.1f;
-  if (triCurAngle >= 360.0f)
-    triCurAngle -= 360.0f;
-}
 
 int main() {
   try {
     // Create a fullscreen window
     Window window("Test window", WINDOW_WIDTH, WINDOW_HEIGHT, USE_FULLSCREEN);
 
-    // Create a triangle in the scene and add to the mesh list
-    MeshList meshList;
-    meshList.push_back(CreateTriangle());
+    // Create a tetrahedron in the scene and add to the object list
+    ObjList objList;
+    Tetrahedron *t1 = new Tetrahedron;
+    t1->setPosition(glm::vec3(0.0f, 0.0f, 3.0f));
+    t1->setRotation(0.0f, glm::vec3(1.0f));
+    t1->setScale(glm::vec3(0.4f));
+    objList.push_back(t1);
 
-    // Load and compile the triangle shader
-    Shader triangleShader("Triangle");
-    Texture brickTexture("brick2.png");
-
-    // Get MVP parameter from shader
-    GLint uMVP = triangleShader.getUL("mvp");
-
-    // Setup camera projection
-    Camera camera(cameraPos, glm::vec3(0.0f, 1.0f, 0.0f), 90.0f, 0.0f, CAMERA_MOVE_SPEED,
+    // Setup camera
+    Camera camera(glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f), 90.0f, 0.0f, CAMERA_MOVE_SPEED,
                   CAMERA_TURN_SPEED);
-    glm::mat4 projection = glm::perspective(FOV, window.getAspectRatio(), NEAR_PLANE, FAR_PLANE);
+    camera.setProjection(FOV, window.getAspectRatio(), NEAR_PLANE, FAR_PLANE);
+
+    // Enable backface culling
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
 
     // Main program loop
     while (!window.getShouldClose()) {
@@ -105,37 +67,20 @@ int main() {
       glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-      // Enable backface culling
-      glEnable(GL_CULL_FACE);
-      glCullFace(GL_BACK);
-
       // Update triangle motion
-      UpdateMotion();
+      for (auto &obj : objList) {
+        if (obj->update() != ERROR_OK)
+          throw std::runtime_error(
+              "An error occurred while updating object (id = " + std::to_string(obj->_id) + ")");
 
-      // Apply transforms to the model
-      glm::mat4 model(1.0f);
-      model = glm::translate(model, triPos);
-      model = glm::rotate(model, glm::radians(triCurAngle), triRotation);
-      model = glm::scale(model, triScale);
-
-      // Get camera view
-      glm::mat4 view = camera.calcViewMatrix();
-
-      // Calculate the MVP matrix and apply to shader
-      glm::mat4 mvp = projection * view * model;
-      glUniformMatrix4fv(uMVP, 1, GL_FALSE, glm::value_ptr(mvp));
-
-      // Draw all meshes
-      brickTexture.use();
-      for (const auto &mesh : meshList)
-        mesh->Render();
-
-      // Apply shader
-      triangleShader.use();
+        if (obj->draw(camera) != ERROR_OK)
+          throw std::runtime_error(
+              "An error occurred while drawing object (id = " + std::to_string(obj->_id) + ")");
+      }
 
       window.swapBuffers();
     }
-  } catch (std::exception e) {
+  } catch (std::exception &e) {
     printf(e.what());
     return EXIT_FAILURE;
   }
