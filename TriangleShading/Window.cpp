@@ -33,15 +33,19 @@ ERROR Window::initialize() {
   // Allow forwards compatibility
   glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
-  // Get primary monitor if fullscreen is enabled
-  GLFWmonitor *monitor = m_useFullscreen ? glfwGetPrimaryMonitor() : nullptr;
+  // Set window dimensions from screen if fullscreen enabled
+  GLFWmonitor *monitor = nullptr;
+  if (m_useFullscreen) {
+    monitor = glfwGetPrimaryMonitor();
+    const GLFWvidmode *mode = glfwGetVideoMode(monitor);
+    m_width = mode->width;
+    m_height = mode->height;
+  }
 
-  m_mainWindow = glfwCreateWindow(m_width, m_height, "Test Window", monitor, NULL);
+  // Initialiase window with given dimension
+  m_mainWindow = glfwCreateWindow(m_width, m_height, m_name.c_str(), monitor, NULL);
   if (m_mainWindow == nullptr)
     return ERROR_GLFW_WINDOW_CREATE_FAILED;
-
-  // Get buffer size information
-  glfwGetFramebufferSize(m_mainWindow, &m_bufferWidth, &m_bufferHeight);
 
   // Set context for GLEW to use
   glfwMakeContextCurrent(m_mainWindow);
@@ -54,7 +58,7 @@ ERROR Window::initialize() {
     return ERROR_GLEW_INIT_FAILED;
 
   // Setup viewport size
-  glViewport(0, 0, m_bufferWidth, m_bufferHeight);
+  glViewport(0, 0, m_width, m_height);
 
   // Setup keyboard and mouse handlers
   glfwSetKeyCallback(m_mainWindow, keyHandler);

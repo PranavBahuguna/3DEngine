@@ -2,6 +2,7 @@
 
 #include "Camera.h"
 #include "Mesh.h"
+#include "Resources.h"
 #include "Shader.h"
 #include "Texture.h"
 
@@ -16,7 +17,7 @@ public:
   Object();
   virtual ~Object();
 
-  unsigned int _id; 
+  unsigned int _id;
 
   virtual ERROR update() = 0;
 
@@ -38,6 +39,6 @@ protected:
   glm::vec3 m_scale;
 
   Mesh *m_mesh;
-  Texture *m_texture;
-  Shader *m_shader;
+  std::shared_ptr<Texture> m_texture;
+  std::shared_ptr<Shader> m_shader;
 };

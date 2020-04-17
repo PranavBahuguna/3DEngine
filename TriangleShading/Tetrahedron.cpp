@@ -21,8 +21,8 @@ Tetrahedron::Tetrahedron() {
   };
 
   m_mesh = new Mesh(vertices, indices);
-  m_shader = new Shader("Triangle");
-  m_texture = new Texture("brick.png");
+  m_shader = Resources::GetShader("Triangle");
+  m_texture = Resources::GetTexture("brick.png");
 }
 
 Tetrahedron::~Tetrahedron() {}

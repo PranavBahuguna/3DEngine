@@ -3,7 +3,7 @@
 // Constructor
 Object::Object()
     : m_pos(glm::vec3(0.0f)), m_angle(0.0f), m_euler(glm::vec3(0.0f)), m_scale(glm::vec3(1.0f)),
-      m_mesh(nullptr), m_shader(nullptr), m_texture(nullptr) {
+      m_mesh(nullptr) {
 
   static unsigned int id = 0;
   _id = id++;
@@ -13,10 +13,6 @@ Object::Object()
 Object::~Object() {
   if (m_mesh)
     delete m_mesh;
-  if (m_shader)
-    delete m_shader;
-  if (m_texture)
-    delete m_texture;
 }
 
 // Draws the object to the screen

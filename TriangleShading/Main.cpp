@@ -36,15 +36,29 @@ int main() {
 
     // Create a tetrahedron in the scene and add to the object list
     ObjList objList;
+
     Tetrahedron *t1 = new Tetrahedron;
     t1->setPosition(glm::vec3(0.0f, 0.0f, 3.0f));
     t1->setRotation(0.0f, glm::vec3(1.0f));
     t1->setScale(glm::vec3(0.4f));
     objList.push_back(t1);
 
+    Tetrahedron *t2 = new Tetrahedron;
+    t2->setPosition(glm::vec3(-3.0f, 0.0f, 6.0f));
+    t2->setRotation(0.0f, glm::vec3(1.0f));
+    t2->setScale(glm::vec3(0.4f));
+    objList.push_back(t2);
+
+    Tetrahedron *t3 = new Tetrahedron;
+    t3->setPosition(glm::vec3(3.0f, 0.0f, 6.0f));
+    t3->setRotation(0.0f, glm::vec3(1.0f));
+    t3->setScale(glm::vec3(0.4f));
+    objList.push_back(t3);
+
     // Setup camera
     Camera camera(glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f), 90.0f, 0.0f, CAMERA_MOVE_SPEED,
                   CAMERA_TURN_SPEED);
+    printf("AR = %f\n", window.getAspectRatio());
     camera.setProjection(FOV, window.getAspectRatio(), NEAR_PLANE, FAR_PLANE);
 
     // Enable backface culling
