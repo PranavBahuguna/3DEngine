@@ -34,6 +34,13 @@ int main() {
     // Create a fullscreen window
     Window window("Test window", WINDOW_WIDTH, WINDOW_HEIGHT, USE_FULLSCREEN);
 
+    // Allow objects to obscure other objects behind them
+    glEnable(GL_DEPTH_TEST);
+
+    // Enable backface culling
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
+
     // Create a tetrahedron in the scene and add to the object list
     ObjList objList;
 
@@ -58,12 +65,7 @@ int main() {
     // Setup camera
     Camera camera(glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f), 90.0f, 0.0f, CAMERA_MOVE_SPEED,
                   CAMERA_TURN_SPEED);
-    printf("AR = %f\n", window.getAspectRatio());
     camera.setProjection(FOV, window.getAspectRatio(), NEAR_PLANE, FAR_PLANE);
-
-    // Enable backface culling
-    glEnable(GL_CULL_FACE);
-    glCullFace(GL_BACK);
 
     // Main program loop
     while (!window.getShouldClose()) {
@@ -82,14 +84,9 @@ int main() {
       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
       // Update triangle motion
-      for (auto &obj : objList) {
-        if (obj->update() != ERROR_OK)
-          throw std::runtime_error(
-              "An error occurred while updating object (id = " + std::to_string(obj->_id) + ")");
-
-        if (obj->draw(camera) != ERROR_OK)
-          throw std::runtime_error(
-              "An error occurred while drawing object (id = " + std::to_string(obj->_id) + ")");
+      for (const auto &obj : objList) {
+        obj->update();
+        obj->draw(camera);
       }
 
       window.swapBuffers();
