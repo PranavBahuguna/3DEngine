@@ -19,16 +19,16 @@ Texture::Texture(const std::string &filename)
 // Destructor - clear texture bound to id
 Texture::~Texture() { glDeleteTextures(1, &m_textureID); }
 
-// Loads texture from given flie path
-ERROR Texture::load(const std::string &name) {
+// Loads texture from given file path
+ERROR Texture::load(const std::string &filepath) {
 
   ERROR errCode = ERROR_OK;
 
   // Try loading the texture from path
-  unsigned char *texData = stbi_load(name.c_str(), &m_width, &m_height, &m_bitDepth, 0);
+  unsigned char *texData = stbi_load(filepath.c_str(), &m_width, &m_height, &m_bitDepth, 0);
   if (!texData) {
     errCode = ERROR_FILE_OPEN_FAILED;
-    printErrorMsg(errCode);
+    printErrorMsg(errCode, filepath);
   }
 
   // Set the texture format

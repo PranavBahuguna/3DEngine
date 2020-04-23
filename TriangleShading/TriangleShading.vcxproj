@@ -166,10 +166,19 @@
     <ClInclude Include="stb_image.h" />
     <ClInclude Include="Tetrahedron.h" />
     <ClInclude Include="Texture.h" />
+    <ClInclude Include="tiny_obj_loader.h" />
     <ClInclude Include="Window.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Textures\brick.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Object Include="Meshes\Tetrahedron.obj">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </Object>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

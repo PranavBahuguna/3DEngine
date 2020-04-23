@@ -11,11 +11,10 @@ public:
   Texture(const std::string &filename);
   ~Texture();
 
-  ERROR load(const std::string &path);
-
   void use() const;
 
 private:
+  ERROR load(const std::string &filepath);
   ERROR setFormat(int channels);
 
   GLuint m_textureID;
