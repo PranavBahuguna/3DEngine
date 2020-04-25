@@ -1,5 +1,17 @@
 #include "Resources.h"
 
+std::shared_ptr<Mesh> Resources::GetMesh(const std::string &name) {
+  static std::unordered_map<std::string, std::weak_ptr<Mesh>> map;
+  std::weak_ptr<Mesh> &mesh = map[name];
+  if (mesh.expired()) {
+    std::shared_ptr<Mesh> newMesh(new Mesh(name));
+    mesh = newMesh;
+    return newMesh;
+  } else {
+    return mesh.lock();
+  }
+}
+
 std::shared_ptr<Shader> Resources::GetShader(const std::string& name) {
   static std::unordered_map<std::string, std::weak_ptr<Shader>> map;
   std::weak_ptr<Shader> &shader = map[name];

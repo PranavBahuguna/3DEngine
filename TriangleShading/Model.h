@@ -12,33 +12,32 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-class Object {
+class Model {
 public:
-  Object();
-  virtual ~Object();
+  Model();
+  virtual ~Model(){};
 
   unsigned int _id;
 
-  virtual ERROR update() = 0;
+  virtual ERROR update() { return ERROR_OK; };
+  ERROR draw(const Camera &camera);
 
   void setPosition(const glm::vec3 &pos) { m_pos = pos; }
-  void setRotation(float angle, const glm::vec3 &euler) {
-    m_angle = angle;
+  void setRotation(const glm::vec3 &euler, float angle) {
     m_euler = euler;
+    m_angle = angle;
   }
   void setScale(const glm::vec3 &scale) { m_scale = scale; }
 
-  ERROR draw(const Camera &camera);
-
-  glm::mat4 getModel() const;
+  glm::mat4 getMatrix() const;
 
 protected:
   glm::vec3 m_pos;
-  float m_angle;
   glm::vec3 m_euler;
+  float m_angle;
   glm::vec3 m_scale;
 
-  Mesh *m_mesh;
+  std::shared_ptr<Mesh> m_mesh;
   std::shared_ptr<Texture> m_texture;
   std::shared_ptr<Shader> m_shader;
 };

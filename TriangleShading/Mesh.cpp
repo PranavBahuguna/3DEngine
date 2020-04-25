@@ -8,7 +8,6 @@ Mesh::Mesh(const std::string &name) {
 
   std::vector<GLfloat> verts;
   std::vector<GLfloat> uvs;
-
   const std::string filepath = "Meshes/" + name + ".obj";
 
   if (load(filepath, verts, uvs) != ERROR_OK)

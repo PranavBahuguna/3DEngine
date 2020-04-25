@@ -1,14 +1,14 @@
 #pragma once
 
-#include "Object.h"
+#include "Model.h"
 
 #include <GL/glew.h>
 #include <glm/glm.hpp>
 
-class Tetrahedron : public Object {
+class Tetrahedron : public Model {
 public:
   Tetrahedron();
-  ~Tetrahedron();
+  ~Tetrahedron(){};
 
   ERROR update() override;
 };

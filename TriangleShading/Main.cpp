@@ -24,8 +24,6 @@
 #define NEAR_PLANE 0.1f
 #define FAR_PLANE 100.0f
 
-typedef std::vector<Object *> ObjList;
-
 GLfloat deltaTime = 0.0f;
 GLfloat lastTime = 0.0f;
 
@@ -42,30 +40,32 @@ int main() {
     glCullFace(GL_BACK);
 
     // Create a tetrahedron in the scene and add to the object list
-    ObjList objList;
+    std::vector<Model *> modelList;
 
-    Tetrahedron *t1 = new Tetrahedron;
+    Model *t1 = new Tetrahedron;
     t1->setPosition(glm::vec3(0.0f, 0.0f, 3.0f));
-    t1->setRotation(0.0f, glm::vec3(1.0f));
+    t1->setRotation(glm::vec3(1.0f), 0.0f);
     t1->setScale(glm::vec3(0.4f));
-    objList.push_back(t1);
+    modelList.push_back(t1);
 
-    Tetrahedron *t2 = new Tetrahedron;
+    Model *t2 = new Tetrahedron;
     t2->setPosition(glm::vec3(-3.0f, 0.0f, 6.0f));
-    t2->setRotation(0.0f, glm::vec3(1.0f));
+    t2->setRotation(glm::vec3(1.0f), 0.0f);
     t2->setScale(glm::vec3(0.4f));
-    objList.push_back(t2);
+    modelList.push_back(t2);
 
-    Tetrahedron *t3 = new Tetrahedron;
+    Model *t3 = new Tetrahedron;
     t3->setPosition(glm::vec3(3.0f, 0.0f, 6.0f));
-    t3->setRotation(0.0f, glm::vec3(1.0f));
+    t3->setRotation(glm::vec3(1.0f), 0.0f);
     t3->setScale(glm::vec3(0.4f));
-    objList.push_back(t3);
+    modelList.push_back(t3);
 
     // Setup camera
     Camera camera(glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f), 90.0f, 0.0f, CAMERA_MOVE_SPEED,
                   CAMERA_TURN_SPEED);
     camera.setProjection(FOV, window.getAspectRatio(), NEAR_PLANE, FAR_PLANE);
+
+    ERROR errCode = ERROR_OK;
 
     // Main program loop
     while (!window.getShouldClose()) {
@@ -84,9 +84,13 @@ int main() {
       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
       // Update triangle motion
-      for (const auto &obj : objList) {
-        obj->update();
-        obj->draw(camera);
+      for (const auto &model : modelList) {
+        errCode = model->update();
+        errCode = model->draw(camera);
+
+        if (errCode != ERROR_OK)
+          throw std::runtime_error("An error occurred while processing model " +
+                                   std::to_string(model->_id) + ".");
       }
 
       window.swapBuffers();
