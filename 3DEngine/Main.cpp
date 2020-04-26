@@ -11,8 +11,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#define WINDOW_WIDTH 800
-#define WINDOW_HEIGHT 600
+#define WINDOW_WIDTH 1600
+#define WINDOW_HEIGHT 1200
 #ifdef _DEBUG
 #define USE_FULLSCREEN false
 #else
@@ -85,7 +85,7 @@ int main() {
 
       // Update triangle motion
       for (const auto &model : modelList) {
-        errCode = model->update();
+        //errCode = model->update();
         errCode = model->draw(camera);
 
         if (errCode != ERROR_OK)

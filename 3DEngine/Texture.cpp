@@ -13,7 +13,7 @@ Texture::Texture(const std::string &filename)
   const std::string path = "Textures/" + filename;
 
   if (load(path) != ERROR_OK)
-    throw std::runtime_error("An error occurred while loading texture");
+    throw std::runtime_error("An error occurred while loading texture.");
 }
 
 // Destructor - clear texture bound to id
@@ -39,19 +39,17 @@ ERROR Texture::load(const std::string &filepath) {
     // Bind the texture and set its properties
     glGenTextures(1, &m_textureID);
     glBindTexture(GL_TEXTURE_2D, m_textureID);
-
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
+    glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
+    glGenerateMipmap(GL_TEXTURE_2D);
     glTexImage2D(GL_TEXTURE_2D, 0, m_format, m_width, m_height, 0, m_format, GL_UNSIGNED_BYTE,
                  texData);
-    glGenerateMipmap(GL_TEXTURE_2D);
-
-    glBindTexture(GL_TEXTURE_2D, 0);
-    stbi_image_free(texData);
   }
+
+  stbi_image_free(texData);
 
   return errCode;
 }

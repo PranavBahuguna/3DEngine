@@ -73,6 +73,8 @@ ERROR Mesh::load(const std::string &filepath, std::vector<GLfloat> &vertices,
         // Loop over face vertices
         for (size_t v = 0; v < fv; v++) {
           tinyobj::index_t idx = shape.mesh.indices[idxOffset + v];
+          GLfloat vertIdx = (GLfloat)idx.vertex_index;
+          GLfloat texcoordIdx = (GLfloat)idx.texcoord_index;
 
           vertices.push_back(attrib.vertices[3 * idx.vertex_index + 0]);
           vertices.push_back(attrib.vertices[3 * idx.vertex_index + 1]);
