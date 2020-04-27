@@ -21,15 +21,15 @@ ERROR Model::draw(const Camera &camera) {
   if (errCode != ERROR_OK) {
     printErrorMsg(errCode);
   } else {
-    // Calculate the MVP matrix and draw
-    const glm::mat4 mvp = camera.getProjection() * camera.getView() * getMatrix();
-    m_shader->setMVP(mvp);
-    m_mesh->draw();
-
     // Apply shader (and texture if applicable)
     m_shader->use();
     if (m_texture)
       m_texture->use();
+
+    // Calculate the MVP matrix and draw
+    const glm::mat4 mvp = camera.getProjection() * camera.getView() * getMatrix();
+    m_shader->setMVP(mvp);
+    m_mesh->draw();
   }
 
   return errCode;

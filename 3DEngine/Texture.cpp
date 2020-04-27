@@ -56,7 +56,6 @@ ERROR Texture::load(const std::string &filepath) {
 
 // Sets the texture format based on the number of channels found (bit depth)
 ERROR Texture::setFormat(int channels) {
-
   ERROR errCode = ERROR_OK;
 
   // Number of channels must be between 1 and 4

@@ -1,4 +1,6 @@
 #include "Camera.h"
+#include "Cube.h"
+#include "Sphere.h"
 #include "Tetrahedron.h"
 #include "Window.h"
 
@@ -48,15 +50,15 @@ int main() {
     t1->setScale(glm::vec3(0.4f));
     modelList.push_back(t1);
 
-    Model *t2 = new Tetrahedron;
+    Model *t2 = new Cube;
     t2->setPosition(glm::vec3(-3.0f, 0.0f, 6.0f));
     t2->setRotation(glm::vec3(1.0f), 0.0f);
     t2->setScale(glm::vec3(0.4f));
     modelList.push_back(t2);
 
-    Model *t3 = new Tetrahedron;
+    Model *t3 = new Sphere;
     t3->setPosition(glm::vec3(3.0f, 0.0f, 6.0f));
-    t3->setRotation(glm::vec3(1.0f), 0.0f);
+    t3->setRotation(glm::vec3(0.0f, 1.0f, 0.0f), 0.0f);
     t3->setScale(glm::vec3(0.4f));
     modelList.push_back(t3);
 
@@ -85,7 +87,7 @@ int main() {
 
       // Update triangle motion
       for (const auto &model : modelList) {
-        //errCode = model->update();
+        errCode = model->update();
         errCode = model->draw(camera);
 
         if (errCode != ERROR_OK)
