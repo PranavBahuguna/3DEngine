@@ -63,6 +63,16 @@ void Camera::mouseControl(GLfloat deltaX, GLfloat deltaY, GLfloat deltaTime) {
   updateDirection();
 }
 
+// Set the camera projection
+void Camera::setProjection(float fov, float aspectRatio, float near, float far) {
+  m_projection = glm::perspective(fov, aspectRatio, near, far);
+}
+
+// Get the camera view
+glm::mat4 Camera::getView() const { 
+  return glm::lookAt(m_position, m_position + m_front, m_up); 
+}
+
 // Update the camera's direction
 void Camera::updateDirection() {
   // Calculate the front vector

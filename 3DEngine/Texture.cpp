@@ -21,7 +21,6 @@ Texture::~Texture() { glDeleteTextures(1, &m_textureID); }
 
 // Loads texture from given file path
 ERROR Texture::load(const std::string &filepath) {
-
   ERROR errCode = ERROR_OK;
 
   // Try loading the texture from path
@@ -48,7 +47,6 @@ ERROR Texture::load(const std::string &filepath) {
     glTexImage2D(GL_TEXTURE_2D, 0, m_format, m_width, m_height, 0, m_format, GL_UNSIGNED_BYTE,
                  texData);
   }
-
   stbi_image_free(texData);
 
   return errCode;

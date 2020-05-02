@@ -26,6 +26,7 @@
 #define FOV 45.0f
 #define NEAR_PLANE 0.1f
 #define FAR_PLANE 100.0f
+#define AMBIENT_INTENSITY 1.0f
 
 GLfloat deltaTime = 0.0f;
 GLfloat lastTime = 0.0f;
@@ -69,7 +70,7 @@ int main() {
     camera.setProjection(FOV, window.getAspectRatio(), NEAR_PLANE, FAR_PLANE);
 
     // Setup scene light
-    Light mainLight(glm::vec3(1.0f, 1.0f, 1.0f), 0.8f);
+    Light ambientLight(glm::vec3(1.0f, 1.0f, 1.0f), AMBIENT_INTENSITY);
 
     ERROR errCode = ERROR_OK;
 
@@ -92,7 +93,7 @@ int main() {
       // Update, light and draw each model
       for (const auto &model : modelList) {
         model->update(errCode);
-        model->applyLight(mainLight);
+        model->applyLight(ambientLight);
         model->draw(camera, errCode);
 
         if (errCode != ERROR_OK)

@@ -12,12 +12,9 @@ public:
 
   void keyControl(bool *keys, GLfloat deltaTime);
   void mouseControl(GLfloat deltaX, GLfloat deltaY, GLfloat deltaTime);
+  void setProjection(float fov, float aspectRatio, float near, float far);
 
-  void setProjection(float fov, float aspectRatio, float near, float far) {
-    m_projection = glm::perspective(fov, aspectRatio, near, far);
-  }
-
-  glm::mat4 getView() const { return glm::lookAt(m_position, m_position + m_front, m_up); }
+  glm::mat4 getView() const;
   glm::mat4 getProjection() const { return m_projection; }
 
 private:
