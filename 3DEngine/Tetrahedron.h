@@ -10,5 +10,5 @@ public:
   Tetrahedron();
   ~Tetrahedron(){};
 
-  ERROR update() override;
+  void update(ERROR &errCode) override;
 };

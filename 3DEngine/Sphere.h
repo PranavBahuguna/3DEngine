@@ -10,5 +10,5 @@ public:
   Sphere();
   ~Sphere(){};
 
-  ERROR update() override;
+  void update(ERROR &errCode) override;
 };

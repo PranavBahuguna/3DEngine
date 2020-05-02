@@ -9,10 +9,17 @@ Model::Model()
   _id = id++;
 }
 
+// Applies a light source to the model
+void Model::applyLight(const Light &light) const {
+  light.use(*m_shader);
+}
+
 // Draws the model to the screen
-ERROR Model::draw(const Camera &camera) {
+void Model::draw(const Camera &camera, ERROR &errCode) const {
+  if (errCode != ERROR_OK)
+    return;
+
   // Check that we have a mesh and shader to use
-  ERROR errCode = ERROR_OK;
   if (!m_mesh)
     errCode = ERROR_MISSING_MESH;
   else if (!m_shader)
@@ -20,19 +27,18 @@ ERROR Model::draw(const Camera &camera) {
 
   if (errCode != ERROR_OK) {
     printErrorMsg(errCode);
-  } else {
-    // Apply shader (and texture if applicable)
-    m_shader->use();
-    if (m_texture)
-      m_texture->use();
-
-    // Calculate the MVP matrix and draw
-    const glm::mat4 mvp = camera.getProjection() * camera.getView() * getMatrix();
-    m_shader->setMVP(mvp);
-    m_mesh->draw();
+    return;
   }
 
-  return errCode;
+  // Apply shader (and texture if applicable)
+  m_shader->use();
+  if (m_texture)
+    m_texture->use();
+
+  // Calculate the MVP matrix and draw
+  const glm::mat4 mvp = camera.getProjection() * camera.getView() * getMatrix();
+  m_shader->setMVP(mvp);
+  m_mesh->draw();
 }
 
 // Gets the model matrix

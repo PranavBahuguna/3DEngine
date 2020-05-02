@@ -1,24 +1,26 @@
 #include "Shader.h"
 
+#include <GL\GL.h>
+
 #include <fstream>
 #include <vector>
 
 // Constructor
-Shader::Shader(const std::string &name) : m_progId(0), m_vertId(0), m_fragId(0), m_mvpId(0) {
+Shader::Shader(const std::string &name) : m_progId(0), m_vertId(0), m_fragId(0), m_colorId(0) {
   // Get file paths
   const std::string vertPath = "Shaders/" + name + ".vert";
   const std::string fragPath = "Shaders/" + name + ".frag";
 
   // Load shaders from disk and compiles them
-  ERROR errCode = load(vertPath, GL_VERTEX_SHADER, m_vertId);
-  if (errCode == ERROR_OK)
-    errCode = load(fragPath, GL_FRAGMENT_SHADER, m_fragId);
+  ERROR errCode = ERROR_OK;
+  load(vertPath, GL_VERTEX_SHADER, m_vertId, errCode);
+  load(fragPath, GL_FRAGMENT_SHADER, m_fragId, errCode);
+  compile(errCode);
 
-  if (errCode == ERROR_OK)
-    errCode = compile();
-
-  if (errCode == ERROR_OK)
-    errCode = getMVPParameter();
+  // Bind parameters from shader files
+  bindParameter(m_mvpId, "mvp", errCode);
+  bindParameter(m_colorId, "directionalLight.color", errCode);
+  bindParameter(m_ambientIntensityId, "directionalLight.ambientIntensity", errCode);
 
   if (errCode != ERROR_OK)
     throw std::runtime_error("An error occurred while loading shader.");
@@ -34,9 +36,11 @@ Shader::~Shader() {
 }
 
 // Loads shader from file
-ERROR Shader::load(const std::string &filename, GLenum type, GLuint &shaderId) {
+void Shader::load(const std::string &filename, GLenum type, GLuint &shaderId, ERROR &errCode) {
+  if (errCode != ERROR_OK)
+    return;
+  
   // Open the file
-  ERROR errCode = ERROR_OK;
   std::ifstream file(filename.c_str());
 
   if (file) {
@@ -56,27 +60,25 @@ ERROR Shader::load(const std::string &filename, GLenum type, GLuint &shaderId) {
 
     if (!isCompiled) {
       errCode = ERROR_SHADER_COMPILE_FAILED;
-      printErrorMsg(errCode, getShaderErrorLog(shaderId));
+      printErrorMsg(errCode, shaderId, getShaderErrorLog(shaderId));
       glDeleteShader(shaderId);
     }
   } else {
     errCode = ERROR_FILE_OPEN_FAILED;
     printErrorMsg(errCode, filename.c_str());
   }
-
-  return errCode;
 }
 
 // Compiles all loaded shaders into the program
-ERROR Shader::compile() {
-  // Create program
-  ERROR errCode = ERROR_OK;
-  m_progId = glCreateProgram();
+void Shader::compile(ERROR &errCode) {
+  if (errCode != ERROR_OK)
+    return;
 
+  m_progId = glCreateProgram();
   if (!m_progId) {
-    errCode = ERROR_SHADER_COMPILE_FAILED;
-    printErrorMsg(errCode);
-    return errCode;
+    errCode = ERROR_SHADER_PROGRAM_CREATE_FAILED;
+    printErrorMsg(errCode, m_progId);
+    return;
   }
 
   // Attach all shaders to the program
@@ -102,40 +104,54 @@ ERROR Shader::compile() {
   // Report any errors that occurred
   if (errCode != ERROR_OK)
     printErrorMsg(errCode, getProgramErrorLog(m_progId));
-
-  return errCode;
 }
 
-// Retrieves the id of the mvp parameter from shader
-ERROR Shader::getMVPParameter() {
+// Use this shader
+void Shader::use() const { glUseProgram(m_progId); }
 
-  ERROR errCode = ERROR_OK;
-  m_mvpId = glGetUniformLocation(m_progId, "mvp");
+// Assigns a value to the shader's mvp parameter
+void Shader::setMVP(const glm::mat4 &mvp) const {
+  glUniformMatrix4fv(m_mvpId, 1, GL_FALSE, glm::value_ptr(mvp));
+}
 
-  if (m_mvpId == GL_INVALID_VALUE) {
-    errCode = ERROR_SHADER_MISSING_MVP_PARAMETER;
-    printErrorMsg(errCode);
+// Binds a parameter to a shader variable
+void Shader::bindParameter(GLuint &id, const std::string &param, ERROR &errCode) {
+  if (errCode != ERROR_OK)
+    return;
+
+  id = glGetUniformLocation(m_progId, param.c_str());
+  if (id == GL_INVALID_VALUE) {
+    errCode = ERROR_SHADER_MISSING_PARAMETER;
+    printErrorMsg(errCode, param);
   }
-
-  return errCode;
 }
 
 // Prints the error log of a shader
-std::string Shader::getShaderErrorLog(GLuint id) const {
+char* Shader::getShaderErrorLog(GLuint id) const {
   GLint errorLength = 0;
   glGetShaderiv(id, GL_INFO_LOG_LENGTH, &errorLength);
   std::vector<GLchar> errorLog(errorLength);
   glGetShaderInfoLog(id, errorLength, &errorLength, errorLog.data());
+  
+  // Copy errLog to output
+  size_t len = errorLog.size() + 1;
+  char *outStr = new char[len];
+  strcpy_s(outStr, len, errorLog.data());
 
-  return errorLog.data();
+  return outStr;
 }
 
 // Prints the error log of the program
-std::string Shader::getProgramErrorLog(GLuint id) const {
+char* Shader::getProgramErrorLog(GLuint id) const {
   GLint errorLength = 0;
   glGetShaderiv(id, GL_INFO_LOG_LENGTH, &errorLength);
   std::vector<GLchar> errorLog(errorLength);
   glGetProgramInfoLog(id, errorLength, &errorLength, errorLog.data());
 
-  return errorLog.data();
+  // Copy errLog to output
+  size_t len = errorLog.size() + 1;
+  char *outStr = new char[len];
+  strcpy_s(outStr, len, errorLog.data());
+
+  return outStr;
 }

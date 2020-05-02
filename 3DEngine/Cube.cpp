@@ -7,11 +7,9 @@ Cube::Cube() {
   m_texture = Resources::GetTexture("brick.png");
 }
 
-// Makes the sphere spin on the current axes
-ERROR Cube::update() {
+// Makes the model spin on the current axes
+void Cube::update(ERROR &errCode) {
   m_angle += 0.1f;
   if (m_angle >= 360.0f)
     m_angle -= 360.0f;
-
-  return ERROR_OK;
 }

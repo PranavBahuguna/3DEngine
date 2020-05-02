@@ -7,11 +7,9 @@ Tetrahedron::Tetrahedron() {
   m_texture = Resources::GetTexture("brick.png");
 }
 
-// Makes the tetrahedron spin on the current axes
-ERROR Tetrahedron::update() {
+// Makes the model spin on the current axes
+void Tetrahedron::update(ERROR &errCode) {
   m_angle += 0.1f;
   if (m_angle >= 360.0f)
     m_angle -= 360.0f;
-
-  return ERROR_OK;
 }

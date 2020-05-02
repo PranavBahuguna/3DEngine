@@ -1,5 +1,6 @@
 #include "Camera.h"
 #include "Cube.h"
+#include "Light.h"
 #include "Sphere.h"
 #include "Tetrahedron.h"
 #include "Window.h"
@@ -67,6 +68,9 @@ int main() {
                   CAMERA_TURN_SPEED);
     camera.setProjection(FOV, window.getAspectRatio(), NEAR_PLANE, FAR_PLANE);
 
+    // Setup scene light
+    Light mainLight(glm::vec3(1.0f, 1.0f, 1.0f), 0.8f);
+
     ERROR errCode = ERROR_OK;
 
     // Main program loop
@@ -85,10 +89,11 @@ int main() {
       glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-      // Update triangle motion
+      // Update, light and draw each model
       for (const auto &model : modelList) {
-        errCode = model->update();
-        errCode = model->draw(camera);
+        model->update(errCode);
+        model->applyLight(mainLight);
+        model->draw(camera, errCode);
 
         if (errCode != ERROR_OK)
           throw std::runtime_error("An error occurred while processing model " +

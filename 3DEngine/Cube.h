@@ -10,5 +10,5 @@ public:
   Cube();
   ~Cube(){};
 
-  ERROR update() override;
+  void update(ERROR &errCode) override;
 };

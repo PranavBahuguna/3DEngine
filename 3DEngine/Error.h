@@ -21,7 +21,7 @@ typedef uint32_t ERROR;
 #define ERROR_INVALID_BITDEPTH                  9
 #define ERROR_MISSING_MESH                      10
 #define ERROR_MISSING_SHADER                    11
-#define ERROR_SHADER_MISSING_MVP_PARAMETER      12
+#define ERROR_SHADER_MISSING_PARAMETER          12
 // clang-format on
 
 static void printErrorMsg(ERROR errCode, ...) {
@@ -46,7 +46,7 @@ static void printErrorMsg(ERROR errCode, ...) {
     errBody = "Unable to compile shader %d!\nSource: %s";
     break;
   case ERROR_SHADER_PROGRAM_CREATE_FAILED:
-    errBody = "Unable to create shader program!";
+    errBody = "Unable to create shader program %d!";
     break;
   case ERROR_SHADER_PROGRAM_INVALID:
     errBody = "Error in validating program:\n%s";
@@ -55,7 +55,7 @@ static void printErrorMsg(ERROR errCode, ...) {
     errBody = "Error in linking program:\n%s";
     break;
   case ERROR_INVALID_BITDEPTH:
-    errBody = "Bitdepth of %d found during texture load is invalid! Bitdepth must be  between 1 "
+    errBody = "Bitdepth of %d found during texture load is invalid! Bitdepth must be between 1 "
               "and 4 inclusive.";
     break;
   case ERROR_MISSING_MESH:
@@ -64,8 +64,8 @@ static void printErrorMsg(ERROR errCode, ...) {
   case ERROR_MISSING_SHADER:
     errBody = "A shader has not been assigned to this object.";
     break;
-  case ERROR_SHADER_MISSING_MVP_PARAMETER:
-    errBody = "Shader program must contain an mvp parameter.";
+  case ERROR_SHADER_MISSING_PARAMETER:
+    errBody = "Could not locate parameter %s in shader program.";
     break;
   default:
     errBody = "Unknown error";

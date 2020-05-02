@@ -7,11 +7,9 @@ Sphere::Sphere() {
   m_texture = Resources::GetTexture("earth.jpg");
 }
 
-// Makes the sphere spin on the current axes
-ERROR Sphere::update() {
+// Makes the model spin on the current axes
+void Sphere::update(ERROR &errCode) {
   m_angle += 0.1f;
   if (m_angle >= 360.0f)
     m_angle -= 360.0f;
-
-  return ERROR_OK;
 }
