@@ -358,3 +358,6 @@ MigrationBackup/
 
 # NonEuclidean
 NonEuclidean/
+
+# Do not ignore wavefront .obj files in Meshes folder
+!3DEngine/Meshes/*.obj

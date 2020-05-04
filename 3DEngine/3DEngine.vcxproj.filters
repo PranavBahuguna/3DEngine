@@ -9,18 +9,6 @@
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
     </Filter>
-    <Filter Include="Resources">
-      <UniqueIdentifier>{ee732bac-6ae0-4211-b0ce-a1b265ff6352}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Resources\Meshes">
-      <UniqueIdentifier>{c48f4ed5-9de2-4d16-a14a-c83ca2bf1e2e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Resources\Shaders">
-      <UniqueIdentifier>{a00e72ee-03f4-4826-89d0-3fbbe205619c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Resources\Textures">
-      <UniqueIdentifier>{d9dfce2a-e54c-4a82-ae4d-281ac2785c26}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\Models">
       <UniqueIdentifier>{c50c353b-a569-44d4-bd45-881d4c0a2233}</UniqueIdentifier>
     </Filter>
@@ -67,14 +55,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Shaders\Triangle.vert">
-      <Filter>Resources\Shaders</Filter>
-    </None>
-    <None Include="Shaders\Triangle.frag">
-      <Filter>Resources\Shaders</Filter>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="Shader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -117,18 +97,5 @@
     <ClInclude Include="Light.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include="Textures\brick.png">
-      <Filter>Resources\Textures</Filter>
-    </Image>
-    <Image Include="Textures\earth.jpg">
-      <Filter>Resources\Textures</Filter>
-    </Image>
-  </ItemGroup>
-  <ItemGroup>
-    <Object Include="Meshes\Tetrahedron.obj">
-      <Filter>Resources\Meshes</Filter>
-    </Object>
   </ItemGroup>
 </Project>
