@@ -18,11 +18,10 @@ Shader::Shader(const std::string &name) : m_progId(0), m_vertId(0), m_fragId(0),
   compile(errCode);
 
   // Bind parameters from shader files
+  bindParameter(m_mvpId, "mvp", errCode);
   bindParameter(m_modelId, "model", errCode);
-  bindParameter(m_viewId, "view", errCode);
-  bindParameter(m_projectionId, "projection", errCode);
   bindParameter(m_colorId, "directionalLight.color", errCode);
-  bindParameter(m_lightDirectionId, "directionalLight.direction", errCode);
+  bindParameter(m_lightPosId, "directionalLight.pos", errCode);
   bindParameter(m_ambientIntensityId, "directionalLight.ambientIntensity", errCode);
   bindParameter(m_diffuseIntensityId, "directionalLight.diffuseIntensity", errCode);
 
@@ -112,19 +111,14 @@ void Shader::compile(ERROR &errCode) {
 // Use this shader
 void Shader::use() const { glUseProgram(m_progId); }
 
+// Sets the shader's mvp parameter
+void Shader::setMVP(const glm::mat4 &mvp) const {
+  glUniformMatrix4fv(m_mvpId, 1, GL_FALSE, glm::value_ptr(mvp));
+}
+
 // Sets the shader's model parameter
 void Shader::setModel(const glm::mat4 &model) const {
   glUniformMatrix4fv(m_modelId, 1, GL_FALSE, glm::value_ptr(model));
-}
-
-// Sets the shader's view parameter
-void Shader::setView(const glm::mat4 &view) const {
-  glUniformMatrix4fv(m_viewId, 1, GL_FALSE, glm::value_ptr(view));
-}
-
-// Sets the shader's projection parameter
-void Shader::setProjection(const glm::mat4 &projection) const {
-  glUniformMatrix4fv(m_projectionId, 1, GL_FALSE, glm::value_ptr(projection));
 }
 
 // Binds a parameter to a shader variable

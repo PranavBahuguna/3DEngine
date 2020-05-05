@@ -9,7 +9,7 @@ out vec4 color;
 
 struct DirectionalLight {
   vec3 color;
-  vec3 direction;
+  vec3 pos;
   float ambientIntensity;
   float diffuseIntensity;
 };
@@ -20,7 +20,7 @@ uniform DirectionalLight directionalLight;
 void main() {
   vec4 ambientColor = vec4(directionalLight.color, 1.0f) * directionalLight.ambientIntensity;
 
-  vec3 lightDir = normalize(directionalLight.direction - FragPos);
+  vec3 lightDir = normalize(directionalLight.pos - FragPos);
   float diffuseFactor = max(dot(normalize(Normal), lightDir), 0.0f);
   vec4 diffuseColor =
       vec4(directionalLight.color, 1.0f) * directionalLight.diffuseIntensity * diffuseFactor;

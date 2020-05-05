@@ -16,7 +16,7 @@ public:
 
 protected:
   glm::vec3 m_color;
-  glm::vec3 m_direction;
+  glm::vec3 m_pos;
 
   GLfloat m_ambientIntensity;
   GLfloat m_diffuseIntensity;
