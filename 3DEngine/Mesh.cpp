@@ -5,12 +5,13 @@
 
 // Constructor
 Mesh::Mesh(const std::string &name) {
-
   std::vector<GLfloat> verts;
   std::vector<GLfloat> uvs;
+  std::vector<GLfloat> normals;
+
   const std::string filepath = "Meshes/" + name + ".obj";
 
-  if (load(filepath, verts, uvs) != ERROR_OK)
+  if (load(filepath, verts, uvs, normals) != ERROR_OK)
     throw std::runtime_error("An error occurred while loading mesh.");
 
   m_numVerts = (GLsizei)verts.size();
@@ -32,6 +33,13 @@ Mesh::Mesh(const std::string &name) {
     glEnableVertexAttribArray(1);
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, 0);
   }
+  {
+    glBindBuffer(GL_ARRAY_BUFFER, m_VBO[2]);
+    glBufferData(GL_ARRAY_BUFFER, normals.size() * sizeof(normals[0]), normals.data(),
+                 GL_STATIC_DRAW);
+    glEnableVertexAttribArray(2);
+    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, 0);
+  }
 }
 
 // Destructor
@@ -42,7 +50,7 @@ Mesh::~Mesh() {
 
 // Loads mesh from given file path
 ERROR Mesh::load(const std::string &filepath, std::vector<GLfloat> &vertices,
-                 std::vector<GLfloat> &uvs) const {
+                 std::vector<GLfloat> &uvs, std::vector<GLfloat> &normals) const {
   ERROR errCode = ERROR_OK;
 
   tinyobj::attrib_t attrib;
@@ -73,15 +81,17 @@ ERROR Mesh::load(const std::string &filepath, std::vector<GLfloat> &vertices,
         // Loop over face vertices
         for (size_t v = 0; v < fv; v++) {
           tinyobj::index_t idx = shape.mesh.indices[idxOffset + v];
-          GLfloat vertIdx = (GLfloat)idx.vertex_index;
-          GLfloat texcoordIdx = (GLfloat)idx.texcoord_index;
 
           vertices.push_back(attrib.vertices[3 * idx.vertex_index + 0]);
           vertices.push_back(attrib.vertices[3 * idx.vertex_index + 1]);
           vertices.push_back(attrib.vertices[3 * idx.vertex_index + 2]);
-          
+
           uvs.push_back(attrib.texcoords[2 * idx.texcoord_index + 0]);
           uvs.push_back(attrib.texcoords[2 * idx.texcoord_index + 1]);
+
+          normals.push_back(attrib.normals[3 * idx.normal_index + 0]);
+          normals.push_back(attrib.normals[3 * idx.normal_index + 1]);
+          normals.push_back(attrib.normals[3 * idx.normal_index + 2]);
         }
         idxOffset += fv;
       }

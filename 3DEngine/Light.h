@@ -8,11 +8,16 @@
 class Light {
 public:
   Light();
-  Light(const glm::vec3 &rgb, GLfloat intensity);
+  Light(const glm::vec3 &rgb, const glm::vec3 &direction, GLfloat ambientIntensity,
+        GLfloat diffuseIntensity);
 
   void use(const Shader &shader) const;
+  void update(ERROR &errCode){};
 
-private:
+protected:
   glm::vec3 m_color;
-  GLfloat m_intensity;
+  glm::vec3 m_direction;
+
+  GLfloat m_ambientIntensity;
+  GLfloat m_diffuseIntensity;
 };

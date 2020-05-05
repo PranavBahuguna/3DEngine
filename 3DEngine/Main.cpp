@@ -26,10 +26,16 @@
 #define FOV 45.0f
 #define NEAR_PLANE 0.1f
 #define FAR_PLANE 100.0f
-#define AMBIENT_INTENSITY 1.0f
+#define AMBIENT_INTENSITY 0.3f
+#define DIFFUSE_INTENSITY 1.0f
+
+ERROR errCode = ERROR_OK;
 
 GLfloat deltaTime = 0.0f;
 GLfloat lastTime = 0.0f;
+
+std::vector<Model *> modelList;
+std::vector<Light *> sceneLights;
 
 int main() {
   try {
@@ -43,36 +49,34 @@ int main() {
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
 
-    // Create a tetrahedron in the scene and add to the object list
-    std::vector<Model *> modelList;
+    // Setup scene objects
+    Model *tetrahedron = new Tetrahedron;
+    tetrahedron->setPosition(glm::vec3(0.0f, 0.0f, 3.0f));
+    tetrahedron->setRotation(glm::vec3(1.0f), 0.0f);
+    tetrahedron->setScale(glm::vec3(0.4f));
+    modelList.push_back(tetrahedron);
 
-    Model *t1 = new Tetrahedron;
-    t1->setPosition(glm::vec3(0.0f, 0.0f, 3.0f));
-    t1->setRotation(glm::vec3(1.0f), 0.0f);
-    t1->setScale(glm::vec3(0.4f));
-    modelList.push_back(t1);
+    Model *cube = new Cube;
+    cube->setPosition(glm::vec3(-3.0f, 0.0f, 6.0f));
+    cube->setRotation(glm::vec3(1.0f), 0.0f);
+    cube->setScale(glm::vec3(0.4f));
+    modelList.push_back(cube);
 
-    Model *t2 = new Cube;
-    t2->setPosition(glm::vec3(-3.0f, 0.0f, 6.0f));
-    t2->setRotation(glm::vec3(1.0f), 0.0f);
-    t2->setScale(glm::vec3(0.4f));
-    modelList.push_back(t2);
+    Model *earth = new Sphere;
+    earth->setPosition(glm::vec3(3.0f, 0.0f, 6.0f));
+    earth->setRotation(glm::vec3(0.0f, 1.0f, 0.0f), 0.0f);
+    earth->setScale(glm::vec3(0.4f));
+    modelList.push_back(earth);
 
-    Model *t3 = new Sphere;
-    t3->setPosition(glm::vec3(3.0f, 0.0f, 6.0f));
-    t3->setRotation(glm::vec3(0.0f, 1.0f, 0.0f), 0.0f);
-    t3->setScale(glm::vec3(0.4f));
-    modelList.push_back(t3);
+    // Setup scene lights
+    Light *light01 = new Light(glm::vec3(1.0f), glm::vec3(5.0f, 5.0f, -5.0f), AMBIENT_INTENSITY,
+                               DIFFUSE_INTENSITY);
+    sceneLights.push_back(light01);
 
     // Setup camera
     Camera camera(glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f), 90.0f, 0.0f, CAMERA_MOVE_SPEED,
                   CAMERA_TURN_SPEED);
     camera.setProjection(FOV, window.getAspectRatio(), NEAR_PLANE, FAR_PLANE);
-
-    // Setup scene light
-    Light ambientLight(glm::vec3(1.0f, 1.0f, 1.0f), AMBIENT_INTENSITY);
-
-    ERROR errCode = ERROR_OK;
 
     // Main program loop
     while (!window.getShouldClose()) {
@@ -93,7 +97,10 @@ int main() {
       // Update, light and draw each model
       for (const auto &model : modelList) {
         model->update(errCode);
-        model->applyLight(ambientLight);
+
+        for (const auto &light : sceneLights)
+          model->applyLight(*light);
+
         model->draw(camera, errCode);
 
         if (errCode != ERROR_OK)

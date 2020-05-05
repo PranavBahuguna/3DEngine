@@ -14,11 +14,11 @@ public:
   void draw() const;
 
 private:
-  static const int NUM_VBO = 2;
+  static const int NUM_VBO = 3;
   static const GLuint VERTEX_STRIDE = 5;
 
-  ERROR load(const std::string &filepath, std::vector<GLfloat> &vertices,
-             std::vector<GLfloat> &uvs) const;
+  ERROR load(const std::string &filepath, std::vector<GLfloat> &vertices, std::vector<GLfloat> &uvs,
+             std::vector<GLfloat> &normals) const;
 
   GLuint m_VAO;
   GLuint m_VBO[NUM_VBO];
