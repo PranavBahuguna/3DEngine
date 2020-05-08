@@ -20,10 +20,13 @@ Shader::Shader(const std::string &name) : m_progId(0), m_vertId(0), m_fragId(0),
   // Bind parameters from shader files
   bindParameter(m_mvpId, "mvp", errCode);
   bindParameter(m_modelId, "model", errCode);
+  bindParameter(m_viewPosId, "viewPos", errCode);
   bindParameter(m_colorId, "directionalLight.color", errCode);
-  bindParameter(m_lightPosId, "directionalLight.pos", errCode);
   bindParameter(m_ambientIntensityId, "directionalLight.ambientIntensity", errCode);
+  bindParameter(m_lightPosId, "directionalLight.pos", errCode);
   bindParameter(m_diffuseIntensityId, "directionalLight.diffuseIntensity", errCode);
+  bindParameter(m_specularIntensityId, "material.specularIntensity", errCode);
+  bindParameter(m_shineId, "material.shine", errCode);
 
   if (errCode != ERROR_OK)
     throw std::runtime_error("An error occurred while loading shader.");
@@ -119,6 +122,11 @@ void Shader::setMVP(const glm::mat4 &mvp) const {
 // Sets the shader's model parameter
 void Shader::setModel(const glm::mat4 &model) const {
   glUniformMatrix4fv(m_modelId, 1, GL_FALSE, glm::value_ptr(model));
+}
+
+// Sets the shader's viewPos parameter
+void Shader::setViewPos(const glm::vec3 &viewPos) const {
+  glUniform3f(m_viewPosId, viewPos.x, viewPos.y, viewPos.z);
 }
 
 // Binds a parameter to a shader variable

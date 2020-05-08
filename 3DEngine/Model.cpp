@@ -33,12 +33,15 @@ void Model::draw(const Camera &camera, ERROR &errCode) const {
   if (m_texture)
     m_texture->use();
 
-  // Set shader parameters and draw
+  // Set shader parameters
   glm::mat4 model = getMatrix();
   m_shader->setModel(glm::transpose(glm::inverse(model)));
-  glm::mat4 mvp = camera.getProjection() * camera.getView() * model; 
+  glm::mat4 mvp = camera.getProjection() * camera.getView() * model;
   m_shader->setMVP(mvp);
+  m_shader->setViewPos(camera.getPosition());
 
+  // Apply mesh material and draw
+  m_mesh->getMaterial().use(*m_shader);
   m_mesh->draw();
 }
 

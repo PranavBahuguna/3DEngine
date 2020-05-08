@@ -9,21 +9,40 @@ out vec4 color;
 
 struct DirectionalLight {
   vec3 color;
-  vec3 pos;
   float ambientIntensity;
+  vec3 pos;
   float diffuseIntensity;
+};
+
+struct Material {
+  float specularIntensity;
+  float shine;
 };
 
 uniform sampler2D thisTexture;
 uniform DirectionalLight directionalLight;
+uniform Material material;
+uniform vec3 viewPos;
 
 void main() {
-  vec4 ambientColor = vec4(directionalLight.color, 1.0f) * directionalLight.ambientIntensity;
+  vec3 ambient = directionalLight.color * directionalLight.ambientIntensity;
 
   vec3 lightDir = normalize(directionalLight.pos - FragPos);
-  float diffuseFactor = max(dot(normalize(Normal), lightDir), 0.0f);
-  vec4 diffuseColor =
-      vec4(directionalLight.color, 1.0f) * directionalLight.diffuseIntensity * diffuseFactor;
+  vec3 norm = normalize(Normal);
+  float diffuseFactor = max(dot(norm, lightDir), 0.0f);
+  vec3 diffuse = directionalLight.color * directionalLight.diffuseIntensity * diffuseFactor;
+      
+  vec3 specular = vec3(0, 0, 0);
+  if (diffuseFactor > 0.0f) {
+    vec3 viewDir = normalize(viewPos - FragPos);
+    vec3 reflectDir = reflect(-lightDir, norm);
 
-  color = texture(thisTexture, TexCoord) * (ambientColor + diffuseColor);
+    float specularFactor = dot(viewDir, reflectDir);
+    if (specularFactor > 0.0f) {
+      specularFactor = pow(specularFactor, material.shine);
+      specular = directionalLight.color * material.specularIntensity * specularFactor;
+    }    
+  }
+
+  color = texture(thisTexture, TexCoord) * vec4(ambient + diffuse + specular, 1.0f);
 }

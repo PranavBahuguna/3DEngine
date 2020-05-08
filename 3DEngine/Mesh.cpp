@@ -1,17 +1,18 @@
 #define TINYOBJLOADER_IMPLEMENTATION
 
 #include "Mesh.h"
-#include "tiny_obj_loader.h"
 
 // Constructor
 Mesh::Mesh(const std::string &name) {
   std::vector<GLfloat> verts;
   std::vector<GLfloat> uvs;
   std::vector<GLfloat> normals;
+  tinyobj::material_t mat;
 
-  const std::string filepath = "Meshes/" + name + ".obj";
+  const std::string meshFile = "Meshes/" + name + ".obj";
+  const std::string matDir = "Materials";
 
-  if (load(filepath, verts, uvs, normals) != ERROR_OK)
+  if (load(meshFile, matDir, verts, uvs, normals, mat) != ERROR_OK)
     throw std::runtime_error("An error occurred while loading mesh.");
 
   m_numVerts = (GLsizei)verts.size();
@@ -40,6 +41,14 @@ Mesh::Mesh(const std::string &name) {
     glEnableVertexAttribArray(2);
     glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, 0);
   }
+
+  // Get specular intensity
+  GLfloat specularSum = 0.0f;
+  for (GLfloat specularComponent : mat.specular)
+    specularSum += specularComponent;
+  GLfloat specularIntensity = specularSum / 3.0f;
+
+  m_material = Material(specularIntensity, mat.shininess);
 }
 
 // Destructor
@@ -48,9 +57,10 @@ Mesh::~Mesh() {
   glDeleteVertexArrays(1, &m_VAO);
 }
 
-// Loads mesh from given file path
-ERROR Mesh::load(const std::string &filepath, std::vector<GLfloat> &vertices,
-                 std::vector<GLfloat> &uvs, std::vector<GLfloat> &normals) const {
+// Loads mesh and material from given file path
+ERROR Mesh::load(const std::string &meshFile, const std::string &matDir,
+                 std::vector<GLfloat> &vertices, std::vector<GLfloat> &uvs,
+                 std::vector<GLfloat> &normals, tinyobj::material_t &mat) const {
   ERROR errCode = ERROR_OK;
 
   tinyobj::attrib_t attrib;
@@ -59,7 +69,8 @@ ERROR Mesh::load(const std::string &filepath, std::vector<GLfloat> &vertices,
   std::string warn;
   std::string err;
 
-  bool ret = tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, filepath.c_str());
+  bool ret =
+      tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, meshFile.c_str(), matDir.c_str());
 
   // Print any warning or error messages we get
   if (!warn.empty())
@@ -69,7 +80,7 @@ ERROR Mesh::load(const std::string &filepath, std::vector<GLfloat> &vertices,
 
   if (!ret) {
     errCode = ERROR_FILE_OPEN_FAILED;
-    printErrorMsg(errCode, filepath);
+    printErrorMsg(errCode, meshFile);
   } else {
     // Loop over shapes
     for (auto &shape : shapes) {
@@ -97,6 +108,8 @@ ERROR Mesh::load(const std::string &filepath, std::vector<GLfloat> &vertices,
       }
     }
   }
+
+  mat = materials.front(); // get first material
 
   return errCode;
 }

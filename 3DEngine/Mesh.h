@@ -1,6 +1,8 @@
 #pragma once
 
 #include "Error.h"
+#include "Material.h"
+#include "tiny_obj_loader.h"
 
 #include <vector>
 
@@ -12,16 +14,19 @@ public:
   ~Mesh();
 
   void draw() const;
+  Material getMaterial() const { return m_material; }
 
 private:
   static const int NUM_VBO = 3;
   static const GLuint VERTEX_STRIDE = 5;
 
-  ERROR load(const std::string &filepath, std::vector<GLfloat> &vertices, std::vector<GLfloat> &uvs,
-             std::vector<GLfloat> &normals) const;
+  ERROR load(const std::string &meshFile, const std::string &matDir, std::vector<GLfloat> &vertices,
+             std::vector<GLfloat> &uvs, std::vector<GLfloat> &normals,
+             tinyobj::material_t &mat) const;
+
+  Material m_material;
 
   GLuint m_VAO;
   GLuint m_VBO[NUM_VBO];
-
   GLsizei m_numVerts;
 };

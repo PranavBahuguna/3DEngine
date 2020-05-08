@@ -6,6 +6,7 @@
 #include "Resources.h"
 #include "Shader.h"
 #include "Texture.h"
+#include "Material.h"
 
 #include <memory>
 

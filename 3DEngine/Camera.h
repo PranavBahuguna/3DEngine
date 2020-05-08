@@ -16,6 +16,7 @@ public:
 
   glm::mat4 getView() const;
   glm::mat4 getProjection() const { return m_projection; }
+  glm::vec3 getPosition() const { return m_position; }
 
 private:
   void updateDirection();
