@@ -26,8 +26,6 @@
 #define FOV 45.0f
 #define NEAR_PLANE 0.1f
 #define FAR_PLANE 100.0f
-#define AMBIENT_INTENSITY 0.3f
-#define DIFFUSE_INTENSITY 1.0f
 
 ERROR errCode = ERROR_OK;
 
@@ -69,8 +67,8 @@ int main() {
     modelList.push_back(earth);
 
     // Setup scene lights
-    Light *light01 = new Light(glm::vec3(1.0f), glm::vec3(5.0f, 5.0f, -5.0f), AMBIENT_INTENSITY,
-                               DIFFUSE_INTENSITY);
+    Light *light01 =
+        new Light(glm::vec3(0.25f), glm::vec3(1.0f), glm::vec3(1.0f), glm::vec3(4.0f, 4.0f, -4.0f));
     sceneLights.push_back(light01);
 
     // Setup camera

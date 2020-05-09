@@ -7,11 +7,14 @@
 class Material {
 public:
   Material();
-  Material(GLfloat sIntensity, GLfloat shine);
+  Material(const glm::vec3 &ambient, const glm::vec3 &diffuse, const glm::vec3 &specular,
+           GLfloat m_shininess);
 
   void use(const Shader &shader) const;
 
 private:
-  GLfloat m_specularIntensity;
-  GLfloat m_shine;
+  glm::vec3 m_ambient;
+  glm::vec3 m_diffuse;
+  glm::vec3 m_specular;
+  GLfloat m_shininess;
 };

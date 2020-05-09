@@ -59,7 +59,7 @@ void Model::setScale(const glm::vec3 &scale) { m_scale = scale; }
 
 // Gets the model matrix
 glm::mat4 Model::getMatrix() const {
-  glm::mat4 matrix = glm::mat4(1.0f);
+  auto matrix = glm::mat4(1.0f);
   matrix = glm::translate(matrix, m_pos);
   matrix = glm::rotate(matrix, glm::radians(m_angle), m_euler);
   matrix = glm::scale(matrix, m_scale);

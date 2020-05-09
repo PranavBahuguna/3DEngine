@@ -8,16 +8,15 @@
 class Light {
 public:
   Light();
-  Light(const glm::vec3 &rgb, const glm::vec3 &direction, GLfloat ambientIntensity,
-        GLfloat diffuseIntensity);
+  Light(const glm::vec3 &ambient, const glm::vec3 &diffuse, const glm::vec3 &specular,
+        const glm::vec3 &position);
 
   void use(const Shader &shader) const;
   void update(ERROR &errCode){};
 
 protected:
-  glm::vec3 m_color;
-  glm::vec3 m_pos;
-
-  GLfloat m_ambientIntensity;
-  GLfloat m_diffuseIntensity;
+  glm::vec3 m_ambient;
+  glm::vec3 m_diffuse;
+  glm::vec3 m_specular;
+  glm::vec3 m_position;
 };

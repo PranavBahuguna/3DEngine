@@ -18,12 +18,8 @@ public:
   void setModel(const glm::mat4 &model) const;
   void setViewPos(const glm::vec3 &viewPos) const;
 
-  GLuint getColorId() const { return m_colorId; }
-  GLuint getAmbientIntensityId() const { return m_ambientIntensityId; }
-  GLuint getLightPosId() const { return m_lightPosId; }
-  GLuint getDiffuseIntensityId() const { return m_diffuseIntensityId; }
-  GLuint getSpecularIntensityId() const { return m_specularIntensityId; }
-  GLuint getShineId() const { return m_shineId; }
+  const GLuint* getLightIds() const { return m_lightId; }
+  const GLuint *getMaterialIds() const { return m_materialId; }
 
 private:
   void load(const std::string &filename, GLenum type, GLuint &shaderId, ERROR &errCOde);
@@ -31,6 +27,9 @@ private:
   void bindParameter(GLuint &id, const std::string &param, ERROR &errCode);
   char *getShaderErrorLog(GLuint id) const;
   char *getProgramErrorLog(GLuint id) const;
+
+  static constexpr int NUM_LIGHT_IDS = 4;
+  static constexpr int NUM_MATERIAL_IDS = 4;
 
   // Program ids
   GLuint m_progId;
@@ -41,10 +40,6 @@ private:
   GLuint m_mvpId;
   GLuint m_modelId;
   GLuint m_viewPosId;
-  GLuint m_colorId;
-  GLuint m_ambientIntensityId;
-  GLuint m_lightPosId;
-  GLuint m_diffuseIntensityId;
-  GLuint m_specularIntensityId;
-  GLuint m_shineId;
+  GLuint m_lightId[NUM_LIGHT_IDS];
+  GLuint m_materialId[NUM_MATERIAL_IDS];
 };

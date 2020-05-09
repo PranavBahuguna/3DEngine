@@ -6,7 +6,7 @@
 #include <vector>
 
 // Constructor
-Shader::Shader(const std::string &name) : m_progId(0), m_vertId(0), m_fragId(0), m_colorId(0) {
+Shader::Shader(const std::string &name) : m_progId(0), m_vertId(0), m_fragId(0) {
   // Get file paths
   const std::string vertPath = "Shaders/" + name + ".vert";
   const std::string fragPath = "Shaders/" + name + ".frag";
@@ -21,12 +21,16 @@ Shader::Shader(const std::string &name) : m_progId(0), m_vertId(0), m_fragId(0),
   bindParameter(m_mvpId, "mvp", errCode);
   bindParameter(m_modelId, "model", errCode);
   bindParameter(m_viewPosId, "viewPos", errCode);
-  bindParameter(m_colorId, "directionalLight.color", errCode);
-  bindParameter(m_ambientIntensityId, "directionalLight.ambientIntensity", errCode);
-  bindParameter(m_lightPosId, "directionalLight.pos", errCode);
-  bindParameter(m_diffuseIntensityId, "directionalLight.diffuseIntensity", errCode);
-  bindParameter(m_specularIntensityId, "material.specularIntensity", errCode);
-  bindParameter(m_shineId, "material.shine", errCode);
+
+  bindParameter(m_lightId[0], "light.ambient", errCode);
+  bindParameter(m_lightId[1], "light.diffuse", errCode);
+  bindParameter(m_lightId[2], "light.specular", errCode);
+  bindParameter(m_lightId[3], "light.position", errCode);
+
+  bindParameter(m_materialId[0], "material.ambient", errCode);
+  bindParameter(m_materialId[1], "material.diffuse", errCode);
+  bindParameter(m_materialId[2], "material.specular", errCode);
+  bindParameter(m_materialId[3], "material.shininess", errCode);
 
   if (errCode != ERROR_OK)
     throw std::runtime_error("An error occurred while loading shader.");
