@@ -35,3 +35,18 @@ std::shared_ptr<Texture> Resources::GetTexture(const std::string& name) {
     return texture.lock();
   }
 }
+
+std::shared_ptr<Material> Resources::GetMaterial(const tinyobj::material_t &mat) {
+  static std::unordered_map<std::string, std::weak_ptr<Material>> map;
+  std::weak_ptr<Material> &material = map[mat.name];
+  if (material.expired()) {
+    auto ambient = glm::vec3(mat.ambient[0], mat.ambient[1], mat.ambient[2]);
+    auto diffuse = glm::vec3(mat.diffuse[0], mat.diffuse[1], mat.diffuse[2]);
+    auto specular = glm::vec3(mat.specular[0], mat.specular[1], mat.specular[2]);
+    std::shared_ptr<Material> newMaterial(new Material(ambient, diffuse, specular, mat.shininess));
+    material = newMaterial;
+    return newMaterial;
+  } else {
+    return material.lock();
+  }
+}

@@ -41,7 +41,7 @@ void Model::draw(const Camera &camera, ERROR &errCode) const {
   m_shader->setViewPos(camera.getPosition());
 
   // Apply mesh material and draw
-  m_mesh->getMaterial().use(*m_shader);
+  m_mesh->getMaterial()->use(*m_shader);
   m_mesh->draw();
 }
 

@@ -5,6 +5,7 @@
 #include "tiny_obj_loader.h"
 
 #include <vector>
+#include <memory>
 
 #include <GL/glew.h>
 
@@ -14,7 +15,7 @@ public:
   ~Mesh();
 
   void draw() const;
-  Material getMaterial() const { return m_material; }
+  std::shared_ptr<Material> getMaterial() const { return m_material; }
 
 private:
   static const int NUM_VBO = 3;
@@ -24,7 +25,7 @@ private:
              std::vector<GLfloat> &uvs, std::vector<GLfloat> &normals,
              tinyobj::material_t &mat) const;
 
-  Material m_material;
+  std::shared_ptr<Material> m_material;
 
   GLuint m_VAO;
   GLuint m_VBO[NUM_VBO];
