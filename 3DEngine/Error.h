@@ -22,6 +22,7 @@ typedef uint32_t ERROR;
 #define ERROR_MISSING_MESH                      10
 #define ERROR_MISSING_SHADER                    11
 #define ERROR_SHADER_MISSING_PARAMETER          12
+#define ERROR_MODEL_LOAD_FAILED                 13
 // clang-format on
 
 static void printErrorMsg(ERROR errCode, ...) {
@@ -66,6 +67,9 @@ static void printErrorMsg(ERROR errCode, ...) {
     break;
   case ERROR_SHADER_MISSING_PARAMETER:
     errBody = "Could not locate parameter %s in shader program.";
+    break;
+  case ERROR_MODEL_LOAD_FAILED:
+    errBody = "Failed to load wavefront file (%s): %s";
     break;
   default:
     errBody = "Unknown error";

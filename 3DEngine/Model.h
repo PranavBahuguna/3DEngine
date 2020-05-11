@@ -21,21 +21,20 @@
 class Model {
 public:
   Model(const std::string &name);
-  virtual ~Model(){};
 
   unsigned int _id;
 
-  void LoadModel(const std::string &filename);
+  ERROR LoadModel(const std::string &filename);
 
-  virtual void update(ERROR &errCode) {}
   void applyLight(const Light &light) const;
   void draw(const Camera &camera, ERROR &errCode) const;
-
   void setPosition(const glm::vec3 &pos);
   void setRotation(const glm::vec3 &euler, float angle);
   void setScale(const glm::vec3 &scale);
 
   glm::mat4 getMatrix() const;
+
+  virtual void update(ERROR &errCode) {}
 
 protected:
   glm::vec3 m_pos;
@@ -43,8 +42,8 @@ protected:
   float m_angle;
   glm::vec3 m_scale;
 
-  void LoadNode(aiNode *node, const aiScene *scene);
-  void LoadMaterials(const aiScene *scene);
+  void LoadNode(const aiNode &node, const aiScene &scene, ERROR &errCode);
+  void LoadMaterials(const aiScene &scene, ERROR &errCode);
 
   std::vector<std::shared_ptr<Mesh>> m_meshes;
   std::vector<std::shared_ptr<Texture>> m_textures;

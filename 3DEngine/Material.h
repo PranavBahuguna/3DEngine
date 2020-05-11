@@ -7,15 +7,13 @@
 
 class Material {
 public:
-  Material(const aiMaterial *mat);
-  Material(const glm::vec3 &ambient, const glm::vec3 &diffuse, const glm::vec3 &specular,
-           GLfloat m_shininess);
+  Material(const aiMaterial &mat);
 
   void use(const Shader &shader) const;
 
 private:
-  glm::vec3 m_ambient;
-  glm::vec3 m_diffuse;
-  glm::vec3 m_specular;
-  GLfloat m_shininess;
+  aiColor3D m_ambient;
+  aiColor3D m_diffuse;
+  aiColor3D m_specular;
+  float m_shininess;
 };

@@ -38,9 +38,10 @@ void Model::draw(const Camera &camera, ERROR &errCode) const {
     m_textures.front()->use();
 
   // Set shader parameters
-  glm::mat4 model = getMatrix();
-  m_shader->setModel(glm::transpose(glm::inverse(model)));
-  glm::mat4 mvp = camera.getProjection() * camera.getView() * model;
+  glm::mat4 modelMatrix = getMatrix();
+  m_shader->setModel(glm::transpose(glm::inverse(modelMatrix)));
+
+  glm::mat4 mvp = camera.getProjection() * camera.getView() * modelMatrix;
   m_shader->setMVP(mvp);
   m_shader->setViewPos(camera.getPosition());
 
@@ -71,57 +72,68 @@ glm::mat4 Model::getMatrix() const {
   return matrix;
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////
-
 // Loads model from the given file path
-void Model::LoadModel(const std::string &filename) {
+ERROR Model::LoadModel(const std::string &filename) {
+  ERROR errCode = ERROR_OK;
+
   // Setup importer and try reading the scene data
   Assimp::Importer importer;
-  const aiScene *scene =
-      importer.ReadFile(filename, aiProcess_Triangulate | aiProcess_FlipUVs |
-                                      aiProcess_GenSmoothNormals | aiProcess_JoinIdenticalVertices);
+  unsigned int flags = aiProcess_Triangulate | aiProcess_GenSmoothNormals |
+                       aiProcess_JoinIdenticalVertices | aiProcess_RemoveRedundantMaterials;
+  const aiScene *scene = importer.ReadFile(filename, flags);
 
-  if (!scene) {
-    printf("ERROR");
-    return;
+  if (scene == nullptr) {
+    errCode = ERROR_MODEL_LOAD_FAILED;
+    printErrorMsg(errCode, filename.c_str(), importer.GetErrorString());
+  } else {
+    LoadNode(*scene->mRootNode, *scene, errCode);
+    LoadMaterials(*scene, errCode);
   }
 
-  LoadNode(scene->mRootNode, scene);
-  LoadMaterials(scene);
+  return errCode;
 }
 
 // Loads all meshes from the current node
-void Model::LoadNode(aiNode *node, const aiScene *scene) {
+void Model::LoadNode(const aiNode &node, const aiScene &scene, ERROR &errCode) {
+  if (errCode != ERROR_OK)
+    return;
+
   // Iterate and load each mesh
-  for (size_t i = 0; i < node->mNumMeshes; i++) {
-    aiMesh *mesh = scene->mMeshes[node->mMeshes[i]];
-    m_meshes.push_back(Resources::GetMesh(mesh));
+  for (size_t i = 0; i < node.mNumMeshes; i++) {
+    aiMesh *mesh = scene.mMeshes[node.mMeshes[i]];
+    m_meshes.push_back(Resources::GetMesh(*mesh));
     m_meshToTex.push_back(mesh->mMaterialIndex);
   }
 
   // Recursively load from all child nodes
-  for (size_t i = 0; i < node->mNumChildren; i++)
-    LoadNode(node->mChildren[i], scene);
+  for (size_t i = 0; i < node.mNumChildren; i++)
+    LoadNode(*node.mChildren[i], scene, errCode);
 }
 
 // Load all materials from the current scene
-void Model::LoadMaterials(const aiScene *scene) {
+void Model::LoadMaterials(const aiScene &scene, ERROR &errCode) {
 
-  for (size_t i = 0; i < scene->mNumMaterials; i++) {
-    aiMaterial *material = scene->mMaterials[i];
+  m_textures.resize(scene.mNumMaterials);
+
+  for (size_t i = 0; i < scene.mNumMaterials; i++) {
+    aiMaterial *material = scene.mMaterials[i];
+    m_textures[i] = nullptr; 
 
     // Load textures associated with the material
     if (material->GetTextureCount(aiTextureType_DIFFUSE)) {
       aiString path;
+
       if (material->GetTexture(aiTextureType_DIFFUSE, 0, &path) == AI_SUCCESS) {
         size_t idx = std::string(path.data).rfind("\\");
         std::string filename = std::string(path.data).substr(idx + 1);
 
-        m_textures.push_back(Resources::GetTexture(filename));
+        m_textures[i] = Resources::GetTexture(filename);
+      } else {
+        m_textures[i] = Resources::GetTexture("Textures/error.jpg");
       }
     }
 
     // Load the material itself
-    m_materials.push_back(Resources::GetMaterial(material));
+    m_materials.push_back(Resources::GetMaterial(*material));
   }
 }
