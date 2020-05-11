@@ -32,12 +32,7 @@ void Model::draw(const Camera &camera, ERROR &errCode) const {
     return;
   }
 
-  // Apply shader (and texture if applicable)
-  m_shader->use();
-  if (!m_textures.empty())
-    m_textures.front()->use();
-
-  // Set shader parameters
+  // Set shader parameters and apply
   glm::mat4 modelMatrix = getMatrix();
   m_shader->setModel(glm::transpose(glm::inverse(modelMatrix)));
 
@@ -45,9 +40,19 @@ void Model::draw(const Camera &camera, ERROR &errCode) const {
   m_shader->setMVP(mvp);
   m_shader->setViewPos(camera.getPosition());
 
-  // Apply mesh material and draw
-  m_materials.front()->use(*m_shader);
-  m_meshes.front()->draw();
+  m_shader->use();
+
+  // Iterate over each stored mesh/texture/material and draw
+  for (size_t i = 0; i < m_meshes.size(); i++) {
+    unsigned int materialIndex = m_meshToTex[i];
+
+    if (materialIndex < m_textures.size() && m_textures[materialIndex] != nullptr)
+      m_textures[materialIndex]->use();
+
+    // Apply mesh material and draw
+    m_materials[i]->use(*m_shader);
+    m_meshes[i]->draw();
+  }
 }
 
 // Set model position
@@ -129,7 +134,7 @@ void Model::LoadMaterials(const aiScene &scene, ERROR &errCode) {
 
         m_textures[i] = Resources::GetTexture(filename);
       } else {
-        m_textures[i] = Resources::GetTexture("Textures/error.jpg");
+        m_textures[i] = Resources::GetTexture("error.jpg");
       }
     }
 

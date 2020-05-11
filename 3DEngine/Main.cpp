@@ -66,6 +66,12 @@ int main() {
     earth->setScale(glm::vec3(0.4f));
     modelList.push_back(earth);
 
+    Model *starfighter = new Model("arc170");
+    starfighter->setPosition(glm::vec3(0.0f, 0.0f, 7.0f));
+    starfighter->setRotation(glm::vec3(1.0f, 0.0f, 0.0f), 180.0f);
+    starfighter->setScale(glm::vec3(0.002f));
+    modelList.push_back(starfighter);
+
     // Setup scene lights
     Light *light01 =
         new Light(glm::vec3(0.25f), glm::vec3(1.0f), glm::vec3(1.0f), glm::vec3(4.0f, 4.0f, -4.0f));
