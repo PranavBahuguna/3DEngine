@@ -14,12 +14,18 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
+
 class Model {
 public:
-  Model();
+  Model(const std::string &name);
   virtual ~Model(){};
 
   unsigned int _id;
+
+  void LoadModel(const std::string &filename);
 
   virtual void update(ERROR &errCode) {}
   void applyLight(const Light &light) const;
@@ -37,7 +43,12 @@ protected:
   float m_angle;
   glm::vec3 m_scale;
 
-  std::shared_ptr<Mesh> m_mesh;
-  std::shared_ptr<Texture> m_texture;
+  void LoadNode(aiNode *node, const aiScene *scene);
+  void LoadMaterials(const aiScene *scene);
+
+  std::vector<std::shared_ptr<Mesh>> m_meshes;
+  std::vector<std::shared_ptr<Texture>> m_textures;
+  std::vector<std::shared_ptr<Material>> m_materials;
+  std::vector<unsigned int> m_meshToTex;
   std::shared_ptr<Shader> m_shader;
 };

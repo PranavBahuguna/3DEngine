@@ -1,7 +1,21 @@
 #include "Material.h"
 
 // Constructor - set default values
-Material::Material() : Material(glm::vec3(0.5f), glm::vec3(0.5f), glm::vec3(0.5f), 32.0f) {}
+Material::Material(const aiMaterial *mat) {
+  aiColor3D ambient;
+  aiColor3D diffuse;
+  aiColor3D specular;
+  float shininess;
+
+  mat->Get(AI_MATKEY_COLOR_AMBIENT, ambient);
+  mat->Get(AI_MATKEY_COLOR_DIFFUSE, diffuse);
+  mat->Get(AI_MATKEY_COLOR_SPECULAR, specular);
+  mat->Get(AI_MATKEY_SHININESS, m_shininess);
+
+  m_ambient = glm::vec3(ambient.r, ambient.g, ambient.b);
+  m_diffuse = glm::vec3(diffuse.r, diffuse.g, diffuse.b);
+  m_specular = glm::vec3(specular.r, specular.g, specular.b);
+}
 
 // Constructor - main
 Material::Material(const glm::vec3 &ambient, const glm::vec3 &diffuse, const glm::vec3 &specular,

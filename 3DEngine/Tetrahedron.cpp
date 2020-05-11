@@ -1,11 +1,7 @@
 #include "Tetrahedron.h"
 
 // Constructor
-Tetrahedron::Tetrahedron() {
-  m_mesh = Resources::GetMesh("Tetrahedron");
-  m_shader = Resources::GetShader("Triangle");
-  m_texture = Resources::GetTexture("brick.png");
-}
+Tetrahedron::Tetrahedron() : Model("Tetrahedron") {}
 
 // Makes the model spin on the current axes
 void Tetrahedron::update(ERROR &errCode) {

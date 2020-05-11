@@ -1,11 +1,7 @@
 #include "Cube.h"
 
 // Constructor
-Cube::Cube() {
-  m_mesh = Resources::GetMesh("Cube");
-  m_shader = Resources::GetShader("Triangle");
-  m_texture = Resources::GetTexture("brick.png");
-}
+Cube::Cube() : Model("Cube") {}
 
 // Makes the model spin on the current axes
 void Cube::update(ERROR &errCode) {

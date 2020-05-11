@@ -8,7 +8,6 @@
 class Tetrahedron : public Model {
 public:
   Tetrahedron();
-  ~Tetrahedron(){};
 
   void update(ERROR &errCode) override;
 };

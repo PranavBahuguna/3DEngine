@@ -3,10 +3,11 @@
 #include "Shader.h"
 
 #include <GL/glew.h>
+#include <assimp/material.h>
 
 class Material {
 public:
-  Material();
+  Material(const aiMaterial *mat);
   Material(const glm::vec3 &ambient, const glm::vec3 &diffuse, const glm::vec3 &specular,
            GLfloat m_shininess);
 

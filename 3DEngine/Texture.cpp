@@ -27,7 +27,7 @@ ERROR Texture::load(const std::string &filepath) {
   unsigned char *texData = stbi_load(filepath.c_str(), &m_width, &m_height, &m_bitDepth, 0);
   if (!texData) {
     errCode = ERROR_FILE_OPEN_FAILED;
-    printErrorMsg(errCode, filepath);
+    printErrorMsg(errCode, filepath.c_str());
   }
 
   // Set the texture format

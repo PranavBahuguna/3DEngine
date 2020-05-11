@@ -8,7 +8,6 @@
 class Cube : public Model {
 public:
   Cube();
-  ~Cube(){};
 
   void update(ERROR &errCode) override;
 };

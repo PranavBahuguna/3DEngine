@@ -1,10 +1,10 @@
 #include "Resources.h"
 
-std::shared_ptr<Mesh> Resources::GetMesh(const std::string &name) {
+std::shared_ptr<Mesh> Resources::GetMesh(const aiMesh *aiMesh) {
   static std::unordered_map<std::string, std::weak_ptr<Mesh>> map;
-  std::weak_ptr<Mesh> &mesh = map[name];
+  std::weak_ptr<Mesh> &mesh = map[std::string(aiMesh->mName.data)];
   if (mesh.expired()) {
-    std::shared_ptr<Mesh> newMesh(new Mesh(name));
+    std::shared_ptr<Mesh> newMesh(new Mesh(aiMesh));
     mesh = newMesh;
     return newMesh;
   } else {
@@ -36,14 +36,13 @@ std::shared_ptr<Texture> Resources::GetTexture(const std::string& name) {
   }
 }
 
-std::shared_ptr<Material> Resources::GetMaterial(const tinyobj::material_t &mat) {
+std::shared_ptr<Material> Resources::GetMaterial(const aiMaterial *mat) {
   static std::unordered_map<std::string, std::weak_ptr<Material>> map;
-  std::weak_ptr<Material> &material = map[mat.name];
+  aiString name;
+  mat->Get(AI_MATKEY_NAME, name);
+  std::weak_ptr<Material> &material = map[std::string(name.data)];
   if (material.expired()) {
-    auto ambient = glm::vec3(mat.ambient[0], mat.ambient[1], mat.ambient[2]);
-    auto diffuse = glm::vec3(mat.diffuse[0], mat.diffuse[1], mat.diffuse[2]);
-    auto specular = glm::vec3(mat.specular[0], mat.specular[1], mat.specular[2]);
-    std::shared_ptr<Material> newMaterial(new Material(ambient, diffuse, specular, mat.shininess));
+    std::shared_ptr<Material> newMaterial(new Material(mat));
     material = newMaterial;
     return newMaterial;
   } else {

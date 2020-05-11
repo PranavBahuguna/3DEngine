@@ -8,7 +8,6 @@
 class Sphere : public Model {
 public:
   Sphere();
-  ~Sphere(){};
 
   void update(ERROR &errCode) override;
 };

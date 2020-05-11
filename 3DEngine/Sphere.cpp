@@ -1,11 +1,7 @@
 #include "Sphere.h"
 
 // Constructor
-Sphere::Sphere() {
-  m_mesh = Resources::GetMesh("Sphere");
-  m_shader = Resources::GetShader("Triangle");
-  m_texture = Resources::GetTexture("earth.jpg");
-}
+Sphere::Sphere() : Model("Sphere") {}
 
 // Makes the model spin on the current axes
 void Sphere::update(ERROR &errCode) {

@@ -1,20 +1,13 @@
-#define TINYOBJLOADER_IMPLEMENTATION
-
 #include "Mesh.h"
 #include "Resources.h"
 
 // Constructor
-Mesh::Mesh(const std::string &name) {
+Mesh::Mesh(const aiMesh *aiMesh) {
   std::vector<GLfloat> verts;
   std::vector<GLfloat> uvs;
   std::vector<GLfloat> normals;
-  tinyobj::material_t mat;
 
-  const std::string meshFile = "Meshes/" + name + ".obj";
-  const std::string matDir = "Materials";
-
-  if (load(meshFile, matDir, verts, uvs, normals, mat) != ERROR_OK)
-    throw std::runtime_error("An error occurred while loading mesh.");
+  generate(aiMesh, verts, uvs, normals);
 
   m_numVerts = (GLsizei)verts.size();
 
@@ -43,7 +36,7 @@ Mesh::Mesh(const std::string &name) {
     glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, 0);
   }
 
-  m_material = Resources::GetMaterial(mat);
+  //m_material = Resources::GetMaterial(mat);
 }
 
 // Destructor
@@ -52,61 +45,29 @@ Mesh::~Mesh() {
   glDeleteVertexArrays(1, &m_VAO);
 }
 
-// Loads mesh and material from given file path
-ERROR Mesh::load(const std::string &meshFile, const std::string &matDir,
-                 std::vector<GLfloat> &vertices, std::vector<GLfloat> &uvs,
-                 std::vector<GLfloat> &normals, tinyobj::material_t &mat) const {
-  ERROR errCode = ERROR_OK;
+// Generate the mesh from the assimp mesh object
+void Mesh::generate(const aiMesh *mesh, std::vector<GLfloat> &verts, std::vector<GLfloat> &uvs,
+                    std::vector<GLfloat> &normals) const {
 
-  tinyobj::attrib_t attrib;
-  std::vector<tinyobj::shape_t> shapes;
-  std::vector<tinyobj::material_t> materials;
-  std::string warn;
-  std::string err;
+  for (size_t i = 0; i < mesh->mNumVertices; i++) {
+    // Vertices
+    verts.push_back(mesh->mVertices[i].x);
+    verts.push_back(mesh->mVertices[i].y);
+    verts.push_back(mesh->mVertices[i].z);
 
-  bool ret =
-      tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, meshFile.c_str(), matDir.c_str());
-
-  // Print any warning or error messages we get
-  if (!warn.empty())
-    printf(warn.c_str());
-  if (!err.empty())
-    printf(err.c_str());
-
-  if (!ret) {
-    errCode = ERROR_FILE_OPEN_FAILED;
-    printErrorMsg(errCode, meshFile);
-  } else {
-    // Loop over shapes
-    for (auto &shape : shapes) {
-      // Loop over faces
-      size_t idxOffset = 0;
-      for (size_t f = 0; f < shape.mesh.num_face_vertices.size(); f++) {
-        int fv = shape.mesh.num_face_vertices[f];
-
-        // Loop over face vertices
-        for (size_t v = 0; v < fv; v++) {
-          tinyobj::index_t idx = shape.mesh.indices[idxOffset + v];
-
-          vertices.push_back(attrib.vertices[3 * idx.vertex_index + 0]);
-          vertices.push_back(attrib.vertices[3 * idx.vertex_index + 1]);
-          vertices.push_back(attrib.vertices[3 * idx.vertex_index + 2]);
-
-          uvs.push_back(attrib.texcoords[2 * idx.texcoord_index + 0]);
-          uvs.push_back(attrib.texcoords[2 * idx.texcoord_index + 1]);
-
-          normals.push_back(attrib.normals[3 * idx.normal_index + 0]);
-          normals.push_back(attrib.normals[3 * idx.normal_index + 1]);
-          normals.push_back(attrib.normals[3 * idx.normal_index + 2]);
-        }
-        idxOffset += fv;
-      }
+    // Texture coordinates
+    if (mesh->mTextureCoords[0]) {
+      uvs.push_back(mesh->mTextureCoords[0][i].x);
+      uvs.push_back(mesh->mTextureCoords[0][i].y);
+    } else {
+      uvs.insert(uvs.end(), {0.0f, 0.0f});
     }
+
+    // Normals
+    normals.push_back(-mesh->mNormals[i].x);
+    normals.push_back(-mesh->mNormals[i].y);
+    normals.push_back(-mesh->mNormals[i].z);
   }
-
-  mat = materials.front(); // get first material
-
-  return errCode;
 }
 
 // Draws the mesh onto the screen
