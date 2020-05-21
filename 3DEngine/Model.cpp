@@ -131,10 +131,12 @@ void Model::LoadMaterials(const aiScene &scene, ERROR &errCode) {
         std::string filename = std::string(path.data).substr(idx + 1);
 
         m_textures[i] = Resources::GetTexture(filename);
-      } else {
-        m_textures[i] = Resources::GetTexture("error.jpg");
       }
     }
+
+    // Load error texture if texture cannot be assigned to
+    if (m_textures[i] == nullptr)
+      m_textures[i] = Resources::GetTexture("error.jpg");
 
     // Load the material itself
     m_materials.push_back(Resources::GetMaterial(*material));
