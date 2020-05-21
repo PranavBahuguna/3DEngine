@@ -14,8 +14,9 @@ public:
   ~Shader();
 
   void use() const;
-  void setMVP(const glm::mat4 &mvp) const;
   void setModel(const glm::mat4 &model) const;
+  void setView(const glm::mat4 &view) const;
+  void setProjection(const glm::mat4 &projection) const;
   void setViewPos(const glm::vec3 &viewPos) const;
 
   const GLuint* getLightIds() const { return m_lightId; }
@@ -37,8 +38,9 @@ private:
   GLuint m_fragId;
 
   // Parameter ids
-  GLuint m_mvpId;
   GLuint m_modelId;
+  GLuint m_viewId;
+  GLuint m_projectionId;
   GLuint m_viewPosId;
   GLuint m_lightId[NUM_LIGHT_IDS];
   GLuint m_materialId[NUM_MATERIAL_IDS];

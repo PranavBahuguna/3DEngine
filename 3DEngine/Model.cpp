@@ -33,11 +33,9 @@ void Model::draw(const Camera &camera, ERROR &errCode) const {
   }
 
   // Set shader parameters and apply
-  glm::mat4 modelMatrix = getMatrix();
-  m_shader->setModel(glm::transpose(glm::inverse(modelMatrix)));
-
-  glm::mat4 mvp = camera.getProjection() * camera.getView() * modelMatrix;
-  m_shader->setMVP(mvp);
+  m_shader->setModel(getMatrix());
+  m_shader->setView(camera.getView());
+  m_shader->setProjection(camera.getProjection());
   m_shader->setViewPos(camera.getPosition());
 
   m_shader->use();

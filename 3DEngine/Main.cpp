@@ -68,7 +68,7 @@ int main() {
 
     Model *starfighter = new Model("arc170");
     starfighter->setPosition(glm::vec3(0.0f, 0.0f, 7.0f));
-    starfighter->setRotation(glm::vec3(1.0f, 0.0f, 0.0f), 180.0f);
+    starfighter->setRotation(glm::vec3(0.0f, 1.0f, 0.0f), 180.0f);
     starfighter->setScale(glm::vec3(0.002f));
     modelList.push_back(starfighter);
 
