@@ -1,5 +1,6 @@
 #include "Camera.h"
 #include "Cube.h"
+#include "Font.h"
 #include "Light.h"
 #include "Sphere.h"
 #include "Tetrahedron.h"
@@ -71,6 +72,9 @@ int main() {
     starfighter->setRotation(glm::vec3(0.0f, 1.0f, 0.0f), 180.0f);
     starfighter->setScale(glm::vec3(0.002f));
     modelList.push_back(starfighter);
+
+    // Test - get font
+    std::shared_ptr<Font> f = Resources::GetFont("Calibri");
 
     // Setup scene lights
     Light *light01 =

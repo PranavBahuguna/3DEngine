@@ -22,6 +22,4 @@ private:
   int m_width;
   int m_height;
   int m_bitDepth;
-
-  std::string m_filename;
 };

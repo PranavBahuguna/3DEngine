@@ -23,6 +23,9 @@ typedef uint32_t ERROR;
 #define ERROR_MISSING_SHADER                    11
 #define ERROR_SHADER_MISSING_PARAMETER          12
 #define ERROR_MODEL_LOAD_FAILED                 13
+#define ERROR_CANNOT_INITIALISE_FREETYPE        14
+#define ERROR_FONT_LOAD_FAILED                  15
+#define ERROR_FONT_GLYPH_LOAD_FAILED            16
 // clang-format on
 
 static void printErrorMsg(ERROR errCode, ...) {
@@ -70,6 +73,15 @@ static void printErrorMsg(ERROR errCode, ...) {
     break;
   case ERROR_MODEL_LOAD_FAILED:
     errBody = "Failed to load wavefront file (%s): %s";
+    break;
+  case ERROR_CANNOT_INITIALISE_FREETYPE:
+    errBody = "Could not initialise the FreeType library: FT error %d - %s";
+    break;
+  case ERROR_FONT_LOAD_FAILED:
+    errBody = "Failed to load font (%s): FT error %d - %s";
+    break;
+  case ERROR_FONT_GLYPH_LOAD_FAILED:
+    errBody = "Failed to load glyph %d from font (%s): FT error %d - %s";
     break;
   default:
     errBody = "Unknown error";

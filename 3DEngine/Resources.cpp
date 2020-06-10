@@ -49,3 +49,15 @@ std::shared_ptr<Material> Resources::GetMaterial(const aiMaterial &mat) {
     return material.lock();
   }
 }
+
+std::shared_ptr<Font> Resources::GetFont(const std::string &name) {
+  static std::unordered_map<std::string, std::weak_ptr<Font>> map;
+  std::weak_ptr<Font> &font = map[name];
+  if (font.expired()) {
+    std::shared_ptr<Font> newFont(new Font(name));
+    font = newFont;
+    return newFont;
+  } else {
+    return font.lock();
+  }
+}

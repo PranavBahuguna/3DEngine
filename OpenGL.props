@@ -5,11 +5,11 @@
   <PropertyGroup />
   <ItemDefinitionGroup>
     <ClCompile>
-      <AdditionalIncludeDirectories>$(GLEW_DIR)/include;$(GLFW_DIR)/include;$(GLM_DIR);$(ASSIMP_DIR)/include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(GLEW_DIR)/include;$(GLFW_DIR)/include;$(GLM_DIR);$(ASSIMP_DIR)/include;$(FREETYPE_DIR)/include/freetype2;</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>$(GLEW_DIR)/lib/Release/x64;$(GLFW_DIR)/lib-vc2019;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>opengl32.lib;glew32.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(GLEW_DIR)/lib/Release/x64;$(GLFW_DIR)/lib-vc2019;$(FREETYPE_DIR)/lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>opengl32.lib;glew32.lib;glfw3.lib;freetype.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup />
