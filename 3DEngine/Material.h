@@ -9,7 +9,7 @@ class Material {
 public:
   Material(const aiMaterial &mat);
 
-  void use(const Shader &shader) const;
+  void use(const Shader &shader, ERROR &errCode) const;
 
 private:
   aiColor3D m_ambient;

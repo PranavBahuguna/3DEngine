@@ -26,7 +26,7 @@ public:
 
   ERROR LoadModel(const std::string &filename);
 
-  void applyLight(const Light &light) const;
+  void applyLight(const Light &light, ERROR &errCode) const;
   void draw(const Camera &camera, ERROR &errCode) const;
   void setPosition(const glm::vec3 &pos);
   void setRotation(const glm::vec3 &euler, float angle);

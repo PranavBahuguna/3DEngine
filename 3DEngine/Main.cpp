@@ -107,7 +107,7 @@ int main() {
         model->update(errCode);
 
         for (const auto &light : sceneLights)
-          model->applyLight(*light);
+          model->applyLight(*light, errCode);
 
         model->draw(camera, errCode);
 

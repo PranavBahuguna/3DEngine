@@ -14,7 +14,7 @@ Model::Model(const std::string &name)
 }
 
 // Applies a light source to the model
-void Model::applyLight(const Light &light) const { light.use(*m_shader); }
+void Model::applyLight(const Light &light, ERROR &errCode) const { light.use(*m_shader, errCode); }
 
 // Draws the model to the screen
 void Model::draw(const Camera &camera, ERROR &errCode) const {
@@ -33,22 +33,30 @@ void Model::draw(const Camera &camera, ERROR &errCode) const {
   }
 
   // Set shader parameters and apply
-  m_shader->setModel(getMatrix());
-  m_shader->setView(camera.getView());
-  m_shader->setProjection(camera.getProjection());
-  m_shader->setViewPos(camera.getPosition());
+  GLuint modelId = m_shader->getParamId("model", errCode);
+  GLuint viewId = m_shader->getParamId("view", errCode);
+  GLuint projId = m_shader->getParamId("projection", errCode);
+  GLuint viewPos = m_shader->getParamId("viewPos", errCode);
+
+  if (errCode != ERROR_OK)
+    return;
+
+  glUniformMatrix4fv(modelId, 1, GL_FALSE, glm::value_ptr(getMatrix()));
+  glUniformMatrix4fv(viewId, 1, GL_FALSE, glm::value_ptr(camera.getView()));
+  glUniformMatrix4fv(projId, 1, GL_FALSE, glm::value_ptr(camera.getProjection()));
+  glUniform3f(viewPos, camera.getPosition().x, camera.getPosition().y, camera.getPosition().z);
 
   m_shader->use();
 
   // Iterate over each stored mesh/texture/material and draw
-  for (size_t i = 0; i < m_meshes.size(); i++) {
+  for (size_t i = 0; i < m_meshes.size() && errCode == ERROR_OK; i++) {
     unsigned int materialIndex = m_meshToTex[i];
 
     if (materialIndex < m_textures.size() && m_textures[materialIndex] != nullptr)
       m_textures[materialIndex]->use();
 
     // Apply mesh material and draw
-    m_materials[i]->use(*m_shader);
+    m_materials[i]->use(*m_shader, errCode);
     m_meshes[i]->draw();
   }
 }
@@ -120,7 +128,7 @@ void Model::LoadMaterials(const aiScene &scene, ERROR &errCode) {
 
   for (size_t i = 0; i < scene.mNumMaterials; i++) {
     aiMaterial *material = scene.mMaterials[i];
-    m_textures[i] = nullptr; 
+    m_textures[i] = nullptr;
 
     // Load textures associated with the material
     if (material->GetTextureCount(aiTextureType_DIFFUSE)) {

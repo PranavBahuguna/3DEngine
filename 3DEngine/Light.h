@@ -11,10 +11,10 @@ public:
   Light(const glm::vec3 &ambient, const glm::vec3 &diffuse, const glm::vec3 &specular,
         const glm::vec3 &position);
 
-  void use(const Shader &shader) const;
+  void use(const Shader &shader, ERROR &errCode) const;
   void update(ERROR &errCode){};
 
-protected:
+private:
   glm::vec3 m_ambient;
   glm::vec3 m_diffuse;
   glm::vec3 m_specular;

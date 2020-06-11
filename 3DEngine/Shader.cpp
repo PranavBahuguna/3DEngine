@@ -16,22 +16,7 @@ Shader::Shader(const std::string &name) : m_progId(0), m_vertId(0), m_fragId(0) 
   load(vertPath, GL_VERTEX_SHADER, m_vertId, errCode);
   load(fragPath, GL_FRAGMENT_SHADER, m_fragId, errCode);
   compile(errCode);
-
-  // Bind parameters from shader files
-  bindParameter(m_modelId, "model", errCode);
-  bindParameter(m_viewId, "view", errCode);
-  bindParameter(m_projectionId, "projection", errCode);
-  bindParameter(m_viewPosId, "viewPos", errCode);
-
-  bindParameter(m_lightId[0], "light.ambient", errCode);
-  bindParameter(m_lightId[1], "light.diffuse", errCode);
-  bindParameter(m_lightId[2], "light.specular", errCode);
-  bindParameter(m_lightId[3], "light.position", errCode);
-
-  bindParameter(m_materialId[0], "material.ambient", errCode);
-  bindParameter(m_materialId[1], "material.diffuse", errCode);
-  bindParameter(m_materialId[2], "material.specular", errCode);
-  bindParameter(m_materialId[3], "material.shininess", errCode);
+  bindParameters();
 
   if (errCode != ERROR_OK)
     throw std::runtime_error("An error occurred while loading shader.");
@@ -116,39 +101,32 @@ void Shader::compile(ERROR &errCode) {
     printErrorMsg(errCode, getProgramErrorLog(m_progId));
 }
 
+// Finds all uniforms in the shader program and binds each to an id
+void Shader::bindParameters() {
+  GLint count;
+  GLchar name[MAX_PARAM_LENGTH];
+
+  // Get uniforms
+  glGetProgramiv(m_progId, GL_ACTIVE_UNIFORMS, &count);
+  for (GLuint i = 0; i < (GLuint)count; ++i) {
+    glGetActiveUniform(m_progId, i, MAX_PARAM_LENGTH, NULL, NULL, NULL, name);
+    GLuint id = glGetUniformLocation(m_progId, name);
+    m_paramMap[name] = id;
+  }
+}
+
 // Use this shader
 void Shader::use() const { glUseProgram(m_progId); }
 
-// Sets the shader's model parameter
-void Shader::setModel(const glm::mat4 &model) const {
-  glUniformMatrix4fv(m_modelId, 1, GL_FALSE, glm::value_ptr(model));
-}
-
-// Sets the shader's view parameter
-void Shader::setView(const glm::mat4 &view) const {
-  glUniformMatrix4fv(m_viewId, 1, GL_FALSE, glm::value_ptr(view));
-}
-
-// Sets the shader's projection parameter
-void Shader::setProjection(const glm::mat4 &projection) const {
-  glUniformMatrix4fv(m_projectionId, 1, GL_FALSE, glm::value_ptr(projection));
-}
-
-// Sets the shader's viewPos parameter
-void Shader::setViewPos(const glm::vec3 &viewPos) const {
-  glUniform3f(m_viewPosId, viewPos.x, viewPos.y, viewPos.z);
-}
-
-// Binds a parameter to a shader variable
-void Shader::bindParameter(GLuint &id, const std::string &param, ERROR &errCode) {
-  if (errCode != ERROR_OK)
-    return;
-
-  id = glGetUniformLocation(m_progId, param.c_str());
-  if (id == GL_INVALID_VALUE) {
-    errCode = ERROR_SHADER_MISSING_PARAMETER;
-    printErrorMsg(errCode, param);
+// Gets the id of a parameter from the shader program
+GLuint Shader::getParamId(const std::string &param, ERROR &errCode) const {
+  auto it = m_paramMap.find(param);
+  if (it == m_paramMap.end()) {
+    printErrorMsg(ERROR_SHADER_MISSING_PARAMETER, param.c_str());
+    return 0;
   }
+
+  return it->second;
 }
 
 // Prints the error log of a shader
