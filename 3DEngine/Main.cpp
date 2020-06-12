@@ -1,9 +1,9 @@
 #include "Camera.h"
 #include "Cube.h"
-#include "Font.h"
 #include "Light.h"
 #include "Sphere.h"
 #include "Tetrahedron.h"
+#include "Text.h"
 #include "Window.h"
 
 #include <stdexcept>
@@ -48,6 +48,10 @@ int main() {
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
 
+    // Enable blending
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
     // Setup scene objects
     Model *tetrahedron = new Tetrahedron;
     tetrahedron->setPosition(glm::vec3(0.0f, 0.0f, 3.0f));
@@ -73,8 +77,11 @@ int main() {
     starfighter->setScale(glm::vec3(0.002f));
     modelList.push_back(starfighter);
 
-    // Test - get font
-    std::shared_ptr<Font> f = Resources::GetFont("Calibri");
+    // Setup text object
+    const glm::mat4 projection =
+        glm::ortho(0.0f, static_cast<float>(WINDOW_WIDTH), 0.0f, static_cast<float>(WINDOW_HEIGHT));
+    Text *sampleText = new Text("Calibri", glm::vec2(100.0f, 100.0f), 1.0f,
+                                glm::vec3(0.5f, 0.8f, 0.2f), projection);
 
     // Setup scene lights
     Light *light01 =
@@ -115,6 +122,11 @@ int main() {
           throw std::runtime_error("An error occurred while processing model " +
                                    std::to_string(model->_id) + ".");
       }
+
+      // Draw text to screen
+      sampleText->draw("Hello world!", errCode);
+      if (errCode != ERROR_OK)
+        throw std::runtime_error("An error occurred while drawing text object.");
 
       window.swapBuffers();
     }

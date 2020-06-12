@@ -15,7 +15,7 @@ public:
   ~Shader();
 
   void use() const;
-  GLuint getParamId(const std::string &param, ERROR &errCode) const;
+  GLint getParamId(const std::string &param, ERROR &errCode) const;
 
 private:
   void load(const std::string &filename, GLenum type, GLuint &shaderId, ERROR &errCode);

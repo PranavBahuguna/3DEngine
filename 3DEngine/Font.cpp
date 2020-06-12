@@ -8,7 +8,7 @@
 #define FONT_PIXEL_SIZE 64
 
 // Constructor
-Font::Font(const std::string &name) : m_characters{} {
+Font::Font(const std::string &name) : m_name(name), m_characters{} {
   ERROR errCode = ERROR_OK;
 
   // Try initialising the FreeType library
@@ -42,15 +42,15 @@ ERROR Font::load(const std::string &filepath, FT_Library &ft) {
   FT_Error ftErrCode = FT_New_Face(ft, filepath.c_str(), 0, &face);
   if (ftErrCode != FT_Err_Ok) {
     errCode = ERROR_FONT_LOAD_FAILED;
-    printErrorMsg(errCode, filepath.c_str(), ftErrCode, getFTErrorMsg(ftErrCode));
+    printErrorMsg(errCode, m_name.c_str(), ftErrCode, getFTErrorMsg(ftErrCode));
     return errCode;
   }
 
   // Set font pixel size
-  ftErrCode = FT_Set_Pixel_Sizes(face, FONT_PIXEL_SIZE, 0);
+  ftErrCode = FT_Set_Pixel_Sizes(face, 0, FONT_PIXEL_SIZE);
   if (ftErrCode != FT_Err_Ok) {
     errCode = ERROR_FONT_LOAD_FAILED;
-    printErrorMsg(errCode, filepath.c_str(), ftErrCode, getFTErrorMsg(ftErrCode));
+    printErrorMsg(errCode, m_name.c_str(), ftErrCode, getFTErrorMsg(ftErrCode));
     return errCode;
   }
 
@@ -60,7 +60,7 @@ ERROR Font::load(const std::string &filepath, FT_Library &ft) {
     // Load character glyph
     ftErrCode = FT_Load_Char(face, c, FT_LOAD_RENDER);
     if (ftErrCode != FT_Err_Ok) {
-      printErrorMsg(ERROR_FONT_GLYPH_LOAD_FAILED, (int)c, filepath.c_str(), ftErrCode,
+      printErrorMsg(ERROR_FONT_GLYPH_LOAD_FAILED, (int)c, m_name.c_str(), ftErrCode,
                     getFTErrorMsg(ftErrCode));
       continue;
     }
@@ -89,6 +89,20 @@ ERROR Font::load(const std::string &filepath, FT_Library &ft) {
   FT_Done_FreeType(ft);
 
   return errCode;
+}
+
+// Retrieves font character from store
+const Character *Font::getCharacter(const unsigned char c, ERROR &errCode) const {
+  if (errCode != ERROR_OK)
+    return NULL;
+
+  if (c >= CHAR_ARRAY_SIZE) {
+    errCode = ERROR_FONT_CHARACTER_OUT_OF_RANGE;
+    printErrorMsg(errCode, c, m_name.c_str());
+    return NULL;
+  }
+
+  return &m_characters[c];
 }
 
 // Helper method for getting error messages from the FreeType library

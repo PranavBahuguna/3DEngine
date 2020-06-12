@@ -26,6 +26,7 @@ typedef uint32_t ERROR;
 #define ERROR_CANNOT_INITIALISE_FREETYPE        14
 #define ERROR_FONT_LOAD_FAILED                  15
 #define ERROR_FONT_GLYPH_LOAD_FAILED            16
+#define ERROR_FONT_CHARACTER_OUT_OF_RANGE       17
 // clang-format on
 
 static void printErrorMsg(ERROR errCode, ...) {
@@ -69,7 +70,7 @@ static void printErrorMsg(ERROR errCode, ...) {
     errBody = "A shader has not been assigned to this object.";
     break;
   case ERROR_SHADER_MISSING_PARAMETER:
-    errBody = "Could not locate parameter %s in shader program.";
+    errBody = "Could not locate parameter (%s) in shader program.";
     break;
   case ERROR_MODEL_LOAD_FAILED:
     errBody = "Failed to load wavefront file (%s): %s";
@@ -82,6 +83,9 @@ static void printErrorMsg(ERROR errCode, ...) {
     break;
   case ERROR_FONT_GLYPH_LOAD_FAILED:
     errBody = "Failed to load glyph %d from font (%s): FT error %d - %s";
+    break;
+  case ERROR_FONT_CHARACTER_OUT_OF_RANGE:
+    errBody = "Character (%s) is not contained in font (%s).";
     break;
   default:
     errBody = "Unknown error";

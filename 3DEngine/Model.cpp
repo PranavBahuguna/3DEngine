@@ -6,8 +6,8 @@ Model::Model(const std::string &name)
 
   const std::string filename = "Models/" + name + ".obj";
 
-  LoadModel(filename);
   m_shader = Resources::GetShader("Triangle");
+  LoadModel(filename);
 
   static unsigned int id = 0;
   _id = id++;
@@ -33,6 +33,7 @@ void Model::draw(const Camera &camera, ERROR &errCode) const {
   }
 
   // Set shader parameters and apply
+  m_shader->use();
   GLuint modelId = m_shader->getParamId("model", errCode);
   GLuint viewId = m_shader->getParamId("view", errCode);
   GLuint projId = m_shader->getParamId("projection", errCode);
@@ -45,8 +46,6 @@ void Model::draw(const Camera &camera, ERROR &errCode) const {
   glUniformMatrix4fv(viewId, 1, GL_FALSE, glm::value_ptr(camera.getView()));
   glUniformMatrix4fv(projId, 1, GL_FALSE, glm::value_ptr(camera.getProjection()));
   glUniform3f(viewPos, camera.getPosition().x, camera.getPosition().y, camera.getPosition().z);
-
-  m_shader->use();
 
   // Iterate over each stored mesh/texture/material and draw
   for (size_t i = 0; i < m_meshes.size() && errCode == ERROR_OK; i++) {

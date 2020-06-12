@@ -119,11 +119,15 @@ void Shader::bindParameters() {
 void Shader::use() const { glUseProgram(m_progId); }
 
 // Gets the id of a parameter from the shader program
-GLuint Shader::getParamId(const std::string &param, ERROR &errCode) const {
+GLint Shader::getParamId(const std::string &param, ERROR &errCode) const {
+  if (errCode != ERROR_OK)
+    return -1;
+
   auto it = m_paramMap.find(param);
   if (it == m_paramMap.end()) {
-    printErrorMsg(ERROR_SHADER_MISSING_PARAMETER, param.c_str());
-    return 0;
+    errCode = ERROR_SHADER_MISSING_PARAMETER;
+    printErrorMsg(errCode, param.c_str());
+    return -1;
   }
 
   return it->second;
