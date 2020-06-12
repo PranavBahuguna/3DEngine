@@ -5,15 +5,22 @@
 
 // Constructor
 Text::Text(const std::string &font, const glm::vec2 &pos, const GLfloat scale,
-           const glm::vec3 &color, const glm::mat4 &projection)
-    : m_pos(pos), m_scale(scale), m_color(color) {
+           const glm::vec3 &color, const glm::vec2 &screenDimensions)
+    : m_scale(scale), m_color(color) {
 
   m_font = Resources::GetFont(font);
   m_shader = Resources::GetShader("Text");
 
+  // Convert from relative to absolute position
+  m_pos.x = pos.x * screenDimensions.x;
+  m_pos.y = pos.y * screenDimensions.y;
+
   // Setup shader properties
   ERROR errCode = ERROR_OK;
   m_shader->use();
+
+  const glm::mat4 projection =
+      glm::ortho(0.0f, (GLfloat)screenDimensions.x, 0.0f, (GLfloat)screenDimensions.y);
   glUniformMatrix4fv(m_shader->getParamId("projection", errCode), 1, GL_FALSE,
                      glm::value_ptr(projection));
   if (errCode != ERROR_OK)
@@ -32,8 +39,11 @@ Text::Text(const std::string &font, const glm::vec2 &pos, const GLfloat scale,
   }
 }
 
+// Sets this text object's text string
+void Text::setText(const std::string &text) { m_text = text; }
+
 // Draws a text string onto the screen
-void Text::draw(const std::string &str, ERROR &errCode) const {
+void Text::draw(ERROR &errCode) const {
   // Activate shader and pass parameters
   m_shader->use();
   glUniform3f(m_shader->getParamId("textColor", errCode), m_color.x, m_color.y, m_color.z);
@@ -43,7 +53,7 @@ void Text::draw(const std::string &str, ERROR &errCode) const {
   GLfloat xStart = m_pos.x; // starting x-position current character in text string
 
   // Iterate and draw each character
-  for (const char &c : str) {
+  for (const char &c : m_text) {
     const Character *ch = m_font->getCharacter(c, errCode);
 
     // Calculate position and size for the given character
@@ -65,6 +75,4 @@ void Text::draw(const std::string &str, ERROR &errCode) const {
     // Advance x-position for next glyph (bitshift by 6 to get advance value in pixels)
     xStart += (ch->advance >> 6) * m_scale;
   }
-  glBindVertexArray(0);
-  glBindTexture(GL_TEXTURE_2D, 0);
 }

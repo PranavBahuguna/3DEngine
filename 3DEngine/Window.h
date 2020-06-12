@@ -13,6 +13,8 @@ public:
   Window(const std::string &name, GLint width, GLint height, bool useFullscreen = false);
   ~Window();
 
+  GLint getWidth() { return m_width; }
+  GLint getHeight() { return m_height; }
   GLfloat getAspectRatio() const { return (GLfloat)m_width / (GLfloat)m_height; }
   bool getShouldClose() const { return glfwWindowShouldClose(m_mainWindow); }
   void swapBuffers() const { glfwSwapBuffers(m_mainWindow); }

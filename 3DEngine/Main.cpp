@@ -27,6 +27,7 @@
 #define FOV 45.0f
 #define NEAR_PLANE 0.1f
 #define FAR_PLANE 100.0f
+#define HUD_FONT "Unreal"
 
 ERROR errCode = ERROR_OK;
 
@@ -77,11 +78,19 @@ int main() {
     starfighter->setScale(glm::vec3(0.002f));
     modelList.push_back(starfighter);
 
-    // Setup text object
-    const glm::mat4 projection =
-        glm::ortho(0.0f, static_cast<float>(WINDOW_WIDTH), 0.0f, static_cast<float>(WINDOW_HEIGHT));
-    Text *sampleText = new Text("Calibri", glm::vec2(100.0f, 100.0f), 1.0f,
-                                glm::vec3(0.5f, 0.8f, 0.2f), projection);
+    // Setup HUD elements
+    const auto &windowDimensions = glm::vec2(window.getWidth(), window.getHeight());
+    const auto &red = glm::vec3(0.651f, 0.1725f, 0.1686f);
+    const auto &green = glm::vec3(0.1608f, 0.4314f, 0.0039f);
+    const auto &blue = glm::vec3(0.1961f, 0.3216f, 0.4824f);
+    const auto &yellow = glm::vec3(0.9922f, 0.80f, 0.051f);
+    const auto &violet = glm::vec3(0.3569f, 0.0392f, 0.5686f);
+
+    Text xPosText(HUD_FONT, glm::vec2(0.7f, 0.9f), 1.0f, red, windowDimensions);
+    Text yPosText(HUD_FONT, glm::vec2(0.7f, 0.85f), 1.0f, green, windowDimensions);
+    Text zPosText(HUD_FONT, glm::vec2(0.7f, 0.8f), 1.0f, blue, windowDimensions);
+    Text pitchText(HUD_FONT, glm::vec2(0.7f, 0.7f), 1.0f, yellow, windowDimensions);
+    Text yawText(HUD_FONT, glm::vec2(0.7f, 0.65f), 1.0f, violet, windowDimensions);
 
     // Setup scene lights
     Light *light01 =
@@ -123,10 +132,24 @@ int main() {
                                    std::to_string(model->_id) + ".");
       }
 
-      // Draw text to screen
-      sampleText->draw("Hello world!", errCode);
-      if (errCode != ERROR_OK)
-        throw std::runtime_error("An error occurred while drawing text object.");
+      // Draw HUD elements to screen
+      if (camera.isHUDEnabled()) {
+        const auto &cameraPos = camera.getPosition();
+
+        xPosText.setText("X:     " + std::to_string(cameraPos.x));
+        xPosText.draw(errCode);
+        yPosText.setText("Y:     " + std::to_string(cameraPos.y));
+        yPosText.draw(errCode);
+        zPosText.setText("Z:     " + std::to_string(cameraPos.z));
+        zPosText.draw(errCode);
+        pitchText.setText("Pitch: " + std::to_string(camera.getPitch()));
+        pitchText.draw(errCode);
+        yawText.setText("Yaw:   " + std::to_string(camera.getYaw()));
+        yawText.draw(errCode);
+
+        if (errCode != ERROR_OK)
+          throw std::runtime_error("An error occurred while drawing HUD element.");
+      }
 
       window.swapBuffers();
     }

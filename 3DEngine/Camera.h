@@ -17,6 +17,9 @@ public:
   glm::mat4 getView() const;
   glm::mat4 getProjection() const { return m_projection; }
   glm::vec3 getPosition() const { return m_position; }
+  GLfloat getPitch() const { return m_pitch; }
+  GLfloat getYaw() const { return m_yaw; }
+  bool isHUDEnabled() const { return m_displayHUD; }
 
 private:
   void updateDirection();
@@ -31,7 +34,8 @@ private:
 
   GLfloat m_yaw;
   GLfloat m_pitch;
-
   GLfloat m_moveSpeed;
   GLfloat m_turnSpeed;
+
+  bool m_displayHUD;
 };

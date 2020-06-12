@@ -8,11 +8,14 @@
 
 class Text {
 public:
-  Text(const std::string &font, const glm::vec2 &pos, const GLfloat scale, const glm::vec3 &color, const glm::mat4 &projection);
+  Text(const std::string &font, const glm::vec2 &pos, const GLfloat scale, const glm::vec3 &color,
+       const glm::vec2 &screenDimensions);
 
-  void draw(const std::string &str, ERROR &errCode) const;
+  void setText(const std::string &text);
+  void draw(ERROR &errCode) const;
 
 private:
+  std::string m_text;
   std::shared_ptr<Shader> m_shader;
   std::shared_ptr<Font> m_font;
   glm::vec2 m_pos;
