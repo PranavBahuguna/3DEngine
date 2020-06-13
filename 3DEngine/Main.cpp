@@ -80,11 +80,11 @@ int main() {
 
     // Setup HUD elements
     const auto &windowDimensions = glm::vec2(window.getWidth(), window.getHeight());
-    const auto &red = glm::vec3(0.651f, 0.1725f, 0.1686f);
-    const auto &green = glm::vec3(0.1608f, 0.4314f, 0.0039f);
-    const auto &blue = glm::vec3(0.1961f, 0.3216f, 0.4824f);
-    const auto &yellow = glm::vec3(0.9922f, 0.80f, 0.051f);
-    const auto &violet = glm::vec3(0.3569f, 0.0392f, 0.5686f);
+    const auto &red = glm::vec4(0.651f, 0.1725f, 0.1686f, 1.0f);
+    const auto &green = glm::vec4(0.1608f, 0.4314f, 0.0039f, 1.0f);
+    const auto &blue = glm::vec4(0.1961f, 0.3216f, 0.4824f, 1.0f);
+    const auto &yellow = glm::vec4(0.9922f, 0.80f, 0.051f, 1.0f);
+    const auto &violet = glm::vec4(0.3569f, 0.0392f, 0.5686f, 1.0f);
 
     Text xPosText(HUD_FONT, glm::vec2(0.7f, 0.9f), 1.0f, red, windowDimensions);
     Text yPosText(HUD_FONT, glm::vec2(0.7f, 0.85f), 1.0f, green, windowDimensions);

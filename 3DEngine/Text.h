@@ -8,7 +8,7 @@
 
 class Text {
 public:
-  Text(const std::string &font, const glm::vec2 &pos, const GLfloat scale, const glm::vec3 &color,
+  Text(const std::string &font, const glm::vec2 &pos, const GLfloat scale, const glm::vec4 &color,
        const glm::vec2 &screenDimensions);
 
   void setText(const std::string &text);
@@ -20,7 +20,7 @@ private:
   std::shared_ptr<Font> m_font;
   glm::vec2 m_pos;
   GLfloat m_scale;
-  glm::vec3 m_color;
+  glm::vec4 m_color;
 
   GLuint m_VAO;
   GLuint m_VBO;

@@ -5,7 +5,7 @@
 
 // Constructor
 Text::Text(const std::string &font, const glm::vec2 &pos, const GLfloat scale,
-           const glm::vec3 &color, const glm::vec2 &screenDimensions)
+           const glm::vec4 &color, const glm::vec2 &screenDimensions)
     : m_scale(scale), m_color(color) {
 
   m_font = Resources::GetFont(font);
@@ -20,7 +20,7 @@ Text::Text(const std::string &font, const glm::vec2 &pos, const GLfloat scale,
   m_shader->use();
 
   const glm::mat4 projection =
-      glm::ortho(0.0f, (GLfloat)screenDimensions.x, 0.0f, (GLfloat)screenDimensions.y);
+      glm::ortho(0.0f, (GLfloat)screenDimensions.x, 0.0f, (GLfloat)screenDimensions.y, 0.0f, 1.0f);
   glUniformMatrix4fv(m_shader->getParamId("projection", errCode), 1, GL_FALSE,
                      glm::value_ptr(projection));
   if (errCode != ERROR_OK)
@@ -33,7 +33,7 @@ Text::Text(const std::string &font, const glm::vec2 &pos, const GLfloat scale,
   glGenBuffers(1, &m_VBO);
   {
     glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 6 * 4, NULL, GL_DYNAMIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 4 * 4, NULL, GL_DYNAMIC_DRAW);
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
   }
@@ -46,7 +46,8 @@ void Text::setText(const std::string &text) { m_text = text; }
 void Text::draw(ERROR &errCode) const {
   // Activate shader and pass parameters
   m_shader->use();
-  glUniform3f(m_shader->getParamId("textColor", errCode), m_color.x, m_color.y, m_color.z);
+  glUniform4f(m_shader->getParamId("textColor", errCode), m_color.r, m_color.g, m_color.b,
+              m_color.a);
   glActiveTexture(GL_TEXTURE0);
   glBindVertexArray(m_VAO);
 
@@ -63,14 +64,17 @@ void Text::draw(ERROR &errCode) const {
     GLfloat h = ch->size.y * m_scale;
 
     // Construct vertices and bind data to VBO
-    GLfloat vertices[6][4] = {{xPos, yPos + h, 0.0f, 0.0f}, {xPos, yPos, 0.0f, 1.0f},
-                              {xPos + w, yPos, 1.0f, 1.0f}, {xPos, yPos + h, 0.0f, 0.0f},
-                              {xPos + w, yPos, 1.0f, 1.0f}, {xPos + w, yPos + h, 1.0f, 0.0f}};
+    GLfloat vertices[4][4] = {
+        {xPos, yPos, 0.0f, 1.0f},
+        {xPos + w, yPos, 1.0f, 1.0f},
+        {xPos, yPos + h, 0.0f, 0.0f},
+        {xPos + w, yPos + h, 1.0f, 0.0f},
+    };
 
     glBindTexture(GL_TEXTURE_2D, ch->textureId);
     glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
     glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
-    glDrawArrays(GL_TRIANGLES, 0, 6);
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
     // Advance x-position for next glyph (bitshift by 6 to get advance value in pixels)
     xStart += (ch->advance >> 6) * m_scale;
