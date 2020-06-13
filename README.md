@@ -10,6 +10,7 @@ There are several libraries that are used in this project, and each can be linke
 - **GLFW** - $(GLFW_DIR) - OpenGL Graphics Library Framework.
 - **GLM** - $(GLM_DIR) - OpenGL Mathematics Library.
 - **ASSIMP** - $(ASSIMP_DIR) - Open Asset Import Library.
+- **FreeType** - $(FREETYPE_DIR) - FreeType Library - build and link to release version.
 
 # Controls
 - **A** - Left
@@ -24,3 +25,4 @@ There are several libraries that are used in this project, and each can be linke
 - **Down arrow** Turn down
 - **Mouse** - Look around
 - **Esc** - Exit
+- **M** - Toggle HUD
