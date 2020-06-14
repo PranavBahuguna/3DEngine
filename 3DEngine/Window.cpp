@@ -10,6 +10,8 @@ Window::Window(const std::string &name, GLint width, GLint height, bool useFulls
     : m_name(name), m_width(width), m_height(height), m_useFullscreen(useFullscreen), m_lastX(0.0f),
       m_lastY(0.0f), m_mouseFirstMoved(true) {
 
+  std::fill_n(m_toggleKeys, NUM_KEYS, true);
+
   ERROR errCode = initialize();
   if (errCode != ERROR_OK) {
     printErrorMsg(errCode);
@@ -84,7 +86,7 @@ GLfloat Window::getDeltaX() {
   return deltaX;
 }
 
-// Obtains and resets change in x-position
+// Obtains and resets change in y-position
 GLfloat Window::getDeltaY() {
   GLfloat deltaY = m_deltaY;
   m_deltaY = 0.0f;
@@ -96,15 +98,18 @@ void Window::keyHandler(GLFWwindow *window, int key, int scancode, int action, i
 
   Window *thisWindow = static_cast<Window *>(glfwGetWindowUserPointer(window));
 
+  if (key < 0 || key >= NUM_KEYS) {
+    printErrorMsg(ERROR_INPUT_KEY_OUT_OF_RANGE, key);
+    return;
+  }
+
   if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
     glfwSetWindowShouldClose(window, GLFW_TRUE);
 
-  if (key >= 0 && key < 1024) {
-    if (action == GLFW_PRESS)
-      thisWindow->m_keys[key] = true;
-    if (action == GLFW_RELEASE)
-      thisWindow->m_keys[key] = false;
-  }
+  if (action == GLFW_PRESS)
+    thisWindow->m_keys[key] = true;
+  if (action == GLFW_RELEASE)
+    thisWindow->m_keys[key] = false;
 }
 
 // Handles mouse input
@@ -126,4 +131,26 @@ void Window::mouseHandler(GLFWwindow *window, double xPos, double yPos) {
 
   thisWindow->m_lastX = fxPos;
   thisWindow->m_lastY = fyPos;
+}
+
+// A toggle key can be queried during the rendering loop. It will return true the first time it is
+// called if the corresponding key is pressed, but will return false on subsequent calls until the
+// key is released and pressed again.
+bool Window::getToggleKey(int key, ERROR *errCode) {
+  if (key < 0 || key >= NUM_KEYS) {
+    *errCode = ERROR_INPUT_KEY_OUT_OF_RANGE;
+    printErrorMsg(*errCode, key);
+    return false;
+  }
+
+  if (m_keys[key]) {
+    if (m_toggleKeys[key]) {
+      m_toggleKeys[key] = false;
+      return true;
+    }
+  } else {
+    m_toggleKeys[key] = true;
+  }
+
+  return false;
 }

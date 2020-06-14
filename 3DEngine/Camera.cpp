@@ -6,7 +6,7 @@
 Camera::Camera(glm::vec3 position, glm::vec3 up, GLfloat yaw, GLfloat pitch, GLfloat moveSpeed,
                GLfloat turnSpeed)
     : m_position(position), m_worldUp(up), m_yaw(yaw), m_pitch(pitch), m_moveSpeed(moveSpeed),
-      m_turnSpeed(turnSpeed), m_displayHUD(false) {
+      m_turnSpeed(turnSpeed) {
 
   updateDirection();
 }
@@ -15,7 +15,7 @@ Camera::Camera(glm::vec3 position, glm::vec3 up, GLfloat yaw, GLfloat pitch, GLf
 Camera::~Camera() {}
 
 // Handles key input to the camera
-void Camera::keyControl(bool *keys, GLfloat deltaTime) {
+void Camera::keyControl(const bool* keys, GLfloat deltaTime) {
 
   if (keys[GLFW_KEY_W])
     m_position += m_front * m_moveSpeed * deltaTime;
@@ -46,9 +46,6 @@ void Camera::keyControl(bool *keys, GLfloat deltaTime) {
 
   if (keys[GLFW_KEY_DOWN])
     m_pitch -= m_turnSpeed * deltaTime;
-
-  if (keys[GLFW_KEY_M])
-    m_displayHUD = !m_displayHUD;
 }
 
 // Handles mouse input to the camera

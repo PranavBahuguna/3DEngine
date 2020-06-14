@@ -28,11 +28,18 @@
 #define NEAR_PLANE 0.1f
 #define FAR_PLANE 100.0f
 #define HUD_FONT "Unreal"
+#define COLOR_RED glm::vec4(0.651f, 0.1725f, 0.1686f, 1.0f)
+#define COLOR_GREEN glm::vec4(0.1608f, 0.4314f, 0.0039f, 1.0f)
+#define COLOR_BLUE glm::vec4(0.1961f, 0.3216f, 0.4824f, 1.0f)
+#define COLOR_YELLOW glm::vec4(0.9922f, 0.80f, 0.051f, 1.0f)
+#define COLOR_VIOLET glm::vec4(0.3569f, 0.0392f, 0.5686f, 1.0f)
 
 ERROR errCode = ERROR_OK;
 
 GLfloat deltaTime = 0.0f;
 GLfloat lastTime = 0.0f;
+
+bool displayHUD = false;
 
 std::vector<Model *> modelList;
 std::vector<Light *> sceneLights;
@@ -80,17 +87,12 @@ int main() {
 
     // Setup HUD elements
     const auto &windowDimensions = glm::vec2(window.getWidth(), window.getHeight());
-    const auto &red = glm::vec4(0.651f, 0.1725f, 0.1686f, 1.0f);
-    const auto &green = glm::vec4(0.1608f, 0.4314f, 0.0039f, 1.0f);
-    const auto &blue = glm::vec4(0.1961f, 0.3216f, 0.4824f, 1.0f);
-    const auto &yellow = glm::vec4(0.9922f, 0.80f, 0.051f, 1.0f);
-    const auto &violet = glm::vec4(0.3569f, 0.0392f, 0.5686f, 1.0f);
 
-    Text xPosText(HUD_FONT, glm::vec2(0.7f, 0.9f), 1.0f, red, windowDimensions);
-    Text yPosText(HUD_FONT, glm::vec2(0.7f, 0.85f), 1.0f, green, windowDimensions);
-    Text zPosText(HUD_FONT, glm::vec2(0.7f, 0.8f), 1.0f, blue, windowDimensions);
-    Text pitchText(HUD_FONT, glm::vec2(0.7f, 0.7f), 1.0f, yellow, windowDimensions);
-    Text yawText(HUD_FONT, glm::vec2(0.7f, 0.65f), 1.0f, violet, windowDimensions);
+    Text xPosText(HUD_FONT, glm::vec2(0.7f, 0.9f), 1.0f, COLOR_RED, windowDimensions);
+    Text yPosText(HUD_FONT, glm::vec2(0.7f, 0.85f), 1.0f, COLOR_GREEN, windowDimensions);
+    Text zPosText(HUD_FONT, glm::vec2(0.7f, 0.8f), 1.0f, COLOR_BLUE, windowDimensions);
+    Text pitchText(HUD_FONT, glm::vec2(0.7f, 0.7f), 1.0f, COLOR_YELLOW, windowDimensions);
+    Text yawText(HUD_FONT, glm::vec2(0.7f, 0.65f), 1.0f, COLOR_VIOLET, windowDimensions);
 
     // Setup scene lights
     Light *light01 =
@@ -114,6 +116,9 @@ int main() {
       camera.keyControl(window.getKeys(), deltaTime);
       camera.mouseControl(window.getDeltaX(), window.getDeltaY(), deltaTime);
 
+      if (window.getToggleKey(GLFW_KEY_M, NULL))
+        displayHUD = !displayHUD;
+
       // Clear window
       glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -133,7 +138,7 @@ int main() {
       }
 
       // Draw HUD elements to screen
-      if (camera.isHUDEnabled()) {
+      if (displayHUD) {
         const auto &cameraPos = camera.getPosition();
 
         xPosText.setText("X:     " + std::to_string(cameraPos.x));

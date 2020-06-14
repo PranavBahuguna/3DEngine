@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Window.h"
+
 #include <GL/glew.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -10,7 +12,7 @@ public:
          GLfloat turnSpeed);
   ~Camera();
 
-  void keyControl(bool *keys, GLfloat deltaTime);
+  void keyControl(const bool *keys, GLfloat deltaTime);
   void mouseControl(GLfloat deltaX, GLfloat deltaY, GLfloat deltaTime);
   void setProjection(float fov, float aspectRatio, float near, float far);
 
@@ -19,7 +21,6 @@ public:
   glm::vec3 getPosition() const { return m_position; }
   GLfloat getPitch() const { return m_pitch; }
   GLfloat getYaw() const { return m_yaw; }
-  bool isHUDEnabled() const { return m_displayHUD; }
 
 private:
   void updateDirection();
@@ -36,6 +37,4 @@ private:
   GLfloat m_pitch;
   GLfloat m_moveSpeed;
   GLfloat m_turnSpeed;
-
-  bool m_displayHUD;
 };

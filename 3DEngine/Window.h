@@ -7,6 +7,8 @@
 #include <GL\glew.h>
 #include <GLFW\glfw3.h>
 
+#define NUM_KEYS 512
+
 class Window {
 public:
   Window();
@@ -22,7 +24,8 @@ public:
   GLfloat getDeltaX();
   GLfloat getDeltaY();
 
-  bool* getKeys() { return m_keys; }
+  const bool* getKeys() const { return m_keys; }
+  bool getToggleKey(int key, ERROR *errCode);
 
 private:
   ERROR initialize();
@@ -37,7 +40,8 @@ private:
   GLint m_width;
   GLint m_height;
 
-  bool m_keys[1024];
+  bool m_keys[NUM_KEYS];
+  bool m_toggleKeys[NUM_KEYS];
 
   GLfloat m_lastX;
   GLfloat m_lastY;
