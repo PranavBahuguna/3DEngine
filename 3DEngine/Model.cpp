@@ -141,9 +141,9 @@ void Model::LoadMaterials(const aiScene &scene, ERROR &errCode) {
       }
     }
 
-    // Load error texture if texture cannot be assigned to
+    // If no texture associated with the material, treat it as having an opacity texture
     if (m_textures[i] == nullptr)
-      m_textures[i] = Resources::GetTexture("error.jpg");
+      m_textures[i] = Resources::GetTexture("opacity.png");
 
     // Load the material itself
     m_materials.push_back(Resources::GetMaterial(*material));

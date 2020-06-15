@@ -136,7 +136,7 @@ int main() {
     sceneLights = {light01};
 
     // Setup camera
-    Camera camera(glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f), -90.0f, 0.0f, CAMERA_MOVE_SPEED,
+    Camera camera(glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f), 90.0f, 0.0f, CAMERA_MOVE_SPEED,
                   CAMERA_TURN_SPEED);
     camera.setProjection(FOV, window.getAspectRatio(), NEAR_PLANE, FAR_PLANE);
 
