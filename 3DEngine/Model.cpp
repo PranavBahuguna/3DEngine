@@ -2,12 +2,10 @@
 
 // Constructor
 Model::Model(const std::string &name)
-    : m_pos(glm::vec3(0.0f)), m_angle(0.0f), m_euler(glm::vec3(0.0f)), m_scale(glm::vec3(1.0f)) {
-
-  const std::string filename = "Models/" + name + ".obj";
+    : m_name(name), m_pos(glm::vec3(0.0f)), m_angle(0.0f), m_euler(glm::vec3(0.0f)),
+      m_scale(glm::vec3(1.0f)) {
 
   m_shader = Resources::GetShader("Triangle");
-  LoadModel(filename);
 
   static unsigned int id = 0;
   _id = id++;
@@ -83,8 +81,10 @@ glm::mat4 Model::getMatrix() const {
 }
 
 // Loads model from the given file path
-ERROR Model::LoadModel(const std::string &filename) {
+ERROR Model::load() {
   ERROR errCode = ERROR_OK;
+
+  const std::string filename = "Models/" + m_name + ".obj";
 
   // Setup importer and try reading the scene data
   Assimp::Importer importer;
@@ -96,32 +96,45 @@ ERROR Model::LoadModel(const std::string &filename) {
     errCode = ERROR_MODEL_LOAD_FAILED;
     printErrorMsg(errCode, filename.c_str(), importer.GetErrorString());
   } else {
-    LoadNode(*scene->mRootNode, *scene, errCode);
-    LoadMaterials(*scene, errCode);
+    loadAssets(*scene, errCode);
   }
 
   return errCode;
 }
 
+// Loads all relevant assets for this model
+void Model::loadAssets(const aiScene &scene, ERROR &errCode) {
+  loadMeshes(*scene.mRootNode, scene, errCode);
+  loadMaterials(scene, errCode);
+}
+
 // Loads all meshes from the current node
-void Model::LoadNode(const aiNode &node, const aiScene &scene, ERROR &errCode) {
+void Model::loadMeshes(const aiNode &node, const aiScene &scene, ERROR &errCode) {
   if (errCode != ERROR_OK)
     return;
 
   // Iterate and load each mesh
   for (size_t i = 0; i < node.mNumMeshes; i++) {
     aiMesh *mesh = scene.mMeshes[node.mMeshes[i]];
-    m_meshes.push_back(Resources::GetMesh(*mesh));
+
+    std::vector<GLfloat> vertices;
+    std::vector<GLfloat> texCoords;
+    std::vector<GLfloat> normals;
+    std::vector<GLuint> indices;
+    getMeshProperties(*mesh, vertices, texCoords, normals, indices);
+
+    std::string meshName = m_name + "_" + std::to_string(mesh->mMaterialIndex);
+    m_meshes.push_back(Resources::GetMesh(meshName, vertices, texCoords, normals, indices));
     m_meshToTex.push_back(mesh->mMaterialIndex);
   }
 
   // Recursively load from all child nodes
   for (size_t i = 0; i < node.mNumChildren; i++)
-    LoadNode(*node.mChildren[i], scene, errCode);
+    loadMeshes(*node.mChildren[i], scene, errCode);
 }
 
 // Load all materials from the current scene
-void Model::LoadMaterials(const aiScene &scene, ERROR &errCode) {
+void Model::loadMaterials(const aiScene &scene, ERROR &errCode) {
 
   m_textures.resize(scene.mNumMaterials);
 
@@ -147,5 +160,39 @@ void Model::LoadMaterials(const aiScene &scene, ERROR &errCode) {
 
     // Load the material itself
     m_materials.push_back(Resources::GetMaterial(*material));
+  }
+}
+
+// Generate the mesh from the assimp mesh object
+void Model::getMeshProperties(const aiMesh &mesh, std::vector<GLfloat> &verts,
+                              std::vector<GLfloat> &texCoords, std::vector<GLfloat> &normals,
+                              std::vector<GLuint> &indices) const {
+
+  for (size_t i = 0; i < mesh.mNumVertices; i++) {
+    // Vertices
+    verts.push_back(mesh.mVertices[i].x);
+    verts.push_back(mesh.mVertices[i].y);
+    verts.push_back(mesh.mVertices[i].z);
+
+    // Texture coordinates
+    if (mesh.mTextureCoords[0]) {
+      texCoords.push_back(mesh.mTextureCoords[0][i].x);
+      texCoords.push_back(mesh.mTextureCoords[0][i].y);
+    } else {
+      texCoords.insert(texCoords.end(), {0.0f, 0.0f});
+    }
+
+    // Normals
+    normals.push_back(mesh.mNormals[i].x);
+    normals.push_back(mesh.mNormals[i].y);
+    normals.push_back(mesh.mNormals[i].z);
+  }
+
+  // Find all mesh indices
+  for (size_t i = 0; i < mesh.mNumFaces; i++) {
+    aiFace face = mesh.mFaces[i];
+
+    for (size_t j = 0; j < face.mNumIndices; j++)
+      indices.push_back(face.mIndices[j]);
   }
 }

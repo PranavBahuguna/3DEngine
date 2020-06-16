@@ -2,6 +2,7 @@
 #include "Cube.h"
 #include "Light.h"
 #include "Sphere.h"
+#include "Terrain.h"
 #include "Tetrahedron.h"
 #include "Text.h"
 #include "Window.h"
@@ -77,26 +78,36 @@ int main() {
 
     // Setup scene objects
     Model *tetrahedron = new Tetrahedron;
+    tetrahedron->load();
     tetrahedron->setPosition(glm::vec3(0.0f, 0.0f, 3.0f));
     tetrahedron->setRotation(glm::vec3(1.0f), 0.0f);
     tetrahedron->setScale(glm::vec3(0.4f));
 
     Model *cube = new Cube;
+    cube->load();
     cube->setPosition(glm::vec3(-3.0f, 0.0f, 6.0f));
     cube->setRotation(glm::vec3(1.0f), 0.0f);
     cube->setScale(glm::vec3(0.4f));
 
     Model *earth = new Sphere;
+    earth->load();
     earth->setPosition(glm::vec3(3.0f, 0.0f, 6.0f));
     earth->setRotation(glm::vec3(0.0f, 1.0f, 0.0f), 0.0f);
     earth->setScale(glm::vec3(0.4f));
 
     Model *starfighter = new Model("Arc170");
-    starfighter->setPosition(glm::vec3(0.0f, 0.0f, 7.0f));
+    starfighter->load();
+    starfighter->setPosition(glm::vec3(0.0f, 0.0f, 10.0f));
     starfighter->setRotation(glm::vec3(0.0f, 1.0f, 0.0f), 180.0f);
     starfighter->setScale(glm::vec3(0.002f));
 
-    modelList = {tetrahedron, cube, earth, starfighter};
+    Terrain *floor = new Terrain("Grass", {4, 4}, 5.0f);
+    floor->load();
+    floor->setPosition(glm::vec3(-10.0f, -3.0f, -10.0f));
+    floor->setRotation(glm::vec3(1.0f), 0.0f);
+    floor->setScale(glm::vec3(1.0f));
+
+    modelList = {tetrahedron, cube, earth, starfighter, floor};
 
     // Setup HUD elements
     const auto &dimensions = glm::vec2(window.getWidth(), window.getHeight());

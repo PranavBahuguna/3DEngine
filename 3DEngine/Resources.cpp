@@ -1,10 +1,13 @@
 #include "Resources.h"
 
-std::shared_ptr<Mesh> Resources::GetMesh(const aiMesh &aiMesh) {
-  static std::unordered_map<std::string, std::weak_ptr<Mesh>> map;
-  std::weak_ptr<Mesh> &mesh = map[aiMesh.mName.data];
+std::shared_ptr<Mesh> Resources::GetMesh(const std::string &name,
+                                         const std::vector<GLfloat> &vertices,
+                                         const std::vector<GLfloat> &texCoords,
+                                         const std::vector<GLfloat> &normals,
+                                         const std::vector<GLuint> &indices) {
+  std::weak_ptr<Mesh> &mesh = meshMap[name];
   if (mesh.expired()) {
-    std::shared_ptr<Mesh> newMesh(new Mesh(aiMesh));
+    std::shared_ptr<Mesh> newMesh(new Mesh(vertices, texCoords, normals, indices));
     mesh = newMesh;
     return newMesh;
   } else {
@@ -13,8 +16,7 @@ std::shared_ptr<Mesh> Resources::GetMesh(const aiMesh &aiMesh) {
 }
 
 std::shared_ptr<Shader> Resources::GetShader(const std::string &name) {
-  static std::unordered_map<std::string, std::weak_ptr<Shader>> map;
-  std::weak_ptr<Shader> &shader = map[name];
+  std::weak_ptr<Shader> &shader = shaderMap[name];
   if (shader.expired()) {
     std::shared_ptr<Shader> newShader(new Shader(name));
     shader = newShader;
@@ -25,8 +27,7 @@ std::shared_ptr<Shader> Resources::GetShader(const std::string &name) {
 }
 
 std::shared_ptr<Texture> Resources::GetTexture(const std::string &name) {
-  static std::unordered_map<std::string, std::weak_ptr<Texture>> map;
-  std::weak_ptr<Texture> &texture = map[name];
+  std::weak_ptr<Texture> &texture = textureMap[name];
   if (texture.expired()) {
     std::shared_ptr<Texture> newTexture(new Texture(name));
     texture = newTexture;
@@ -37,10 +38,9 @@ std::shared_ptr<Texture> Resources::GetTexture(const std::string &name) {
 }
 
 std::shared_ptr<Material> Resources::GetMaterial(const aiMaterial &mat) {
-  static std::unordered_map<std::string, std::weak_ptr<Material>> map;
   aiString name;
   mat.Get(AI_MATKEY_NAME, name);
-  std::weak_ptr<Material> &material = map[name.data];
+  std::weak_ptr<Material> &material = materialMap[name.data];
   if (material.expired()) {
     std::shared_ptr<Material> newMaterial(new Material(mat));
     material = newMaterial;
@@ -51,8 +51,7 @@ std::shared_ptr<Material> Resources::GetMaterial(const aiMaterial &mat) {
 }
 
 std::shared_ptr<Font> Resources::GetFont(const std::string &name) {
-  static std::unordered_map<std::string, std::weak_ptr<Font>> map;
-  std::weak_ptr<Font> &font = map[name];
+  std::weak_ptr<Font> &font = fontMap[name];
   if (font.expired()) {
     std::shared_ptr<Font> newFont(new Font(name));
     font = newFont;

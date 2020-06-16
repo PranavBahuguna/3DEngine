@@ -2,11 +2,11 @@
 
 #include "Camera.h"
 #include "Light.h"
+#include "Material.h"
 #include "Mesh.h"
 #include "Resources.h"
 #include "Shader.h"
 #include "Texture.h"
-#include "Material.h"
 
 #include <memory>
 
@@ -15,8 +15,10 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include <assimp/Importer.hpp>
-#include <assimp/scene.h>
 #include <assimp/postprocess.h>
+#include <assimp/scene.h>
+
+static unsigned int id = 0;
 
 class Model {
 public:
@@ -24,7 +26,7 @@ public:
 
   unsigned int _id;
 
-  ERROR LoadModel(const std::string &filename);
+  ERROR load();
 
   void applyLight(const Light &light, ERROR &errCode) const;
   void draw(const Camera &camera, ERROR &errCode) const;
@@ -37,13 +39,21 @@ public:
   virtual void update(ERROR &errCode) {}
 
 protected:
+  virtual void loadAssets(const aiScene &scene, ERROR &errCode);
+
+  void loadMeshes(const aiNode &node, const aiScene &scene, ERROR &errCode);
+  void loadMaterials(const aiScene &scene, ERROR &errCode);
+
+  void getMeshProperties(const aiMesh &mesh, std::vector<GLfloat> &verts,
+                         std::vector<GLfloat> &texCoordss, std::vector<GLfloat> &normals,
+                         std::vector<GLuint> &indices) const;
+
+  std::string m_name;
+
   glm::vec3 m_pos;
   glm::vec3 m_euler;
   float m_angle;
   glm::vec3 m_scale;
-
-  void LoadNode(const aiNode &node, const aiScene &scene, ERROR &errCode);
-  void LoadMaterials(const aiScene &scene, ERROR &errCode);
 
   std::vector<std::shared_ptr<Mesh>> m_meshes;
   std::vector<std::shared_ptr<Texture>> m_textures;

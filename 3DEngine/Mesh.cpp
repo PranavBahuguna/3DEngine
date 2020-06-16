@@ -2,14 +2,10 @@
 #include "Resources.h"
 
 // Constructor
-Mesh::Mesh(const aiMesh &aiMesh) {
-  std::vector<float> verts;
-  std::vector<float> uvs;
-  std::vector<float> normals;
-  std::vector<unsigned int> indices;
+Mesh::Mesh(const std::vector<float> &vertices, const std::vector<float> &texCoords,
+           const std::vector<float> &normals, const std::vector<unsigned int> &indices) {
 
-  create(aiMesh, verts, uvs, normals, indices);
-  m_numIndices = (GLsizei)indices.size();
+  m_nIndices = (GLsizei)indices.size();
 
   glGenVertexArrays(1, &m_VAO);
   glBindVertexArray(m_VAO);
@@ -18,13 +14,14 @@ Mesh::Mesh(const aiMesh &aiMesh) {
   glGenBuffers(NUM_VBO, m_VBO);
   {
     glBindBuffer(GL_ARRAY_BUFFER, m_VBO[0]);
-    glBufferData(GL_ARRAY_BUFFER, verts.size() * sizeof(float), verts.data(), GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), vertices.data(), GL_STATIC_DRAW);
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
   }
   {
     glBindBuffer(GL_ARRAY_BUFFER, m_VBO[1]);
-    glBufferData(GL_ARRAY_BUFFER, uvs.size() * sizeof(float), uvs.data(), GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, texCoords.size() * sizeof(float), texCoords.data(),
+                 GL_STATIC_DRAW);
     glEnableVertexAttribArray(1);
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, 0);
   }
@@ -50,41 +47,8 @@ Mesh::~Mesh() {
   glDeleteVertexArrays(1, &m_VAO);
 }
 
-// Generate the mesh from the assimp mesh object
-void Mesh::create(const aiMesh &mesh, std::vector<GLfloat> &verts, std::vector<GLfloat> &uvs,
-                  std::vector<GLfloat> &normals, std::vector<unsigned int> &indices) const {
-
-  for (size_t i = 0; i < mesh.mNumVertices; i++) {
-    // Vertices
-    verts.push_back(mesh.mVertices[i].x);
-    verts.push_back(mesh.mVertices[i].y);
-    verts.push_back(mesh.mVertices[i].z);
-
-    // Texture coordinates
-    if (mesh.mTextureCoords[0]) {
-      uvs.push_back(mesh.mTextureCoords[0][i].x);
-      uvs.push_back(mesh.mTextureCoords[0][i].y);
-    } else {
-      uvs.insert(uvs.end(), {0.0f, 0.0f});
-    }
-
-    // Normals
-    normals.push_back(mesh.mNormals[i].x);
-    normals.push_back(mesh.mNormals[i].y);
-    normals.push_back(mesh.mNormals[i].z);
-  }
-
-  // Find all mesh indices
-  for (size_t i = 0; i < mesh.mNumFaces; i++) {
-    aiFace face = mesh.mFaces[i];
-
-    for (size_t j = 0; j < face.mNumIndices; j++)
-      indices.push_back(face.mIndices[j]);
-  }
-}
-
 // Draws the mesh onto the screen
 void Mesh::draw() const {
   glBindVertexArray(m_VAO);
-  glDrawElements(GL_TRIANGLES, m_numIndices, GL_UNSIGNED_INT, 0);
+  glDrawElements(GL_TRIANGLES, m_nIndices, GL_UNSIGNED_INT, 0);
 }
