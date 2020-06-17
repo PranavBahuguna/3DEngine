@@ -12,5 +12,4 @@ private:
 
   glm::uvec2 m_nTiles;
   GLfloat m_tileSize;
-  const int b = 40;
 };

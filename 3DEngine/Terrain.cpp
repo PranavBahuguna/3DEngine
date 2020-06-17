@@ -28,8 +28,8 @@ void Terrain::generateMesh(ERROR &errCode) {
       vertices[vPtr * 3 + 1] = 0.0f;
       vertices[vPtr * 3 + 2] = i * m_tileSize;
 
-      texCoords[vPtr * 2 + 0] = j % 2;
-      texCoords[vPtr * 2 + 1] = i % 2;
+      texCoords[vPtr * 2 + 0] = -(GLfloat)j;
+      texCoords[vPtr * 2 + 1] = -(GLfloat)i;
 
       normals[vPtr * 3 + 0] = 0.0f;
       normals[vPtr * 3 + 1] = 1.0f;

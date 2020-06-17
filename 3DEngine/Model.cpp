@@ -2,8 +2,7 @@
 
 // Constructor
 Model::Model(const std::string &name)
-    : m_name(name), m_pos(glm::vec3(0.0f)), m_angle(0.0f), m_euler(glm::vec3(0.0f)),
-      m_scale(glm::vec3(1.0f)) {
+    : m_name(name), m_pos(0.0f), m_angle(0.0f), m_euler(1.0f), m_scale(1.0f) {
 
   m_shader = Resources::GetShader("Triangle");
 

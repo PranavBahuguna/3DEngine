@@ -60,6 +60,12 @@ void Camera::mouseControl(GLfloat deltaX, GLfloat deltaY, GLfloat deltaTime) {
   if (m_pitch < -89.0f)
     m_pitch = -89.0f;
 
+  // Loop yaw value around if it exceeds +/- 180 degrees
+  if (m_yaw > 180.0f)
+    m_yaw -= 360.0f;
+  if (m_yaw < -180.0f)
+    m_yaw += 360.0f;
+
   updateDirection();
 }
 

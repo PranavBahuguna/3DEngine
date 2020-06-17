@@ -80,13 +80,11 @@ int main() {
     Model *tetrahedron = new Tetrahedron;
     tetrahedron->load();
     tetrahedron->setPosition(glm::vec3(0.0f, 0.0f, 3.0f));
-    tetrahedron->setRotation(glm::vec3(1.0f), 0.0f);
     tetrahedron->setScale(glm::vec3(0.4f));
 
     Model *cube = new Cube;
     cube->load();
     cube->setPosition(glm::vec3(-3.0f, 0.0f, 6.0f));
-    cube->setRotation(glm::vec3(1.0f), 0.0f);
     cube->setScale(glm::vec3(0.4f));
 
     Model *earth = new Sphere;
@@ -105,7 +103,6 @@ int main() {
     floor->load();
     floor->setPosition(glm::vec3(-10.0f, -3.0f, -10.0f));
     floor->setRotation(glm::vec3(1.0f), 0.0f);
-    floor->setScale(glm::vec3(1.0f));
 
     modelList = {tetrahedron, cube, earth, starfighter, floor};
 
