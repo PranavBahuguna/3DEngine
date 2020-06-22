@@ -59,7 +59,7 @@ void Shader::load(const std::string &filename, GLenum type, GLuint &shaderId, ER
       printErrorMsg(errCode, shaderId, getShaderErrorLog(shaderId));
     }
   } else {
-    errCode = ERROR_FILE_OPEN_FAILED;
+    errCode = ERROR_FILE_LOAD_FAILED;
     printErrorMsg(errCode, filename.c_str());
   }
 }

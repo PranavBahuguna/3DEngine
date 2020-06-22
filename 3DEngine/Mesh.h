@@ -3,15 +3,15 @@
 #include "Error.h"
 #include "Material.h"
 
-#include <vector>
 #include <memory>
+#include <vector>
 
 #include <GL/glew.h>
 
 class Mesh {
 public:
-  Mesh(const std::vector<float> &vertices, const std::vector<float> &normals,
-       const std::vector<float> &texCoords, const std::vector<unsigned int> &indices);
+  Mesh(const std::vector<GLfloat> &vertices, const std::vector<GLfloat> &normals,
+       const std::vector<GLfloat> &texCoords, const std::vector<GLuint> &indices);
   ~Mesh();
 
   void draw() const;

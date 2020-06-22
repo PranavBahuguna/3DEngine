@@ -5,7 +5,7 @@
   <PropertyGroup />
   <ItemDefinitionGroup>
     <ClCompile>
-      <AdditionalIncludeDirectories>$(GLEW_DIR)/include;$(GLFW_DIR)/include;$(GLM_DIR);$(ASSIMP_DIR)/include;$(FREETYPE_DIR)/include/freetype2;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(GLEW_DIR)/include;$(GLFW_DIR)/include;$(GLM_DIR);$(FREETYPE_DIR)/include/freetype2</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(GLEW_DIR)/lib/Release/x64;$(GLFW_DIR)/lib-vc2019;$(FREETYPE_DIR)/lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>

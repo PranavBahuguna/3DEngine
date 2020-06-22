@@ -31,7 +31,7 @@ ERROR Texture::load(const std::string &filepath) {
   // Try loading the texture from path
   unsigned char *texData = stbi_load(filepath.c_str(), &m_width, &m_height, &m_bitDepth, 0);
   if (texData == nullptr) {
-    errCode = ERROR_FILE_OPEN_FAILED;
+    errCode = ERROR_FILE_LOAD_FAILED;
     printErrorMsg(errCode, filepath.c_str());
   }
 

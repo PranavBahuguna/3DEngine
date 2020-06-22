@@ -2,8 +2,8 @@
 #include "Resources.h"
 
 // Constructor
-Mesh::Mesh(const std::vector<float> &vertices, const std::vector<float> &texCoords,
-           const std::vector<float> &normals, const std::vector<unsigned int> &indices) {
+Mesh::Mesh(const std::vector<GLfloat> &vertices, const std::vector<GLfloat> &texCoords,
+           const std::vector<GLfloat> &normals, const std::vector<GLuint> &indices) {
 
   m_nIndices = (GLsizei)indices.size();
 

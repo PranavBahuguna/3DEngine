@@ -13,7 +13,7 @@ typedef uint32_t ERROR;
 #define ERROR_GLFW_INIT_FAILED                  1
 #define ERROR_GLFW_WINDOW_CREATE_FAILED         2
 #define ERROR_GLEW_INIT_FAILED                  3
-#define ERROR_FILE_OPEN_FAILED                  4
+#define ERROR_FILE_LOAD_FAILED                  4
 #define ERROR_SHADER_COMPILE_FAILED             5
 #define ERROR_SHADER_PROGRAM_CREATE_FAILED      6
 #define ERROR_SHADER_PROGRAM_INVALID            7
@@ -22,12 +22,11 @@ typedef uint32_t ERROR;
 #define ERROR_MISSING_MESH                      10
 #define ERROR_MISSING_SHADER                    11
 #define ERROR_SHADER_MISSING_PARAMETER          12
-#define ERROR_MODEL_LOAD_FAILED                 13
-#define ERROR_CANNOT_INITIALISE_FREETYPE        14
-#define ERROR_FONT_LOAD_FAILED                  15
-#define ERROR_FONT_GLYPH_LOAD_FAILED            16
-#define ERROR_FONT_CHARACTER_OUT_OF_RANGE       17
-#define ERROR_INPUT_KEY_OUT_OF_RANGE            18
+#define ERROR_CANNOT_INITIALISE_FREETYPE        13
+#define ERROR_FONT_LOAD_FAILED                  14
+#define ERROR_FONT_GLYPH_LOAD_FAILED            15
+#define ERROR_FONT_CHARACTER_OUT_OF_RANGE       16
+#define ERROR_INPUT_KEY_OUT_OF_RANGE            17
 // clang-format on
 
 static void printErrorMsg(ERROR errCode, ...) {
@@ -45,8 +44,8 @@ static void printErrorMsg(ERROR errCode, ...) {
   case ERROR_GLEW_INIT_FAILED:
     errBody = "GLEW initialization failed!";
     break;
-  case ERROR_FILE_OPEN_FAILED:
-    errBody = "Unable to open file: %s";
+  case ERROR_FILE_LOAD_FAILED:
+    errBody = "An error occurred while loading file: %s";
     break;
   case ERROR_SHADER_COMPILE_FAILED:
     errBody = "Unable to compile shader %d!\nSource: %s";
@@ -72,9 +71,6 @@ static void printErrorMsg(ERROR errCode, ...) {
     break;
   case ERROR_SHADER_MISSING_PARAMETER:
     errBody = "Could not locate parameter (%s) in shader program.";
-    break;
-  case ERROR_MODEL_LOAD_FAILED:
-    errBody = "Failed to load wavefront file (%s): %s";
     break;
   case ERROR_CANNOT_INITIALISE_FREETYPE:
     errBody = "Could not initialise the FreeType library: FT error %d - %s";
