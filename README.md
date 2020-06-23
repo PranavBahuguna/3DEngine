@@ -1,7 +1,7 @@
 # 3DEngine
 A custom 3D rendering engine, written in C++ with OpenGL. Will be steadily adding more features to this over time.
 
-# Example screenshot (as of 21/05/2020)
+# Example screenshot (as of 23/06/2020)
 ![](example.png)
 
 # Dependencies
@@ -9,7 +9,6 @@ There are several libraries that are used in this project, and each can be linke
 - **GLEW** - $(GLEW_DIR) - OpenGL Extension Wrangler Library.
 - **GLFW** - $(GLFW_DIR) - OpenGL Graphics Library Framework.
 - **GLM** - $(GLM_DIR) - OpenGL Mathematics Library.
-- **ASSIMP** - $(ASSIMP_DIR) - Open Asset Import Library.
 - **FreeType** - $(FREETYPE_DIR) - FreeType Library - build and link to release version.
 
 # Controls
