@@ -40,13 +40,16 @@
 #define COLOR_BLUE glm::vec4(0.1961f, 0.3216f, 0.4824f, 1.0f)
 #define COLOR_YELLOW glm::vec4(0.9922f, 0.80f, 0.051f, 1.0f)
 #define COLOR_VIOLET glm::vec4(0.3569f, 0.0392f, 0.5686f, 1.0f)
-#define FPS_UPDATE_DELAY 0.25f
+#define FPS_UPDATE_DELAY 0.5f
+#define FPS_BUFFER_SIZE 8
 
 ERROR errCode = ERROR_OK;
 
 GLfloat deltaTime = 0.0f;
 GLfloat lastTime = 0.0f;
-std::vector<GLfloat> fpsCounts;
+
+std::vector<GLfloat> fpsBuffer(FPS_BUFFER_SIZE);
+auto fpsBufferIt = fpsBuffer.begin();
 GLfloat fpsUpdateTime = FPS_UPDATE_DELAY;
 
 bool displayHUD = false;
@@ -154,7 +157,8 @@ int main() {
       GLfloat timeNow = static_cast<GLfloat>(glfwGetTime());
       deltaTime = timeNow - lastTime;
       lastTime = timeNow;
-      fpsCounts.push_back(1.0f / deltaTime);
+      if (fpsBufferIt != fpsBuffer.end())
+        *fpsBufferIt++ = 1.0f / deltaTime;
 
       // Handle user input events
       glfwPollEvents();
@@ -185,11 +189,12 @@ int main() {
       // Draw HUD elements to screen
       if (displayHUD) {
         if (fpsUpdateTime >= FPS_UPDATE_DELAY) {
+          // Calculate average fps from buffer
           GLfloat avgFps =
-              std::accumulate(fpsCounts.begin(), fpsCounts.end(), 0.0f) / fpsCounts.size();
-          fpsCounts.clear();
+              std::accumulate(fpsBuffer.begin(), fpsBuffer.end(), 0.0f) / FPS_BUFFER_SIZE;
           fpsValueText->setText(toStringDp(avgFps, 1));
           fpsUpdateTime -= FPS_UPDATE_DELAY;
+          fpsBufferIt = fpsBuffer.begin();
         } else {
           fpsUpdateTime += deltaTime;
         }
