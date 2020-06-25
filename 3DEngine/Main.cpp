@@ -170,7 +170,7 @@ int main() {
 
       // Update, light and draw each model
       for (const auto &model : modelList) {
-        model->update(errCode);
+        model->update(errCode, deltaTime);
 
         for (const auto &light : sceneLights)
           model->applyLight(*light, errCode);

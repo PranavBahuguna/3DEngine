@@ -9,5 +9,5 @@ class Sphere : public Model {
 public:
   Sphere();
 
-  void update(ERROR &errCode) override;
+  void update(ERROR &errCode, GLfloat deltaTime) override;
 };

@@ -9,5 +9,5 @@ class Tetrahedron : public Model {
 public:
   Tetrahedron();
 
-  void update(ERROR &errCode) override;
+  void update(ERROR &errCode, GLfloat deltaTime) override;
 };

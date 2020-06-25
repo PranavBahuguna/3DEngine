@@ -18,7 +18,7 @@ public:
   unsigned int _id;
 
   virtual void load(ERROR &errCode);
-  virtual void update(ERROR &errCode) {}
+  virtual void update(ERROR &errCode, GLfloat deltaTime) {}
 
   void applyLight(const Light &light, ERROR &errCode) const;
   void draw(const Camera &camera, ERROR &errCode) const;
