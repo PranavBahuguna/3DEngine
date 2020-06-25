@@ -4,8 +4,10 @@
 #include <fstream>
 
 // Constructor
-Terrain::Terrain(const std::string &name, const glm::uvec2 &nTiles, const GLfloat tileSize)
-    : Model(name), m_nTiles(nTiles), m_tileSize(tileSize) {}
+Terrain::Terrain(const std::string &name, const glm::uvec2 &nTiles, const glm::vec2 &tileDimensions,
+                 const glm::vec2 &tileTexMapping)
+    : Model(name), m_nTiles(nTiles), m_tileDimensions(tileDimensions),
+      m_tileTexMapping(tileTexMapping) {}
 
 // Generates the mesh and loads relevant materials
 void Terrain::load(ERROR &errCode) {
@@ -21,19 +23,22 @@ void Terrain::generateMesh() {
   std::vector<GLfloat> normals(nVertices * 3);
   std::vector<GLuint> indices(6 * (size_t)m_nTiles.x * m_nTiles.y);
 
+  GLfloat startX = -(m_nTiles.x * m_tileDimensions.x / 2.0f);
+  GLfloat startY = -(m_nTiles.y * m_tileDimensions.y / 2.0f);
+
   size_t vPtr = 0;
   for (GLuint i = 0; i < m_nTiles.y + 1; ++i) {
     for (GLuint j = 0; j < m_nTiles.x + 1; ++j) {
-      vertices[vPtr * 3 + 0] = j * m_tileSize;
+      vertices[vPtr * 3 + 0] = startX + j * m_tileDimensions.x;
       vertices[vPtr * 3 + 1] = 0.0f;
-      vertices[vPtr * 3 + 2] = i * m_tileSize;
+      vertices[vPtr * 3 + 2] = startY + i * m_tileDimensions.y;
 
       normals[vPtr * 3 + 0] = 0.0f;
       normals[vPtr * 3 + 1] = 1.0f;
       normals[vPtr * 3 + 2] = 0.0f;
 
-      texCoords[vPtr * 2 + 0] = -(GLfloat)j;
-      texCoords[vPtr * 2 + 1] = -(GLfloat)i;
+      texCoords[vPtr * 2 + 0] = -(j * m_tileTexMapping.x);
+      texCoords[vPtr * 2 + 1] = -(i * m_tileTexMapping.y);
 
       ++vPtr;
     }

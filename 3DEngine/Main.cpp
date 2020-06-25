@@ -100,8 +100,8 @@ int main() {
     starfighter->setRotation(glm::vec3(0.0f, 1.0f, 0.0f), 180.0f);
     starfighter->setScale(glm::vec3(0.002f));
 
-    Terrain *floor = new Terrain("Grass", {4, 4}, 5.0f);
-    floor->setPosition(glm::vec3(-10.0f, -3.0f, -10.0f));
+    Terrain *floor = new Terrain("Grass", {5, 5}, {5.0f, 5.0f});
+    floor->setPosition(glm::vec3(0.0f, -3.0f, 0.0f));
     floor->setRotation(glm::vec3(1.0f), 0.0f);
 
     modelList = {tetrahedron, cube, earth, starfighter, floor};
