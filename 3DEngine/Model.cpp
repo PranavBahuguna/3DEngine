@@ -4,7 +4,7 @@
 Model::Model(const std::string &name)
     : m_name(name), m_pos(0.0f), m_angle(0.0f), m_euler(1.0f), m_scale(1.0f) {
 
-  m_shader = Resources::GetShader("Triangle");
+  m_shader = Resources::GetShader("Lighting");
 
   static unsigned int id = 0;
   _id = id++;

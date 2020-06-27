@@ -2,13 +2,16 @@
 
 #include "Camera.h"
 #include "Cube.h"
-#include "Light.h"
+#include "DirectionalLight.h"
+#include "PointLight.h"
 #include "Sphere.h"
+#include "SpotLight.h"
 #include "Terrain.h"
 #include "Tetrahedron.h"
 #include "Text.h"
 #include "Window.h"
 
+#include <algorithm>
 #include <iomanip>
 #include <numeric>
 #include <sstream>
@@ -49,7 +52,7 @@ GLfloat deltaTime = 0.0f;
 GLfloat lastTime = 0.0f;
 
 std::vector<GLfloat> fpsBuffer(FPS_BUFFER_SIZE);
-auto fpsBufferIt = fpsBuffer.begin();
+size_t fpsBufferIdx = 0;
 GLfloat fpsUpdateTime = FPS_UPDATE_DELAY;
 
 bool displayHUD = false;
@@ -141,10 +144,14 @@ int main() {
                    pitchLabelText, pitchValueText, yawLabelText,  yawValueText};
 
     // Setup scene lights
-    Light *light01 =
-        new Light(glm::vec3(0.25f), glm::vec3(1.0f), glm::vec3(1.0f), glm::vec3(4.0f, 4.0f, -4.0f));
-
-    sceneLights = {light01};
+    Light *pointLight = new PointLight(glm::vec3(0.25f), glm::vec3(1.0f), glm::vec3(1.0f),
+                                       glm::vec3(4.0f, 4.0f, -4.0f), 1.0f, 0.045f, 0.0075f);
+    //Light *directionalLight = new DirectionalLight(glm::vec3(0.25f), glm::vec3(1.0f),
+    //                                               glm::vec3(1.0f), {1.0f, 1.0f, -1.0f});
+    //Light *spotLight =
+    //    new SpotLight(glm::vec3(0.25f), glm::vec3(1.0f), glm::vec3(1.0f), {4.0f, 4.0f, -4.0f},
+    //                  {0.0f, -1.0f, 0.0f}, 30.0f, 35.0f, 1.0f, 0.045f, 0.0075f);
+    sceneLights = {pointLight};
 
     // Setup camera
     Camera camera(glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f), 90.0f, 0.0f, CAMERA_MOVE_SPEED,
@@ -157,8 +164,8 @@ int main() {
       GLfloat timeNow = static_cast<GLfloat>(glfwGetTime());
       deltaTime = timeNow - lastTime;
       lastTime = timeNow;
-      if (fpsBufferIt != fpsBuffer.end())
-        *fpsBufferIt++ = 1.0f / deltaTime;
+      if (fpsBufferIdx < FPS_BUFFER_SIZE)
+        fpsBuffer[fpsBufferIdx++] = 1.0f / deltaTime;
 
       // Handle user input events
       glfwPollEvents();
@@ -191,10 +198,11 @@ int main() {
         if (fpsUpdateTime >= FPS_UPDATE_DELAY) {
           // Calculate average fps from buffer
           GLfloat avgFps =
-              std::accumulate(fpsBuffer.begin(), fpsBuffer.end(), 0.0f) / FPS_BUFFER_SIZE;
+              std::accumulate(fpsBuffer.begin(), fpsBuffer.begin() + fpsBufferIdx, 0.0f) /
+              std::max(fpsBufferIdx, (size_t)1);
           fpsValueText->setText(toStringDp(avgFps, 1));
           fpsUpdateTime -= FPS_UPDATE_DELAY;
-          fpsBufferIt = fpsBuffer.begin();
+          fpsBufferIdx = 0;
         } else {
           fpsUpdateTime += deltaTime;
         }
