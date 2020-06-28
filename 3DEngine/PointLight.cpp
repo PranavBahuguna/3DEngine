@@ -12,10 +12,8 @@ void PointLight::use(const Shader &shader, ERROR &errCode) const {
   Light::use(shader, errCode);
 
   // w-value of 1 indicates to shader that this is a position
-  glUniform4f(shader.getParamId("light.position", errCode), m_position.x, m_position.y,
-              m_position.z, 1.0f);
-
-  glUniform1f(shader.getParamId("light.constant", errCode), m_constant);
-  glUniform1f(shader.getParamId("light.linear", errCode), m_linear);
-  glUniform1f(shader.getParamId("light.quadratic", errCode), m_quadratic);
+  shader.setVec4("light.position", m_position.x, m_position.y, m_position.z, 1.0f, errCode);
+  shader.setFloat("light.constant", m_constant, errCode);
+  shader.setFloat("light.linear", m_linear, errCode);
+  shader.setFloat("light.quadratic", m_quadratic, errCode);
 }

@@ -116,9 +116,7 @@ void Shader::bindParameters() {
 }
 
 // Use this shader
-void Shader::use() const { 
-  glUseProgram(m_progId);
-}
+void Shader::use() const { glUseProgram(m_progId); }
 
 // Gets the id of a parameter from the shader program
 GLint Shader::getParamId(const std::string &param, ERROR &errCode) const {
@@ -133,6 +131,56 @@ GLint Shader::getParamId(const std::string &param, ERROR &errCode) const {
   }
 
   return it->second;
+}
+
+void Shader::setBool(const std::string &name, bool value, ERROR &errCode) const {
+  glUniform1i(getParamId(name, errCode), value);
+}
+
+void Shader::setInt(const std::string &name, int value, ERROR &errCode) const {
+  glUniform1i(getParamId(name, errCode), value);
+}
+
+void Shader::setFloat(const std::string &name, float value, ERROR &errCode) const {
+  glUniform1f(getParamId(name, errCode), value);
+}
+
+void Shader::setVec2(const std::string &name, const glm::vec2 &value, ERROR &errCode) const {
+  glUniform2fv(getParamId(name, errCode), 1, glm::value_ptr(value));
+}
+
+void Shader::setVec2(const std::string &name, GLfloat x, GLfloat y, ERROR &errCode) const {
+  glUniform2f(getParamId(name, errCode), x, y);
+}
+
+void Shader::setVec3(const std::string &name, const glm::vec3 &value, ERROR &errCode) const {
+  glUniform3fv(getParamId(name, errCode), 1, glm::value_ptr(value));
+}
+
+void Shader::setVec3(const std::string &name, GLfloat x, GLfloat y, GLfloat z,
+                     ERROR &errCode) const {
+  glUniform3f(getParamId(name, errCode), x, y, z);
+}
+
+void Shader::setVec4(const std::string &name, const glm::vec4 &value, ERROR &errCode) const {
+  glUniform4fv(getParamId(name, errCode), 1, glm::value_ptr(value));
+}
+
+void Shader::setVec4(const std::string &name, GLfloat x, GLfloat y, GLfloat z, GLfloat w,
+                     ERROR &errCode) const {
+  glUniform4f(getParamId(name, errCode), x, y, z, w);
+}
+
+void Shader::setMat2(const std::string &name, const glm::mat2 &value, ERROR &errCode) const {
+  glUniformMatrix2fv(getParamId(name, errCode), 1, GL_FALSE, glm::value_ptr(value));
+}
+
+void Shader::setMat3(const std::string &name, const glm::mat3 &value, ERROR &errCode) const {
+  glUniformMatrix3fv(getParamId(name, errCode), 1, GL_FALSE, glm::value_ptr(value));
+}
+
+void Shader::setMat4(const std::string &name, const glm::mat4 &value, ERROR &errCode) const {
+  glUniformMatrix4fv(getParamId(name, errCode), 1, GL_FALSE, glm::value_ptr(value));
 }
 
 // Prints the error log of a shader

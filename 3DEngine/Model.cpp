@@ -10,9 +10,6 @@ Model::Model(const std::string &name)
 
 // Draws the model to the screen
 void Model::draw(const Shader &shader, ERROR &errCode) const {
-  if (errCode != ERROR_OK)
-    return;
-
   // Check that we have a mesh to use
   if (m_meshes.empty()) {
     errCode = ERROR_MISSING_MESH;
@@ -20,7 +17,7 @@ void Model::draw(const Shader &shader, ERROR &errCode) const {
   }
 
   // Set shader parameters and apply
-  glUniformMatrix4fv(shader.getParamId("model", errCode), 1, GL_FALSE, glm::value_ptr(getMatrix()));
+  shader.setMat4("model", getMatrix(), errCode);
 
   // Iterate over each stored mesh/texture/material and draw
   for (size_t i = 0; i < m_meshes.size() && errCode == ERROR_OK; i++) {

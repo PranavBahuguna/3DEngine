@@ -126,10 +126,9 @@ int main() {
     // Setup text shader
     auto textShader = Resources::GetShader("Text");
     textShader->use();
-    const glm::mat4 projection = glm::ortho(0.0f, (GLfloat)window->getWidth(), 0.0f,
-                                            (GLfloat)window->getHeight(), 0.0f, 1.0f);
-    glUniformMatrix4fv(textShader->getParamId("projection", errCode), 1, GL_FALSE,
-                       glm::value_ptr(projection));
+    const glm::mat4 orthoProjection = glm::ortho(0.0f, (GLfloat)window->getWidth(), 0.0f,
+                                                 (GLfloat)window->getHeight(), 0.0f, 1.0f);
+    textShader->setMat4("projection", orthoProjection, errCode);
 
     // Setup HUD elements
     Text *fpsLabelText = new Text(HUD_FONT, relToScreenPos({0.7f, 0.95f}), 1.0f, COLOR_SEAWEED);
@@ -202,12 +201,9 @@ int main() {
         light->use(*lightingShader, errCode);
 
       // Add camera parameters to lighting shader
-      glUniformMatrix4fv(lightingShader->getParamId("view", errCode), 1, GL_FALSE,
-                         glm::value_ptr(camera.getView()));
-      glUniformMatrix4fv(lightingShader->getParamId("projection", errCode), 1, GL_FALSE,
-                         glm::value_ptr(camera.getProjection()));
-      glUniform3fv(lightingShader->getParamId("viewPos", errCode), 1,
-                   glm::value_ptr(camera.getPosition()));
+      lightingShader->setMat4("view", camera.getView(), errCode);
+      lightingShader->setMat4("projection", camera.getProjection(), errCode);
+      lightingShader->setVec3("viewPos", camera.getPosition(), errCode);
 
       // Update and draw each model
       for (const auto &model : modelList) {

@@ -29,7 +29,7 @@ void Text::setText(const std::string &text) { m_text = text; }
 // Draws a text string onto the screen
 void Text::draw(const Shader &shader, ERROR &errCode) const {
   // Pass shader parameters and activate
-  glUniform4f(shader.getParamId("textColor", errCode), m_color.r, m_color.g, m_color.b, m_color.a);
+  shader.setVec4("textColor", m_color, errCode);
   glActiveTexture(GL_TEXTURE0);
   glBindVertexArray(m_VAO);
 

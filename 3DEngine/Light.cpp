@@ -8,7 +8,7 @@ Light::Light(const glm::vec3 &ambient, const glm::vec3 &diffuse, const glm::vec3
 
 // Supply shader with light data
 void Light::use(const Shader &shader, ERROR &errCode) const {
-  glUniform3fv(shader.getParamId("light.ambient", errCode), 1, glm::value_ptr(m_ambient));
-  glUniform3fv(shader.getParamId("light.diffuse", errCode), 1, glm::value_ptr(m_diffuse));
-  glUniform3fv(shader.getParamId("light.specular", errCode), 1, glm::value_ptr(m_specular));
+  shader.setVec3("light.ambient", m_ambient, errCode);
+  shader.setVec3("light.diffuse", m_diffuse, errCode);
+  shader.setVec3("light.specular", m_specular, errCode);
 }

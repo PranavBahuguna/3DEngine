@@ -9,8 +9,8 @@ Material::Material(const glm::vec3 &ambient, const glm::vec3 &diffuse, const glm
 
 // Use this material
 void Material::use(const Shader &shader, ERROR &errCode) const {
-  glUniform3fv(shader.getParamId("material.ambient", errCode), 1, glm::value_ptr(m_ambient));
-  glUniform3fv(shader.getParamId("material.diffuse", errCode), 1, glm::value_ptr(m_diffuse));
-  glUniform3fv(shader.getParamId("material.specular", errCode), 1, glm::value_ptr(m_specular));
-  glUniform1f(shader.getParamId("material.shininess", errCode), m_shininess);
+  shader.setVec3("material.ambient", m_ambient, errCode);
+  shader.setVec3("material.diffuse", m_diffuse, errCode);
+  shader.setVec3("material.specular", m_specular, errCode);
+  shader.setFloat("material.shininess", m_shininess, errCode);
 }
