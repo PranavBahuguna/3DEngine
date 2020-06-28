@@ -1,7 +1,6 @@
 #pragma once
 
 #include "AssetLoader.h"
-#include "Camera.h"
 #include "Light.h"
 #include "Shader.h"
 
@@ -20,15 +19,14 @@ public:
   virtual void load(ERROR &errCode);
   virtual void update(ERROR &errCode, GLfloat deltaTime) {}
 
-  void applyLight(const Light &light, ERROR &errCode) const;
-  void draw(const Camera &camera, ERROR &errCode) const;
+  void draw(const Shader &shader, ERROR &errCode) const;
   void setPosition(const glm::vec3 &pos);
   void setRotation(const glm::vec3 &euler, float angle);
   void setScale(const glm::vec3 &scale);
 
+protected:
   glm::mat4 getMatrix() const;
 
-protected:
   std::string m_name;
 
   glm::vec3 m_pos;
@@ -39,5 +37,4 @@ protected:
   AssetPtrs<Mesh> m_meshes;
   AssetPtrs<Texture> m_textures;
   AssetPtrs<Material> m_materials;
-  std::shared_ptr<Shader> m_shader;
 };

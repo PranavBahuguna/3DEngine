@@ -116,7 +116,9 @@ void Shader::bindParameters() {
 }
 
 // Use this shader
-void Shader::use() const { glUseProgram(m_progId); }
+void Shader::use() const { 
+  glUseProgram(m_progId);
+}
 
 // Gets the id of a parameter from the shader program
 GLint Shader::getParamId(const std::string &param, ERROR &errCode) const {

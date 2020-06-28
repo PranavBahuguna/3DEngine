@@ -12,14 +12,7 @@ SpotLight::SpotLight(const glm::vec3 &ambient, const glm::vec3 &diffuse, const g
 void SpotLight::use(const Shader &shader, ERROR &errCode) const {
   PointLight::use(shader, errCode);
 
-  GLuint coneDirId = shader.getParamId("light.coneDir", errCode);
-  GLuint innerConeAngleId = shader.getParamId("light.innerConeAngle", errCode);
-  GLuint outerConeAngleId = shader.getParamId("light.outerConeAngle", errCode);
-
-  if (errCode != ERROR_OK)
-    return;
-
-  glUniform3f(coneDirId, m_coneDir.x, m_coneDir.y, m_coneDir.z);
-  glUniform1f(innerConeAngleId, m_innerConeAngle);
-  glUniform1f(outerConeAngleId, m_outerConeAngle);
+  glUniform3fv(shader.getParamId("light.coneDir", errCode), 1, glm::value_ptr(m_coneDir));
+  glUniform1f(shader.getParamId("light.innerConeAngle", errCode), m_innerConeAngle);
+  glUniform1f(shader.getParamId("light.outerConeAngle", errCode), m_outerConeAngle);
 }

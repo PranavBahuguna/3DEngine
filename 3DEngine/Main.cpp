@@ -58,8 +58,11 @@ GLfloat fpsUpdateTime = FPS_UPDATE_DELAY;
 bool displayHUD = false;
 
 std::vector<Model *> modelList;
+std::vector<std::shared_ptr<Shader>> shaders;
 std::vector<Light *> sceneLights;
 std::vector<Text *> textObjects;
+
+Window *window;
 
 // Converts a float to string with a number of decimal places
 static std::string toStringDp(float f, size_t dp) {
@@ -68,10 +71,15 @@ static std::string toStringDp(float f, size_t dp) {
   return ss.str();
 }
 
+// Converts from a relative position to screen position
+static glm::vec2 relToScreenPos(const glm::vec2 &pos) {
+  return {pos.x * window->getWidth(), pos.y * window->getHeight()};
+}
+
 int main() {
   try {
     // Create a fullscreen window
-    Window window("Test window", WINDOW_WIDTH, WINDOW_HEIGHT, USE_FULLSCREEN);
+    window = new Window("Test window", WINDOW_WIDTH, WINDOW_HEIGHT, USE_FULLSCREEN);
 
     // Allow objects to obscure other objects behind them
     glEnable(GL_DEPTH_TEST);
@@ -112,32 +120,41 @@ int main() {
     for (auto it = modelList.begin(); it != modelList.end() && errCode == ERROR_OK; it++)
       (*it)->load(errCode);
 
+    // Setup lighting shader
+    auto lightingShader = Resources::GetShader("Lighting");
+
+    // Setup text shader
+    auto textShader = Resources::GetShader("Text");
+    textShader->use();
+    const glm::mat4 projection = glm::ortho(0.0f, (GLfloat)window->getWidth(), 0.0f,
+                                            (GLfloat)window->getHeight(), 0.0f, 1.0f);
+    glUniformMatrix4fv(textShader->getParamId("projection", errCode), 1, GL_FALSE,
+                       glm::value_ptr(projection));
+
     // Setup HUD elements
-    const auto &dimensions = glm::vec2(window.getWidth(), window.getHeight());
-
-    Text *fpsLabelText = new Text(HUD_FONT, {0.7f, 0.95f}, 1.0f, COLOR_SEAWEED, dimensions);
+    Text *fpsLabelText = new Text(HUD_FONT, relToScreenPos({0.7f, 0.95f}), 1.0f, COLOR_SEAWEED);
     fpsLabelText->setText("FPS:");
-    Text *fpsValueText = new Text(HUD_FONT, {0.8f, 0.95f}, 1.0f, COLOR_SEAWEED, dimensions);
+    Text *fpsValueText = new Text(HUD_FONT, relToScreenPos({0.8f, 0.95f}), 1.0f, COLOR_SEAWEED);
 
-    Text *xPosLabelText = new Text(HUD_FONT, {0.7f, 0.85f}, 1.0f, COLOR_RED, dimensions);
+    Text *xPosLabelText = new Text(HUD_FONT, relToScreenPos({0.7f, 0.85f}), 1.0f, COLOR_RED);
     xPosLabelText->setText("X:");
-    Text *xPosValueText = new Text(HUD_FONT, {0.8f, 0.85f}, 1.0f, COLOR_RED, dimensions);
+    Text *xPosValueText = new Text(HUD_FONT, relToScreenPos({0.8f, 0.85f}), 1.0f, COLOR_RED);
 
-    Text *yPosLabelText = new Text(HUD_FONT, {0.7f, 0.8f}, 1.0f, COLOR_GREEN, dimensions);
+    Text *yPosLabelText = new Text(HUD_FONT, relToScreenPos({0.7f, 0.8f}), 1.0f, COLOR_GREEN);
     yPosLabelText->setText("Y:");
-    Text *yPosValueText = new Text(HUD_FONT, {0.8f, 0.8f}, 1.0f, COLOR_GREEN, dimensions);
+    Text *yPosValueText = new Text(HUD_FONT, relToScreenPos({0.8f, 0.8f}), 1.0f, COLOR_GREEN);
 
-    Text *zPosLabelText = new Text(HUD_FONT, {0.7f, 0.75f}, 1.0f, COLOR_BLUE, dimensions);
+    Text *zPosLabelText = new Text(HUD_FONT, relToScreenPos({0.7f, 0.75f}), 1.0f, COLOR_BLUE);
     zPosLabelText->setText("Z:");
-    Text *zPosValueText = new Text(HUD_FONT, {0.8f, 0.75f}, 1.0f, COLOR_BLUE, dimensions);
+    Text *zPosValueText = new Text(HUD_FONT, relToScreenPos({0.8f, 0.75f}), 1.0f, COLOR_BLUE);
 
-    Text *pitchLabelText = new Text(HUD_FONT, {0.7f, 0.65f}, 1.0f, COLOR_YELLOW, dimensions);
+    Text *pitchLabelText = new Text(HUD_FONT, relToScreenPos({0.7f, 0.65f}), 1.0f, COLOR_YELLOW);
     pitchLabelText->setText("Pitch:");
-    Text *pitchValueText = new Text(HUD_FONT, {0.8f, 0.65f}, 1.0f, COLOR_YELLOW, dimensions);
+    Text *pitchValueText = new Text(HUD_FONT, relToScreenPos({0.8f, 0.65f}), 1.0f, COLOR_YELLOW);
 
-    Text *yawLabelText = new Text(HUD_FONT, {0.7f, 0.6f}, 1.0f, COLOR_VIOLET, dimensions);
+    Text *yawLabelText = new Text(HUD_FONT, relToScreenPos({0.7f, 0.6f}), 1.0f, COLOR_VIOLET);
     yawLabelText->setText("Yaw:");
-    Text *yawValueText = new Text(HUD_FONT, {0.8f, 0.6f}, 1.0f, COLOR_VIOLET, dimensions);
+    Text *yawValueText = new Text(HUD_FONT, relToScreenPos({0.8f, 0.6f}), 1.0f, COLOR_VIOLET);
 
     textObjects = {fpsLabelText,   fpsValueText,   xPosLabelText, xPosValueText,
                    yPosLabelText,  yPosValueText,  zPosLabelText, zPosValueText,
@@ -146,9 +163,9 @@ int main() {
     // Setup scene lights
     Light *pointLight = new PointLight(glm::vec3(0.25f), glm::vec3(1.0f), glm::vec3(1.0f),
                                        glm::vec3(4.0f, 4.0f, -4.0f), 1.0f, 0.045f, 0.0075f);
-    //Light *directionalLight = new DirectionalLight(glm::vec3(0.25f), glm::vec3(1.0f),
+    // Light *directionalLight = new DirectionalLight(glm::vec3(0.25f), glm::vec3(1.0f),
     //                                               glm::vec3(1.0f), {1.0f, 1.0f, -1.0f});
-    //Light *spotLight =
+    // Light *spotLight =
     //    new SpotLight(glm::vec3(0.25f), glm::vec3(1.0f), glm::vec3(1.0f), {4.0f, 4.0f, -4.0f},
     //                  {0.0f, -1.0f, 0.0f}, 30.0f, 35.0f, 1.0f, 0.045f, 0.0075f);
     sceneLights = {pointLight};
@@ -156,10 +173,10 @@ int main() {
     // Setup camera
     Camera camera(glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f), 90.0f, 0.0f, CAMERA_MOVE_SPEED,
                   CAMERA_TURN_SPEED);
-    camera.setProjection(FOV, window.getAspectRatio(), NEAR_PLANE, FAR_PLANE);
+    camera.setProjection(FOV, window->getAspectRatio(), NEAR_PLANE, FAR_PLANE);
 
     // Main program loop
-    while (!window.getShouldClose()) {
+    while (!window->getShouldClose()) {
       // Get time elapsed since last cycle
       GLfloat timeNow = static_cast<GLfloat>(glfwGetTime());
       deltaTime = timeNow - lastTime;
@@ -169,24 +186,33 @@ int main() {
 
       // Handle user input events
       glfwPollEvents();
-      camera.keyControl(window.getKeys(), deltaTime);
-      camera.mouseControl(window.getDeltaX(), window.getDeltaY(), deltaTime);
+      camera.keyControl(window->getKeys(), deltaTime);
+      camera.mouseControl(window->getDeltaX(), window->getDeltaY(), deltaTime);
 
-      if (window.getToggleKey(GLFW_KEY_M, NULL))
+      if (window->getToggleKey(GLFW_KEY_M, NULL))
         displayHUD = !displayHUD;
 
       // Clear window
       glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-      // Update, light and draw each model
+      // Apply lights to lighting shader
+      lightingShader->use();
+      for (const auto &light : sceneLights)
+        light->use(*lightingShader, errCode);
+
+      // Add camera parameters to lighting shader
+      glUniformMatrix4fv(lightingShader->getParamId("view", errCode), 1, GL_FALSE,
+                         glm::value_ptr(camera.getView()));
+      glUniformMatrix4fv(lightingShader->getParamId("projection", errCode), 1, GL_FALSE,
+                         glm::value_ptr(camera.getProjection()));
+      glUniform3fv(lightingShader->getParamId("viewPos", errCode), 1,
+                   glm::value_ptr(camera.getPosition()));
+
+      // Update and draw each model
       for (const auto &model : modelList) {
         model->update(errCode, deltaTime);
-
-        for (const auto &light : sceneLights)
-          model->applyLight(*light, errCode);
-
-        model->draw(camera, errCode);
+        model->draw(*lightingShader, errCode);
 
         if (errCode != ERROR_OK)
           throw std::runtime_error("An error occurred while processing model " +
@@ -215,14 +241,15 @@ int main() {
         pitchValueText->setText(toStringDp(camera.getPitch(), 1));
         yawValueText->setText(toStringDp(camera.getYaw(), 1));
 
+        textShader->use();
         for (auto it = textObjects.begin(); it != textObjects.end() && errCode == ERROR_OK; ++it)
-          (*it)->draw(errCode);
+          (*it)->draw(*textShader, errCode);
 
         if (errCode != ERROR_OK)
           throw std::runtime_error("An error occurred while drawing HUD element.");
       }
 
-      window.swapBuffers();
+      window->swapBuffers();
     }
   } catch (std::exception &e) {
     printf(e.what());
