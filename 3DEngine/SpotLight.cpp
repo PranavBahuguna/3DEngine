@@ -9,10 +9,10 @@ SpotLight::SpotLight(const glm::vec3 &ambient, const glm::vec3 &diffuse, const g
       m_outerConeAngle(glm::cos(glm::radians(outerConeAngle))) {}
 
 // Supply shader with spot light data
-void SpotLight::use(const Shader &shader, ERROR &errCode) const {
-  PointLight::use(shader, errCode);
+void SpotLight::use(const Shader &shader, size_t index, ERROR &errCode) const {
+  PointLight::use(shader, index, errCode);
 
-  shader.setVec3("light.coneDir", m_coneDir, errCode);
-  shader.setFloat("light.innerConeAngle", m_innerConeAngle, errCode);
-  shader.setFloat("light.outerConeAngle", m_outerConeAngle, errCode);
+  shader.setVec3(m_paramPrefix + ".coneDir", m_coneDir, errCode);
+  shader.setFloat(m_paramPrefix + ".innerConeAngle", m_innerConeAngle, errCode);
+  shader.setFloat(m_paramPrefix + ".outerConeAngle", m_outerConeAngle, errCode);
 }

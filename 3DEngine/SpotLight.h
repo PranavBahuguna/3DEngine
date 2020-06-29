@@ -8,7 +8,7 @@ public:
             const glm::vec3 &position, const glm::vec3 &coneDir, GLfloat innerConeAngle,
             GLfloat outerConeAngle, GLfloat constant, GLfloat linear, GLfloat quadratic);
 
-  void use(const Shader &shader, ERROR &errCode) const override;
+  void use(const Shader &shader, size_t index, ERROR &errCode) const override;
 
 private:
   glm::vec3 m_coneDir;

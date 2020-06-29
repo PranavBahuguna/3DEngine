@@ -15,6 +15,7 @@ public:
   ~Shader();
 
   void use() const;
+  GLint getParamId(const std::string &param, ERROR &errCode) const;
 
   // Parameter setter utility functions
   void setBool(const std::string &name, bool value, ERROR &errCode) const;
@@ -35,9 +36,6 @@ private:
   void load(const std::string &filename, GLenum type, GLuint &shaderId, ERROR &errCode);
   void compile(ERROR &errCode);
   void bindParameters();
-
-  GLint getParamId(const std::string &param, ERROR &errCode) const;
-  
   char *getShaderErrorLog(GLuint id) const;
   char *getProgramErrorLog(GLuint id) const;
 

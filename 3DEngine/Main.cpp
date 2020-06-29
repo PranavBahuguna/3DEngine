@@ -120,16 +120,6 @@ int main() {
     for (auto it = modelList.begin(); it != modelList.end() && errCode == ERROR_OK; it++)
       (*it)->load(errCode);
 
-    // Setup lighting shader
-    auto lightingShader = Resources::GetShader("Lighting");
-
-    // Setup text shader
-    auto textShader = Resources::GetShader("Text");
-    textShader->use();
-    const glm::mat4 orthoProjection = glm::ortho(0.0f, (GLfloat)window->getWidth(), 0.0f,
-                                                 (GLfloat)window->getHeight(), 0.0f, 1.0f);
-    textShader->setMat4("projection", orthoProjection, errCode);
-
     // Setup HUD elements
     Text *fpsLabelText = new Text(HUD_FONT, relToScreenPos({0.7f, 0.95f}), 1.0f, COLOR_SEAWEED);
     fpsLabelText->setText("FPS:");
@@ -162,12 +152,26 @@ int main() {
     // Setup scene lights
     Light *pointLight = new PointLight(glm::vec3(0.25f), glm::vec3(1.0f), glm::vec3(1.0f),
                                        glm::vec3(4.0f, 4.0f, -4.0f), 1.0f, 0.045f, 0.0075f);
-    // Light *directionalLight = new DirectionalLight(glm::vec3(0.25f), glm::vec3(1.0f),
-    //                                               glm::vec3(1.0f), {1.0f, 1.0f, -1.0f});
-    // Light *spotLight =
-    //    new SpotLight(glm::vec3(0.25f), glm::vec3(1.0f), glm::vec3(1.0f), {4.0f, 4.0f, -4.0f},
-    //                  {0.0f, -1.0f, 0.0f}, 30.0f, 35.0f, 1.0f, 0.045f, 0.0075f);
-    sceneLights = {pointLight};
+
+    Light *directionalLight = new DirectionalLight(glm::vec3(0.25f), glm::vec3(1.0f),
+                                                   glm::vec3(1.0f), {1.0f, 1.0f, -1.0f});
+    Light *spotLight =
+        new SpotLight(glm::vec3(0.25f), glm::vec3(1.0f), glm::vec3(1.0f), {4.0f, 4.0f, -4.0f},
+                      {0.0f, -1.0f, 0.0f}, 30.0f, 35.0f, 1.0f, 0.045f, 0.0075f);
+
+    sceneLights = {pointLight, directionalLight, spotLight};
+
+    // Setup lighting shader
+    auto lightingShader = Resources::GetShader("Lighting");
+    lightingShader->use();
+    lightingShader->setInt("nLights", (int)sceneLights.size(), errCode);
+
+    // Setup text shader
+    auto textShader = Resources::GetShader("Text");
+    textShader->use();
+    const glm::mat4 orthoProjection = glm::ortho(0.0f, (GLfloat)window->getWidth(), 0.0f,
+                                                 (GLfloat)window->getHeight(), 0.0f, 1.0f);
+    textShader->setMat4("projection", orthoProjection, errCode);
 
     // Setup camera
     Camera camera(glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f), 90.0f, 0.0f, CAMERA_MOVE_SPEED,
@@ -197,8 +201,8 @@ int main() {
 
       // Apply lights to lighting shader
       lightingShader->use();
-      for (const auto &light : sceneLights)
-        light->use(*lightingShader, errCode);
+      for (size_t i = 0; i < sceneLights.size(); i++)
+        sceneLights[i]->use(*lightingShader, i, errCode);
 
       // Add camera parameters to lighting shader
       lightingShader->setMat4("view", camera.getView(), errCode);

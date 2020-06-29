@@ -110,8 +110,7 @@ void Shader::bindParameters() {
   glGetProgramiv(m_progId, GL_ACTIVE_UNIFORMS, &count);
   for (GLuint i = 0; i < (GLuint)count; ++i) {
     glGetActiveUniform(m_progId, i, MAX_PARAM_LENGTH, NULL, NULL, NULL, name);
-    GLuint id = glGetUniformLocation(m_progId, name);
-    m_paramMap[name] = id;
+    m_paramMap[name] = glGetUniformLocation(m_progId, name);
   }
 }
 

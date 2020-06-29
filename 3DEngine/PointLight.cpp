@@ -8,12 +8,13 @@ PointLight::PointLight(const glm::vec3 &ambient, const glm::vec3 &diffuse,
       m_linear(linear), m_quadratic(quadratic) {}
 
 // Supply shader with point light data
-void PointLight::use(const Shader &shader, ERROR &errCode) const {
-  Light::use(shader, errCode);
+void PointLight::use(const Shader &shader, size_t index, ERROR &errCode) const {
+  Light::use(shader, index, errCode);
 
   // w-value of 1 indicates to shader that this is a position
-  shader.setVec4("light.position", m_position.x, m_position.y, m_position.z, 1.0f, errCode);
-  shader.setFloat("light.constant", m_constant, errCode);
-  shader.setFloat("light.linear", m_linear, errCode);
-  shader.setFloat("light.quadratic", m_quadratic, errCode);
+  shader.setVec4(m_paramPrefix + ".position", m_position.x, m_position.y, m_position.z, 1.0f,
+                 errCode);
+  shader.setFloat(m_paramPrefix + ".constant", m_constant, errCode);
+  shader.setFloat(m_paramPrefix + ".linear", m_linear, errCode);
+  shader.setFloat(m_paramPrefix + ".quadratic", m_quadratic, errCode);
 }
