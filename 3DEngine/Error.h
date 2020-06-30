@@ -18,9 +18,9 @@ typedef uint32_t ERROR;
 #define ERROR_SHADER_PROGRAM_CREATE_FAILED      6
 #define ERROR_SHADER_PROGRAM_INVALID            7
 #define ERROR_SHADER_PROGRAM_LINKING_FAILED     8
-#define ERROR_INVALID_BITDEPTH                  9
-#define ERROR_MISSING_MESH                      10
-#define ERROR_MISSING_SHADER                    11
+#define ERROR_SHADER_PREPROCESSOR_NOT_FOUND     9
+#define ERROR_INVALID_BITDEPTH                  10
+#define ERROR_MISSING_MESH                      11
 #define ERROR_SHADER_MISSING_PARAMETER          12
 #define ERROR_CANNOT_INITIALISE_FREETYPE        13
 #define ERROR_FONT_LOAD_FAILED                  14
@@ -59,15 +59,15 @@ static void printErrorMsg(ERROR errCode, ...) {
   case ERROR_SHADER_PROGRAM_LINKING_FAILED:
     errBody = "Error in linking program:\n%s";
     break;
+  case ERROR_SHADER_PREPROCESSOR_NOT_FOUND:
+    errBody = "Preprocessor (%s) was not found in shader (%s).";
+    break;
   case ERROR_INVALID_BITDEPTH:
     errBody = "Bitdepth of %d found during texture load is invalid! Bitdepth must be between 1 "
               "and 4 inclusive.";
     break;
   case ERROR_MISSING_MESH:
     errBody = "A mesh has not been assigned to this object.";
-    break;
-  case ERROR_MISSING_SHADER:
-    errBody = "A shader has not been assigned to this object.";
     break;
   case ERROR_SHADER_MISSING_PARAMETER:
     errBody = "Could not locate parameter (%s) in shader program.";

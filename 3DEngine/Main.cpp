@@ -45,6 +45,7 @@
 #define COLOR_VIOLET glm::vec4(0.3569f, 0.0392f, 0.5686f, 1.0f)
 #define FPS_UPDATE_DELAY 0.5f
 #define FPS_BUFFER_SIZE 8
+#define MAX_LIGHTS 8
 
 ERROR errCode = ERROR_OK;
 
@@ -61,6 +62,8 @@ std::vector<Model *> modelList;
 std::vector<std::shared_ptr<Shader>> shaders;
 std::vector<Light *> sceneLights;
 std::vector<Text *> textObjects;
+
+size_t nLights = 0;
 
 Window *window;
 
@@ -156,19 +159,21 @@ int main() {
     Light *directionalLight = new DirectionalLight(glm::vec3(0.25f), glm::vec3(1.0f),
                                                    glm::vec3(1.0f), {1.0f, 1.0f, -1.0f});
     Light *spotLight =
-        new SpotLight(glm::vec3(0.25f), glm::vec3(1.0f), glm::vec3(1.0f), {4.0f, 4.0f, -4.0f},
-                      {0.0f, -1.0f, 0.0f}, 30.0f, 35.0f, 1.0f, 0.045f, 0.0075f);
+        new SpotLight(glm::vec3(0.25f), glm::vec3(1.0f), glm::vec3(1.0f), {-4.0f, 4.0f, 3.0f},
+                      {0.0f, -1.0f, 0.0f}, 20.0f, 25.0f, 1.0f, 0.045f, 0.0075f);
 
     sceneLights = {pointLight, directionalLight, spotLight};
+    nLights = std::min(sceneLights.size(), (size_t)MAX_LIGHTS);
 
     // Setup lighting shader
     auto lightingShader = Resources::GetShader("Lighting");
-    lightingShader->use();
-    lightingShader->setInt("nLights", (int)sceneLights.size(), errCode);
+    lightingShader->setPreprocessor(GL_FRAGMENT_SHADER, "MAX_LIGHTS", MAX_LIGHTS);
+    lightingShader->compile(errCode);
+    lightingShader->setInt("nLights", (int)nLights, errCode);
 
     // Setup text shader
     auto textShader = Resources::GetShader("Text");
-    textShader->use();
+    textShader->compile(errCode);
     const glm::mat4 orthoProjection = glm::ortho(0.0f, (GLfloat)window->getWidth(), 0.0f,
                                                  (GLfloat)window->getHeight(), 0.0f, 1.0f);
     textShader->setMat4("projection", orthoProjection, errCode);
@@ -201,7 +206,7 @@ int main() {
 
       // Apply lights to lighting shader
       lightingShader->use();
-      for (size_t i = 0; i < sceneLights.size(); i++)
+      for (size_t i = 0; i < nLights; i++)
         sceneLights[i]->use(*lightingShader, i, errCode);
 
       // Add camera parameters to lighting shader
