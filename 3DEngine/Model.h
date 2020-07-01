@@ -4,10 +4,6 @@
 #include "Light.h"
 #include "Shader.h"
 
-#include <GL/glew.h>
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-
 static unsigned int id = 0;
 
 class Model {

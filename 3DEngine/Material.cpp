@@ -1,7 +1,5 @@
 #include "Material.h"
 
-#include <stdexcept>
-
 // Constructor
 Material::Material(const glm::vec3 &ambient, const glm::vec3 &diffuse, const glm::vec3 &specular,
                    GLfloat shininess)

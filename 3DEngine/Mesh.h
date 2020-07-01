@@ -3,11 +3,6 @@
 #include "Error.h"
 #include "Material.h"
 
-#include <memory>
-#include <vector>
-
-#include <GL/glew.h>
-
 class Mesh {
 public:
   Mesh(const std::vector<GLfloat> &vertices, const std::vector<GLfloat> &normals,

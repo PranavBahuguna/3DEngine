@@ -20,12 +20,12 @@ struct Light {
   vec3 diffuse;
   vec3 specular;
   vec4 position;
-  vec3 coneDir;
-  float innerConeAngle;
-  float outerConeAngle;
   float constant;
   float linear;
   float quadratic;
+  vec3 coneDir;
+  float innerConeAngle;
+  float outerConeAngle;
 };
 
 uniform vec3 viewPos;

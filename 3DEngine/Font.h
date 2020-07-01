@@ -2,8 +2,6 @@
 
 #include "Error.h"
 
-#include <unordered_map>
-
 #include <GL/glew.h>
 #include <ft2build.h>
 #include <glm/glm.hpp>

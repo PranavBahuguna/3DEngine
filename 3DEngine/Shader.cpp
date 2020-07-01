@@ -2,6 +2,8 @@
 
 #include <fstream>
 
+#include <glm/gtc/type_ptr.hpp>
+
 // Constructor
 Shader::Shader(const std::string &name) : m_name(name), m_progId(0), m_vertId(0), m_fragId(0) {}
 

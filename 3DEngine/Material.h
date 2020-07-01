@@ -2,8 +2,6 @@
 
 #include "Shader.h"
 
-#include <GL/glew.h>
-
 class Material {
 public:
   Material(const glm::vec3 &ambient, const glm::vec3 &diffuse, const glm::vec3 &specular,

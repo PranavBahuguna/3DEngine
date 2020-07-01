@@ -2,8 +2,6 @@
 
 #include <stdexcept>
 
-#include <GL/glew.h>
-
 #define DEFAULT_FONT "Fonts/Calibri.ttf"
 #define FONT_PIXEL_SIZE 64
 

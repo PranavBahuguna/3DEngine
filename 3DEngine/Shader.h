@@ -1,10 +1,9 @@
 #pragma once
+
 #include "Error.h"
 
 #include <GL/glew.h>
 #include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
 
 typedef std::unordered_map<std::string, GLuint> UniformMap;
 typedef std::unordered_map<GLenum, std::unordered_map<std::string, std::string>> PreprocessorMap;

@@ -1,6 +1,6 @@
 #include "Camera.h"
 
-#include <GLFW\glfw3.h>
+#include <glm/gtc/matrix_transform.hpp>
 
 // Constructor
 Camera::Camera(glm::vec3 position, glm::vec3 up, GLfloat yaw, GLfloat pitch, GLfloat moveSpeed,

@@ -2,10 +2,8 @@
 
 #include "Camera.h"
 #include "Cube.h"
-#include "DirectionalLight.h"
-#include "PointLight.h"
+#include "Light.h"
 #include "Sphere.h"
-#include "SpotLight.h"
 #include "Terrain.h"
 #include "Tetrahedron.h"
 #include "Text.h"
@@ -59,7 +57,6 @@ GLfloat fpsUpdateTime = FPS_UPDATE_DELAY;
 bool displayHUD = false;
 
 std::vector<Model *> modelList;
-std::vector<std::shared_ptr<Shader>> shaders;
 std::vector<Light *> sceneLights;
 std::vector<Text *> textObjects;
 
@@ -153,14 +150,14 @@ int main() {
                    pitchLabelText, pitchValueText, yawLabelText,  yawValueText};
 
     // Setup scene lights
-    Light *pointLight = new PointLight(glm::vec3(0.25f), glm::vec3(1.0f), glm::vec3(1.0f),
-                                       glm::vec3(4.0f, 4.0f, -4.0f), 1.0f, 0.045f, 0.0075f);
-
-    Light *directionalLight = new DirectionalLight(glm::vec3(0.25f), glm::vec3(1.0f),
-                                                   glm::vec3(1.0f), {1.0f, 1.0f, -1.0f});
+    Light *pointLight =
+        new Light(LightType::POINT_LIGHT, glm::vec3(0.25f), glm::vec3(1.0f), glm::vec3(1.0f),
+                  glm::vec3(4.0f, 4.0f, -4.0f), 1.0f, 0.045f, 0.0075f);
+    Light *directionalLight = new Light(LightType::DIRECTIONAL_LIGHT, glm::vec3(0.25f),
+                                        glm::vec3(1.0f), glm::vec3(1.0f), {1.0f, 1.0f, -1.0f});
     Light *spotLight =
-        new SpotLight(glm::vec3(0.25f), glm::vec3(1.0f), glm::vec3(1.0f), {-4.0f, 4.0f, 3.0f},
-                      {0.0f, -1.0f, 0.0f}, 20.0f, 25.0f, 1.0f, 0.045f, 0.0075f);
+        new Light(LightType::SPOT_LIGHT, glm::vec3(0.25f), glm::vec3(1.0f), glm::vec3(1.0f),
+                  {-4.0f, 10.0f, 3.0f}, 1.0f, 0.045f, 0.0075f, {0.0f, -1.0f, 0.0f}, 20.0f, 25.0f);
 
     sceneLights = {pointLight, directionalLight, spotLight};
     nLights = std::min(sceneLights.size(), (size_t)MAX_LIGHTS);

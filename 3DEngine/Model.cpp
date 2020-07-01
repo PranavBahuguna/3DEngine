@@ -1,5 +1,7 @@
 #include "Model.h"
 
+#include <glm/gtc/matrix_transform.hpp>
+
 // Constructor
 Model::Model(const std::string &name)
     : m_name(name), m_pos(0.0f), m_angle(0.0f), m_euler(1.0f), m_scale(1.0f) {

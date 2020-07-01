@@ -15,14 +15,8 @@
     <Filter Include="Header Files\Models">
       <UniqueIdentifier>{6f4f1f63-4380-40f9-beba-eff15d298f89}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Shaders">
+    <Filter Include="Shaders">
       <UniqueIdentifier>{1ed1655c-cc91-4456-b4e8-ff541677a371}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Lights">
-      <UniqueIdentifier>{89758a3f-954f-443d-b2e3-7491a4533fbc}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Lights">
-      <UniqueIdentifier>{0ed5d4dc-f423-4c85-b258-a5d69866848f}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -74,17 +68,8 @@
     <ClCompile Include="AssetLoader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="DirectionalLight.cpp">
-      <Filter>Source Files\Lights</Filter>
-    </ClCompile>
-    <ClCompile Include="PointLight.cpp">
-      <Filter>Source Files\Lights</Filter>
-    </ClCompile>
-    <ClCompile Include="SpotLight.cpp">
-      <Filter>Source Files\Lights</Filter>
-    </ClCompile>
     <ClCompile Include="Light.cpp">
-      <Filter>Source Files\Lights</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -142,31 +127,22 @@
     <ClInclude Include="AssetLoader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="DirectionalLight.h">
-      <Filter>Header Files\Lights</Filter>
-    </ClInclude>
-    <ClInclude Include="PointLight.h">
-      <Filter>Header Files\Lights</Filter>
-    </ClInclude>
-    <ClInclude Include="SpotLight.h">
-      <Filter>Header Files\Lights</Filter>
-    </ClInclude>
     <ClInclude Include="Light.h">
-      <Filter>Header Files\Lights</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\Text.frag">
-      <Filter>Source Files\Shaders</Filter>
+      <Filter>Shaders</Filter>
     </None>
     <None Include="Shaders\Text.vert">
-      <Filter>Source Files\Shaders</Filter>
+      <Filter>Shaders</Filter>
     </None>
     <None Include="Shaders\Lighting.frag">
-      <Filter>Source Files\Shaders</Filter>
+      <Filter>Shaders</Filter>
     </None>
     <None Include="Shaders\Lighting.vert">
-      <Filter>Source Files\Shaders</Filter>
+      <Filter>Shaders</Filter>
     </None>
   </ItemGroup>
 </Project>

@@ -2,8 +2,6 @@
 
 #include "Error.h"
 
-#include <string>
-
 #include <GL/glew.h>
 
 class Texture {
