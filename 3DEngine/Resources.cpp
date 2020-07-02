@@ -1,24 +1,75 @@
 #include "Resources.h"
 
-std::shared_ptr<Mesh> Resources::GetMesh(const std::string &name,
-                                         const std::vector<GLfloat> &vertices,
-                                         const std::vector<GLfloat> &texCoords,
-                                         const std::vector<GLfloat> &normals,
-                                         const std::vector<GLuint> &indices) {
+MeshPtr Resources::FindMesh(const std::string &name) {
   auto &mesh = meshMap[name];
-  if (mesh.expired()) {
-    std::shared_ptr<Mesh> newMesh(new Mesh(vertices, texCoords, normals, indices));
-    mesh = newMesh;
-    return newMesh;
-  } else {
-    return mesh.lock();
-  }
+  return (mesh.expired()) ? mesh.lock() : nullptr;
 }
 
-std::shared_ptr<Shader> Resources::GetShader(const std::string &name) {
+MeshPtr Resources::CreateMesh(const std::string &name, const std::vector<GLfloat> &vertices,
+                              const std::vector<GLfloat> &texCoords,
+                              const std::vector<GLfloat> &normals,
+                              const std::vector<GLuint> &indices) {
+  auto &mesh = meshMap[name];
+  MeshPtr newMesh(new Mesh(vertices, texCoords, normals, indices));
+  mesh = newMesh;
+  return newMesh;
+}
+
+MatPtr Resources::FindMaterial(const std::string &name) {
+  auto &material = materialMap[name];
+  return (material.expired()) ? nullptr : material.lock();
+}
+
+MatPtr Resources::CreateMaterial(const std::string &name, const glm::vec3 &ambient,
+                                 const glm::vec3 &diffuse, const glm::vec3 &specular,
+                                 GLfloat shininess) {
+  auto &material = materialMap[name];
+  MatPtr newMaterial(new Material(ambient, diffuse, specular, shininess));
+  material = newMaterial;
+  return newMaterial;
+}
+
+LightPtr Resources::FindLight(const std::string &name) {
+  auto &light = lightMap[name];
+  return (light.expired()) ? nullptr : light.lock();
+}
+
+LightPtr Resources::CreateDirectionalLight(const std::string &name, const glm::vec3 &ambient,
+                                           const glm::vec3 &diffuse, const glm::vec3 &specular,
+                                           const glm::vec3 &direction) {
+  auto &light = lightMap[name];
+  LightPtr newLight(new Light(LightType::DIRECTIONAL_LIGHT, ambient, diffuse, specular, direction));
+  light = newLight;
+  return newLight;
+}
+
+LightPtr Resources::CreatePointLight(const std::string &name, const glm::vec3 &ambient,
+                                     const glm::vec3 &diffuse, const glm::vec3 &specular,
+                                     const glm::vec3 &position, GLfloat constant, GLfloat linear,
+                                     GLfloat quadratic) {
+  auto &light = lightMap[name];
+  LightPtr newLight(new Light(LightType::POINT_LIGHT, ambient, diffuse, specular, position,
+                              constant, linear, quadratic));
+  light = newLight;
+  return newLight;
+}
+
+LightPtr Resources::CreateSpotLight(const std::string &name, const glm::vec3 &ambient,
+                                    const glm::vec3 &diffuse, const glm::vec3 &specular,
+                                    const glm::vec3 &position, GLfloat constant, GLfloat linear,
+                                    GLfloat quadratic, const glm::vec3 &coneDir,
+                                    GLfloat innerConeAngle, GLfloat outerConeAngle) {
+  auto &light = lightMap[name];
+  LightPtr newLight(new Light(LightType::SPOT_LIGHT, ambient, diffuse, specular, position, constant,
+                              linear, quadratic, coneDir, innerConeAngle, outerConeAngle));
+  light = newLight;
+  return newLight;
+}
+
+ShaderPtr Resources::GetShader(const std::string &name) {
   auto &shader = shaderMap[name];
   if (shader.expired()) {
-    std::shared_ptr<Shader> newShader(new Shader(name));
+    ShaderPtr newShader(new Shader(name));
     shader = newShader;
     return newShader;
   } else {
@@ -26,10 +77,10 @@ std::shared_ptr<Shader> Resources::GetShader(const std::string &name) {
   }
 }
 
-std::shared_ptr<Texture> Resources::GetTexture(const std::string &name) {
+TexPtr Resources::GetTexture(const std::string &name) {
   auto &texture = textureMap[name];
   if (texture.expired()) {
-    std::shared_ptr<Texture> newTexture(new Texture(name));
+    TexPtr newTexture(new Texture(name));
     texture = newTexture;
     return newTexture;
   } else {
@@ -37,23 +88,10 @@ std::shared_ptr<Texture> Resources::GetTexture(const std::string &name) {
   }
 }
 
-std::shared_ptr<Material> Resources::GetMaterial(const std::string &name, const glm::vec3 &ambient,
-                                                 const glm::vec3 &diffuse,
-                                                 const glm::vec3 &specular, GLfloat shininess) {
-  auto &material = materialMap[name];
-  if (material.expired()) {
-    std::shared_ptr<Material> newMaterial(new Material(ambient, diffuse, specular, shininess));
-    material = newMaterial;
-    return newMaterial;
-  } else {
-    return material.lock();
-  }
-}
-
-std::shared_ptr<Font> Resources::GetFont(const std::string &name) {
+FontPtr Resources::GetFont(const std::string &name) {
   auto &font = fontMap[name];
   if (font.expired()) {
-    std::shared_ptr<Font> newFont(new Font(name));
+    FontPtr newFont(new Font(name));
     font = newFont;
     return newFont;
   } else {

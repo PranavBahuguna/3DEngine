@@ -58,7 +58,7 @@ GLfloat fpsUpdateTime = FPS_UPDATE_DELAY;
 bool displayHUD = false;
 
 std::vector<Model *> modelList;
-std::vector<Light *> sceneLights;
+std::vector<LightPtr> sceneLights;
 std::vector<Text *> textObjects;
 
 size_t nLights = 0;
@@ -156,16 +156,17 @@ int main() {
                    pitchLabelText, pitchValueText, yawLabelText,  yawValueText};
 
     // Setup scene lights
-    Light *pointLight =
-        new Light(LightType::POINT_LIGHT, glm::vec3(0.25f), glm::vec3(1.0f), glm::vec3(1.0f),
-                  glm::vec3(4.0f, 4.0f, -4.0f), 1.0f, 0.045f, 0.0075f);
-    Light *directionalLight = new Light(LightType::DIRECTIONAL_LIGHT, glm::vec3(0.25f),
-                                        glm::vec3(1.0f), glm::vec3(1.0f), {1.0f, 1.0f, -1.0f});
-    Light *spotLight =
-        new Light(LightType::SPOT_LIGHT, glm::vec3(0.25f), glm::vec3(1.0f), glm::vec3(1.0f),
-                  {-4.0f, 10.0f, 3.0f}, 1.0f, 0.045f, 0.0075f, {0.0f, -1.0f, 0.0f}, 20.0f, 25.0f);
+    LightPtr light01 =
+        Resources::CreateDirectionalLight("DirectionalLight", glm::vec3(0.25f), glm::vec3(1.0f),
+                                          glm::vec3(1.0f), {1.0f, 1.0f, -1.0f});
+    LightPtr light02 = Resources::CreatePointLight("PointLight", glm::vec3(0.25f), glm::vec3(1.0f),
+                                                   glm::vec3(1.0f), glm::vec3(4.0f, 4.0f, -4.0f),
+                                                   1.0f, 0.045f, 0.0075f);
+    LightPtr light03 = Resources::CreateSpotLight(
+        "SpotLight", glm::vec3(0.25f), glm::vec3(1.0f), glm::vec3(1.0f), {-4.0f, 10.0f, 3.0f}, 1.0f,
+        0.045f, 0.0075f, {0.0f, -1.0f, 0.0f}, 20.0f, 25.0f);
 
-    sceneLights = {pointLight, directionalLight, spotLight};
+    sceneLights = {light01, light02, light03};
     nLights = std::min(sceneLights.size(), (size_t)MAX_LIGHTS);
 
     // Setup lighting shader

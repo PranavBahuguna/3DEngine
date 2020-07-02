@@ -15,7 +15,7 @@ public:
 
 private:
   std::string m_text;
-  std::shared_ptr<Font> m_font;
+  FontPtr m_font;
   glm::vec2 m_pos;
   GLfloat m_scale;
   glm::vec4 m_color;

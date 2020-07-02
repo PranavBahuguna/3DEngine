@@ -7,11 +7,18 @@
 Terrain::Terrain(const std::string &name, const glm::uvec2 &nTiles, const glm::vec2 &tileDimensions,
                  const glm::vec2 &tileTexMapping)
     : Model(name), m_nTiles(nTiles), m_tileDimensions(tileDimensions),
-      m_tileTexMapping(tileTexMapping) {}
+      m_tileTexMapping(tileTexMapping) {
 
-// Generates the mesh and loads relevant materials
+  m_meshes.resize(1);
+}
+
+// Creates the mesh and relevant materials
 void Terrain::load(ERROR &errCode) {
-  generateMesh();
+  // Use existing mesh if available, otherwise generate the mesh
+  m_meshes[0] = Resources::FindMesh(m_name);
+  if (m_meshes[0] == nullptr)
+    generateMesh();
+
   AssetLoader::loadMaterials(m_name, m_materials, m_textures, errCode);
 }
 
@@ -61,5 +68,5 @@ void Terrain::generateMesh() {
     }
   }
 
-  m_meshes.push_back(Resources::GetMesh(m_name, vertices, texCoords, normals, indices));
+  m_meshes[0] = Resources::CreateMesh(m_name, vertices, texCoords, normals, indices);
 }
