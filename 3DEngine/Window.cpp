@@ -2,28 +2,25 @@
 
 #include <stdexcept>
 
-// Constructor - defaults to 800 x 600 size window
-Window::Window() : Window("Test Window", 800, 600) {}
-
 // Constructor
-Window::Window(const std::string &name, GLint width, GLint height, bool useFullscreen)
-    : m_name(name), m_width(width), m_height(height), m_useFullscreen(useFullscreen), m_lastX(0.0f),
-      m_lastY(0.0f), m_mouseFirstMoved(true) {
+Window::Window(const std::string &name, WindowMode wMode, GLint width, GLint height)
+    : m_name(name), m_wMode(wMode), m_width(width), m_height(height), m_lastX(0.0f), m_lastY(0.0f),
+      m_mouseFirstMoved(true) {
 
   std::fill_n(m_toggleKeys, NUM_KEYS, true);
-
-  ERROR errCode = initialize();
-  if (errCode != ERROR_OK) {
-    printErrorMsg(errCode);
-    throw std::runtime_error("An error occurred during shader construction.");
-  }
 }
 
 // Initialises the windows properties
-ERROR Window::initialize() {
+void Window::initialize(ERROR &errCode) {
+  if (errCode != ERROR_OK)
+    return;
+
   // Initialise GLFW
-  if (glfwInit() != GLFW_TRUE)
-    return ERROR_GLFW_INIT_FAILED;
+  if (glfwInit() != GLFW_TRUE) {
+    errCode = ERROR_GLFW_INIT_FAILED;
+    printErrorMsg(errCode);
+    return;
+  }
 
   // Setup GFLW window properties
   // OpenGL version
@@ -37,18 +34,24 @@ ERROR Window::initialize() {
 
   // Set window dimensions from screen if fullscreen enabled
   GLFWmonitor *monitor = nullptr;
-  if (m_useFullscreen) {
-    monitor = glfwGetPrimaryMonitor();
-    const GLFWvidmode *mode = glfwGetVideoMode(monitor);
+  if (m_wMode == WindowMode::FULLSCREEN || m_wMode == WindowMode::FULLSCREEN_WINDOWED) {
+    auto primaryMonitor = glfwGetPrimaryMonitor();
+    const GLFWvidmode *mode = glfwGetVideoMode(primaryMonitor);
     m_width = mode->width;
     m_height = mode->height;
+
+    // Use the primary monitor only if we want fullscreen without window
+    if (m_wMode == WindowMode::FULLSCREEN)
+      monitor = primaryMonitor;
   }
 
   // Initialiase window with given dimension
   m_mainWindow = glfwCreateWindow(m_width, m_height, m_name.c_str(), monitor, NULL);
-  if (m_mainWindow == nullptr)
-    return ERROR_GLFW_WINDOW_CREATE_FAILED;
-
+  if (m_mainWindow == nullptr) {
+    errCode = ERROR_GLFW_WINDOW_CREATE_FAILED;
+    printErrorMsg(errCode);
+    return;
+  }
   // Set context for GLEW to use
   glfwMakeContextCurrent(m_mainWindow);
 
@@ -56,8 +59,11 @@ ERROR Window::initialize() {
   glewExperimental = GL_TRUE;
 
   // Initialise GLEW
-  if (glewInit() != GLEW_OK)
-    return ERROR_GLEW_INIT_FAILED;
+  if (glewInit() != GLEW_OK) {
+    errCode = ERROR_GLEW_INIT_FAILED;
+    printErrorMsg(errCode);
+    return;
+  }
 
   // Setup viewport size
   glViewport(0, 0, m_width, m_height);
@@ -69,8 +75,6 @@ ERROR Window::initialize() {
   glfwSetInputMode(m_mainWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
   glfwSetWindowUserPointer(m_mainWindow, this);
-
-  return ERROR_OK;
 }
 
 // Destructor - destroy window and terminate

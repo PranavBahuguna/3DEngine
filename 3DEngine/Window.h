@@ -3,17 +3,22 @@
 #include "Error.h"
 
 #include <string>
-
+// clang-format off
 #include <GL\glew.h>
 #include <GLFW\glfw3.h>
+// clang-format on
 
 #define NUM_KEYS 512
 
+enum class WindowMode { WINDOWED, FULLSCREEN_WINDOWED, FULLSCREEN };
+
 class Window {
 public:
-  Window();
-  Window(const std::string &name, GLint width, GLint height, bool useFullscreen = false);
+  Window(const std::string &name, WindowMode wMode = WindowMode::WINDOWED, GLint width = 800,
+         GLint height = 600);
   ~Window();
+
+  void initialize(ERROR &errCode);
 
   GLint getWidth() const { return m_width; }
   GLint getHeight() const { return m_height; }
@@ -24,18 +29,16 @@ public:
   GLfloat getDeltaX();
   GLfloat getDeltaY();
 
-  const bool* getKeys() const { return m_keys; }
+  const bool *getKeys() const { return m_keys; }
   bool getToggleKey(int key, ERROR *errCode);
 
 private:
-  ERROR initialize();
-
   static void keyHandler(GLFWwindow *window, int key, int scancode, int action, int mods);
   static void mouseHandler(GLFWwindow *window, double xPos, double yPos);
 
   GLFWwindow *m_mainWindow;
   std::string m_name;
-  bool m_useFullscreen;
+  WindowMode m_wMode;
 
   GLint m_width;
   GLint m_height;

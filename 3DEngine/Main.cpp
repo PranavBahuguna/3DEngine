@@ -25,10 +25,11 @@
 #define WINDOW_WIDTH 1600
 #define WINDOW_HEIGHT 1200
 #ifdef _DEBUG
-#define USE_FULLSCREEN false
+#define USE_WINDOWED true
 #else
-#define USE_FULLSCREEN true
+#define USE_WINDOWED false
 #endif
+#define FULLSCREEN_WINDOWS false
 #define CAMERA_MOVE_SPEED 5.0f
 #define CAMERA_TURN_SPEED 50.0f
 #define FOV 45.0f
@@ -78,8 +79,13 @@ static glm::vec2 relToScreenPos(const glm::vec2 &pos) {
 
 int main() {
   try {
-    // Create a fullscreen window
-    window = new Window("Test window", WINDOW_WIDTH, WINDOW_HEIGHT, USE_FULLSCREEN);
+    // Determine the window mode to use and create a window
+    WindowMode wMode = (!USE_WINDOWED) ? WindowMode::FULLSCREEN
+                                       : (FULLSCREEN_WINDOWS) ? WindowMode::FULLSCREEN_WINDOWED
+                                                              : WindowMode::WINDOWED;
+
+    window = new Window("Test window", wMode, WINDOW_WIDTH, WINDOW_HEIGHT);
+    window->initialize(errCode);
 
     // Allow objects to obscure other objects behind them
     glEnable(GL_DEPTH_TEST);
