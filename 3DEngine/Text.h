@@ -1,8 +1,6 @@
 #pragma once
 
-#include "Error.h"
-#include "Font.h"
-#include "Shader.h"
+#include "Resources.h"
 
 #include <memory>
 

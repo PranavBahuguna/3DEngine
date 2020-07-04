@@ -27,6 +27,7 @@ typedef uint32_t ERROR;
 #define ERROR_FONT_GLYPH_LOAD_FAILED            15
 #define ERROR_FONT_CHARACTER_OUT_OF_RANGE       16
 #define ERROR_INPUT_KEY_OUT_OF_RANGE            17
+#define ERROR_MISSING_LIGHT                     18
 // clang-format on
 
 static void printErrorMsg(ERROR errCode, ...) {
@@ -86,6 +87,9 @@ static void printErrorMsg(ERROR errCode, ...) {
     break;
   case ERROR_INPUT_KEY_OUT_OF_RANGE:
     errBody = "Input key (%d) is out of range.";
+    break;
+  case ERROR_MISSING_LIGHT:
+    errBody = "Light with name (%s) cannot be found.";
     break;
   default:
     errBody = "Unknown error";

@@ -71,6 +71,9 @@
     <ClCompile Include="Light.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="LightIcon.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Shader.h">
@@ -130,6 +133,9 @@
     <ClInclude Include="Light.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="LightIcon.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\Text.frag">
@@ -142,6 +148,12 @@
       <Filter>Shaders</Filter>
     </None>
     <None Include="Shaders\Lighting.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\LightIconParticle.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\LightIconParticle.vert">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>

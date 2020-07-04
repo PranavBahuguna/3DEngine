@@ -1,5 +1,4 @@
 #include "Text.h"
-#include "Resources.h"
 
 // Constructor
 Text::Text(const std::string &font, const glm::vec2 &pos, const GLfloat scale,

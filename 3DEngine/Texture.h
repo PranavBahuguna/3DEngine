@@ -11,6 +11,9 @@ public:
 
   void use() const;
 
+  int getWidth() const { return m_width; };
+  int getHeight() const { return m_height; };
+
 private:
   ERROR load(const std::string &filepath);
   void setFormat(int channels, ERROR &errCode);

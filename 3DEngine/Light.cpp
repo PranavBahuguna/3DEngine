@@ -47,3 +47,14 @@ void Light::use(const Shader &shader, size_t index, ERROR &errCode) const {
     }
   }
 }
+
+// Returns the light type
+LightType Light::getType() const { return m_type; }
+
+// Returns this light's position
+glm::vec4 Light::getPosition() const { return m_position; }
+
+// Returns a normalized summation of this light's ambient diffuse and specular colors
+glm::vec3 Light::getTotalColor() const {
+  return glm::normalize(m_ambient + m_diffuse + m_specular);
+}

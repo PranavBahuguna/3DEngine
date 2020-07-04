@@ -3,6 +3,7 @@
 #include "Camera.h"
 #include "Cube.h"
 #include "Light.h"
+#include "LightIcon.h"
 #include "Sphere.h"
 #include "Terrain.h"
 #include "Tetrahedron.h"
@@ -60,6 +61,7 @@ bool displayHUD = false;
 std::vector<Model *> modelList;
 std::vector<LightPtr> sceneLights;
 std::vector<Text *> textObjects;
+std::vector<LightIcon *> lightIcons;
 
 size_t nLights = 0;
 
@@ -159,15 +161,22 @@ int main() {
     LightPtr light01 =
         Resources::CreateDirectionalLight("DirectionalLight", glm::vec3(0.25f), glm::vec3(1.0f),
                                           glm::vec3(1.0f), {1.0f, 1.0f, -1.0f});
-    LightPtr light02 = Resources::CreatePointLight("PointLight", glm::vec3(0.25f), glm::vec3(1.0f),
-                                                   glm::vec3(1.0f), glm::vec3(4.0f, 4.0f, -4.0f),
-                                                   1.0f, 0.045f, 0.0075f);
+    LightPtr light02 = Resources::CreatePointLight(
+        "PointLight", glm::vec3(0.25f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(1.0f),
+        glm::vec3(4.0f, 4.0f, -4.0f), 1.0f, 0.045f, 0.0075f);
     LightPtr light03 = Resources::CreateSpotLight(
         "SpotLight", glm::vec3(0.25f), glm::vec3(1.0f), glm::vec3(1.0f), {-4.0f, 10.0f, 3.0f}, 1.0f,
         0.045f, 0.0075f, {0.0f, -1.0f, 0.0f}, 20.0f, 25.0f);
 
     sceneLights = {light01, light02, light03};
     nLights = std::min(sceneLights.size(), (size_t)MAX_LIGHTS);
+
+    // Setup light icons
+    LightIcon *li01 = new LightIcon("DirectionalLight");
+    LightIcon *li02 = new LightIcon("PointLight");
+    LightIcon *li03 = new LightIcon("SpotLight");
+
+    lightIcons = {li01, li02, li03};
 
     // Setup lighting shader
     auto lightingShader = Resources::GetShader("Lighting");
@@ -181,6 +190,11 @@ int main() {
     const glm::mat4 orthoProjection = glm::ortho(0.0f, (GLfloat)window->getWidth(), 0.0f,
                                                  (GLfloat)window->getHeight(), 0.0f, 1.0f);
     textShader->setMat4("projection", orthoProjection, errCode);
+
+    // Setup light icon particle shader
+    auto liShader = Resources::GetShader("LightIconParticle");
+    liShader->compile(errCode);
+    liShader->setMat4("projection", orthoProjection, errCode);
 
     // Setup camera
     Camera camera(glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f), 90.0f, 0.0f, CAMERA_MOVE_SPEED,
@@ -227,6 +241,13 @@ int main() {
           throw std::runtime_error("An error occurred while processing model " +
                                    std::to_string(model->_id) + ".");
       }
+
+      // Draw light icons
+      liShader->use();
+      liShader->setMat4("view", camera.getView(), errCode);
+      liShader->setMat4("projection", camera.getProjection(), errCode);
+      for (const auto &icon : lightIcons)
+        icon->draw(*liShader, errCode);
 
       // Draw HUD elements to screen
       if (displayHUD) {

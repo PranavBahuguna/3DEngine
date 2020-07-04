@@ -14,6 +14,10 @@ public:
   void use(const Shader &shader, size_t index, ERROR &errCode) const;
   void update(ERROR &errCode){};
 
+  LightType getType() const;
+  glm::vec4 getPosition() const;
+  glm::vec3 getTotalColor() const;
+
 private:
   LightType m_type;
 
