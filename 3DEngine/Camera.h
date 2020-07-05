@@ -1,26 +1,37 @@
 #pragma once
 
+#include "Error.h"
 #include "Window.h"
+
+#include <memory>
 
 #include <glm/glm.hpp>
 
+class Camera;
+typedef std::shared_ptr<Camera> CamPtr;
+
 class Camera {
 public:
-  Camera(glm::vec3 position, glm::vec3 up, GLfloat yaw, GLfloat pitch, GLfloat moveSpeed,
-         GLfloat turnSpeed);
-  ~Camera();
+  // Prevent copying of this camera object
+  Camera(Camera const &) = delete;
+  void operator=(Camera const &) = delete;
+
+  static void init(glm::vec3 position, glm::vec3 up, GLfloat yaw, GLfloat pitch, GLfloat fov,
+                   GLfloat aspectRatio, GLfloat near, GLfloat far);
+  static CamPtr getInstance();
 
   void keyControl(const bool *keys, GLfloat deltaTime);
   void mouseControl(GLfloat deltaX, GLfloat deltaY, GLfloat deltaTime);
-  void setProjection(float fov, float aspectRatio, float near, float far);
 
-  glm::mat4 getView() const;
+  glm::mat4 getView() const { return m_view; }
   glm::mat4 getProjection() const { return m_projection; }
   glm::vec3 getPosition() const { return m_position; }
   GLfloat getPitch() const { return m_pitch; }
   GLfloat getYaw() const { return m_yaw; }
 
 private:
+  Camera(); // prevent construction of this class
+
   void updateDirection();
 
   glm::vec3 m_position;
@@ -29,10 +40,9 @@ private:
   glm::vec3 m_right;
   glm::vec3 m_worldUp;
 
-  glm::mat4 m_projection;
-
   GLfloat m_yaw;
   GLfloat m_pitch;
-  GLfloat m_moveSpeed;
-  GLfloat m_turnSpeed;
+
+  glm::mat4 m_view;
+  glm::mat4 m_projection;
 };

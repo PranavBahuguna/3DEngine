@@ -15,18 +15,19 @@ void main() {
   TexCoords = vertex.zw;
   ParticleColor = color;
   mat4 modelView = view * model;
-  
-  modelView[0][0] = 1.0; 
-  modelView[0][1] = 0.0; 
-  modelView[0][2] = 0.0; 
 
-  modelView[1][0] = 0.0; 
-  modelView[1][1] = 1.0; 
+  // Clear the rotation component from the modelView matrix
+  modelView[0][0] = 1.0;
+  modelView[0][1] = 0.0;
+  modelView[0][2] = 0.0;
+
+  modelView[1][0] = 0.0;
+  modelView[1][1] = 1.0;
   modelView[1][2] = 0.0;
 
-  modelView[2][0] = 0.0; 
-  modelView[2][1] = 0.0; 
-  modelView[2][2] = 1.0; 
+  modelView[2][0] = 0.0;
+  modelView[2][1] = 0.0;
+  modelView[2][2] = 1.0;
 
   vec4 P = modelView * vec4(vertex.xy * scale, 1.0, 1.0);
   gl_Position = projection * P;

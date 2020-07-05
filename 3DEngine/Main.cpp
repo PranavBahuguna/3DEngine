@@ -31,8 +31,6 @@
 #define USE_WINDOWED false
 #endif
 #define FULLSCREEN_WINDOWS false
-#define CAMERA_MOVE_SPEED 5.0f
-#define CAMERA_TURN_SPEED 50.0f
 #define FOV 45.0f
 #define NEAR_PLANE 0.1f
 #define FAR_PLANE 100.0f
@@ -197,9 +195,9 @@ int main() {
     liShader->setMat4("projection", orthoProjection, errCode);
 
     // Setup camera
-    Camera camera(glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f), 90.0f, 0.0f, CAMERA_MOVE_SPEED,
-                  CAMERA_TURN_SPEED);
-    camera.setProjection(FOV, window->getAspectRatio(), NEAR_PLANE, FAR_PLANE);
+    Camera::init(glm::vec3(0.0f), {0.0f, 1.0f, 0.0f}, 90.0f, 0.0f, FOV, window->getAspectRatio(),
+                 NEAR_PLANE, FAR_PLANE);
+    auto camera = Camera::getInstance();
 
     // Main program loop
     while (!window->getShouldClose()) {
@@ -212,8 +210,8 @@ int main() {
 
       // Handle user input events
       glfwPollEvents();
-      camera.keyControl(window->getKeys(), deltaTime);
-      camera.mouseControl(window->getDeltaX(), window->getDeltaY(), deltaTime);
+      camera->keyControl(window->getKeys(), deltaTime);
+      camera->mouseControl(window->getDeltaX(), window->getDeltaY(), deltaTime);
 
       if (window->getToggleKey(GLFW_KEY_M, NULL))
         displayHUD = !displayHUD;
@@ -228,9 +226,9 @@ int main() {
         sceneLights[i]->use(*lightingShader, i, errCode);
 
       // Add camera parameters to lighting shader
-      lightingShader->setMat4("view", camera.getView(), errCode);
-      lightingShader->setMat4("projection", camera.getProjection(), errCode);
-      lightingShader->setVec3("viewPos", camera.getPosition(), errCode);
+      lightingShader->setMat4("view", camera->getView(), errCode);
+      lightingShader->setMat4("projection", camera->getProjection(), errCode);
+      lightingShader->setVec3("viewPos", camera->getPosition(), errCode);
 
       // Update and draw each model
       for (const auto &model : modelList) {
@@ -244,8 +242,8 @@ int main() {
 
       // Draw light icons
       liShader->use();
-      liShader->setMat4("view", camera.getView(), errCode);
-      liShader->setMat4("projection", camera.getProjection(), errCode);
+      liShader->setMat4("view", camera->getView(), errCode);
+      liShader->setMat4("projection", camera->getProjection(), errCode);
       for (const auto &icon : lightIcons)
         icon->draw(*liShader, errCode);
 
@@ -263,13 +261,13 @@ int main() {
           fpsUpdateTime += deltaTime;
         }
 
-        const auto &cameraPos = camera.getPosition();
+        const auto &cameraPos = camera->getPosition();
 
         xPosValueText->setText(toStringDp(cameraPos.x, 3));
         yPosValueText->setText(toStringDp(cameraPos.y, 3));
         zPosValueText->setText(toStringDp(cameraPos.z, 3));
-        pitchValueText->setText(toStringDp(camera.getPitch(), 1));
-        yawValueText->setText(toStringDp(camera.getYaw(), 1));
+        pitchValueText->setText(toStringDp(camera->getPitch(), 1));
+        yawValueText->setText(toStringDp(camera->getYaw(), 1));
 
         textShader->use();
         for (auto it = textObjects.begin(); it != textObjects.end() && errCode == ERROR_OK; ++it)

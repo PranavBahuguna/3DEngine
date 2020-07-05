@@ -8,13 +8,14 @@
 
 #include <memory>
 
-template <typename T> using ResourceMap = std::unordered_map<std::string, std::weak_ptr<T>>;
 typedef std::shared_ptr<Mesh> MeshPtr;
 typedef std::shared_ptr<Material> MatPtr;
 typedef std::shared_ptr<Light> LightPtr;
 typedef std::shared_ptr<Shader> ShaderPtr;
 typedef std::shared_ptr<Texture> TexPtr;
 typedef std::shared_ptr<Font> FontPtr;
+
+template <typename T> using ResourceMap = std::unordered_map<std::string, std::weak_ptr<T>>;
 
 static ResourceMap<Mesh> meshMap;
 static ResourceMap<Material> materialMap;
@@ -50,6 +51,4 @@ public:
   static ShaderPtr GetShader(const std::string &name);
   static TexPtr GetTexture(const std::string &name);
   static FontPtr GetFont(const std::string &name);
-
-private:
 };
