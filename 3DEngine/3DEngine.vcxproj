@@ -156,7 +156,10 @@
     <ClCompile Include="AssetLoader.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Cube.cpp" />
+    <ClCompile Include="Drawable.cpp" />
+    <ClCompile Include="DrawList.cpp" />
     <ClCompile Include="Font.cpp" />
+    <ClCompile Include="IlluminationDrawList.cpp" />
     <ClCompile Include="Light.cpp" />
     <ClCompile Include="LightIcon.cpp" />
     <ClCompile Include="Material.cpp" />
@@ -170,14 +173,20 @@
     <ClCompile Include="Text.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="Timer.cpp" />
+    <ClCompile Include="TransparencyDrawList.cpp" />
     <ClCompile Include="Window.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AssetLoader.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Cube.h" />
+    <ClInclude Include="Drawable.h" />
+    <ClInclude Include="DrawList.h" />
     <ClInclude Include="Error.h" />
     <ClInclude Include="Font.h" />
+    <ClInclude Include="DrawListBuilder.h" />
+    <ClInclude Include="IlluminationDrawList.h" />
     <ClInclude Include="Light.h" />
     <ClInclude Include="LightIcon.h" />
     <ClInclude Include="Material.h" />
@@ -191,7 +200,9 @@
     <ClInclude Include="Tetrahedron.h" />
     <ClInclude Include="Text.h" />
     <ClInclude Include="Texture.h" />
+    <ClInclude Include="Timer.h" />
     <ClInclude Include="tiny_obj_loader.h" />
+    <ClInclude Include="TransparencyDrawList.h" />
     <ClInclude Include="Window.h" />
   </ItemGroup>
   <ItemGroup>

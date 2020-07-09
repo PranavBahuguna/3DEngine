@@ -1,11 +1,10 @@
 #include "Text.h"
 
 // Constructor
-Text::Text(const std::string &font, const glm::vec2 &pos, const GLfloat scale,
-           const glm::vec4 &color)
-    : m_pos(pos), m_scale(scale), m_color(color) {
-
-  m_font = Resources::GetFont(font);
+Text::Text(const std::string &font, const glm::vec2 &pos,
+           const GLfloat scale, const glm::vec4 &color)
+    : Drawable({pos.x, pos.y, 0.0f}), m_font(Resources::GetFont(font)), m_scale(scale),
+      m_color(color) {
 
   // Configure VAO / VBO for texture quads and bind buffer data
   glGenVertexArrays(1, &m_VAO);
@@ -19,9 +18,6 @@ Text::Text(const std::string &font, const glm::vec2 &pos, const GLfloat scale,
     glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
   }
 }
-
-// Sets this text object's text string
-void Text::setText(const std::string &text) { m_text = text; }
 
 // Draws a text string onto the screen
 void Text::draw(const Shader &shader, ERROR &errCode) const {

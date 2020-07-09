@@ -3,12 +3,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 // Constructor
-Model::Model(const std::string &name)
-    : m_name(name), m_pos(0.0f), m_angle(0.0f), m_euler(1.0f), m_scale(1.0f) {
-
-  static unsigned int id = 0;
-  _id = id++;
-}
+Model::Model(const std::string &name) : m_name(name), m_angle(0.0f), m_euler(1.0f), m_scale(1.0f) {}
 
 // Draws the model to the screen
 void Model::draw(const Shader &shader, ERROR &errCode) const {

@@ -40,6 +40,8 @@ public:
   void setPreprocessor(GLenum type, const std::string &name, int value);
   void setPreprocessor(GLenum type, const std::string &name, float value);
 
+  bool isCompiled() { return m_isCompiled; }
+
 private:
   void load(const std::string &filename, GLenum type, GLuint &shaderId, ERROR &errCode);
   void linkPrograms(ERROR &errCode);
@@ -55,6 +57,8 @@ private:
   std::string m_name;
   UniformMap m_uniformMap;
   PreprocessorMap m_preprocessorMap;
+
+  bool m_isCompiled;
 
   // Program ids
   GLuint m_progId;

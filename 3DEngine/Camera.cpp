@@ -1,4 +1,5 @@
 #include "Camera.h"
+#include "Timer.h"
 
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -35,8 +36,19 @@ void Camera::init(glm::vec3 position, glm::vec3 up, GLfloat yaw, GLfloat pitch, 
   instance->updateDirection();
 }
 
+// Static key handler interface
+void Camera::keyControl(const bool *keys) {
+  getInstance()->_keyControl(keys);
+}
+
+// Static mouse handler interface
+void Camera::mouseControl(float deltaX, float deltaY) {
+  getInstance()->_mouseControl(deltaX, deltaY);
+}
+
 // Handles key input to the camera
-void Camera::keyControl(const bool *keys, GLfloat deltaTime) {
+void Camera::_keyControl(const bool *keys) {
+  float deltaTime = Timer::GetDeltaTime();
 
   if (keys[GLFW_KEY_W])
     m_position += m_front * MOVE_SPEED * deltaTime;
@@ -70,7 +82,9 @@ void Camera::keyControl(const bool *keys, GLfloat deltaTime) {
 }
 
 // Handles mouse input to the camera
-void Camera::mouseControl(GLfloat deltaX, GLfloat deltaY, GLfloat deltaTime) {
+void Camera::_mouseControl(GLfloat deltaX, GLfloat deltaY) {
+  float deltaTime = Timer::GetDeltaTime();
+
   // Update yaw and pitch
   m_yaw += deltaX * TURN_SPEED * deltaTime;
   m_pitch += deltaY * TURN_SPEED * deltaTime;

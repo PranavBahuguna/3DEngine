@@ -9,10 +9,11 @@ out vec4 color;
 uniform sampler2D sprite;
 
 void main() {
+  color = texture(sprite, TexCoords);
+
   if (color.a < TOLERANCE)
     discard;
 
-  color = color = texture(sprite, TexCoords);
   if (color.a < 1.0 - TOLERANCE)
     color *= ParticleColor;
 }

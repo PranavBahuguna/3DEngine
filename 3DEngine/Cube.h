@@ -9,5 +9,5 @@ class Cube : public Model {
 public:
   Cube();
 
-  void update(ERROR &errCode, GLfloat deltaTime) override;
+  void update(ERROR &errCode) override;
 };

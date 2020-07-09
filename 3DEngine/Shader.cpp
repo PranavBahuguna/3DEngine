@@ -28,9 +28,11 @@ void Shader::compile(ERROR &errCode, bool useShader) {
   linkPrograms(errCode);
   bindUniforms(errCode);
 
-  // Switch current program to this shader
-  if (useShader && errCode == ERROR_OK)
-    use();
+  if (errCode == ERROR_OK) {
+    m_isCompiled = true;
+    if (useShader)
+      use(); // switch current program to this shader
+  }
 }
 
 // Loads shader from file

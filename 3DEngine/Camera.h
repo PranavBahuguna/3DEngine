@@ -18,21 +18,24 @@ public:
 
   static void init(glm::vec3 position, glm::vec3 up, GLfloat yaw, GLfloat pitch, GLfloat fov,
                    GLfloat aspectRatio, GLfloat near, GLfloat far);
-  static CamPtr getInstance();
 
-  void keyControl(const bool *keys, GLfloat deltaTime);
-  void mouseControl(GLfloat deltaX, GLfloat deltaY, GLfloat deltaTime);
+  static void keyControl(const bool *keys);
+  static void mouseControl(float deltaX, float deltaY);
 
-  glm::mat4 getView() const { return m_view; }
-  glm::mat4 getProjection() const { return m_projection; }
-  glm::vec3 getPosition() const { return m_position; }
-  GLfloat getPitch() const { return m_pitch; }
-  GLfloat getYaw() const { return m_yaw; }
+  static glm::mat4 getView() { return getInstance()->m_view; }
+  static glm::mat4 getProjection() { return getInstance()->m_projection; }
+  static glm::vec3 getPosition() { return getInstance()->m_position; }
+  static GLfloat getPitch() { return getInstance()->m_pitch; }
+  static GLfloat getYaw()  { return getInstance()->m_yaw; }
 
 private:
   Camera(); // prevent construction of this class
 
+  static CamPtr getInstance();
+
   void updateDirection();
+  void _keyControl(const bool *keys);
+  void _mouseControl(GLfloat deltaX, GLfloat deltaY);
 
   glm::vec3 m_position;
   glm::vec3 m_front;

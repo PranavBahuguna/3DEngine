@@ -1,20 +1,20 @@
 #pragma once
 
+#include "Drawable.h"
 #include "Resources.h"
 
 #include <memory>
 
-class Text {
+class Text : public Drawable {
 public:
   Text(const std::string &font, const glm::vec2 &pos, const GLfloat scale, const glm::vec4 &color);
 
-  void setText(const std::string &text);
-  void draw(const Shader &shader, ERROR &errCode) const;
+  void draw(const Shader &shader, ERROR &errCode) const override;
+  void setText(const std::string &text) { m_text = text; }
 
 private:
   std::string m_text;
   FontPtr m_font;
-  glm::vec2 m_pos;
   GLfloat m_scale;
   glm::vec4 m_color;
 

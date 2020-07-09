@@ -2,12 +2,15 @@
 
 #include "Camera.h"
 #include "Cube.h"
+#include "DrawListBuilder.h"
+#include "Drawable.h"
 #include "Light.h"
 #include "LightIcon.h"
 #include "Sphere.h"
 #include "Terrain.h"
 #include "Tetrahedron.h"
 #include "Text.h"
+#include "Timer.h"
 #include "Window.h"
 
 #include <algorithm>
@@ -45,10 +48,11 @@
 #define FPS_BUFFER_SIZE 8
 #define MAX_LIGHTS 8
 
-ERROR errCode = ERROR_OK;
+using ModelPtr = std::shared_ptr<Model>;
+using TextPtr = std::shared_ptr<Text>;
+using LiPtr = std::shared_ptr<LightIcon>;
 
-GLfloat deltaTime = 0.0f;
-GLfloat lastTime = 0.0f;
+ERROR errCode = ERROR_OK;
 
 std::vector<GLfloat> fpsBuffer(FPS_BUFFER_SIZE);
 size_t fpsBufferIdx = 0;
@@ -56,11 +60,17 @@ GLfloat fpsUpdateTime = FPS_UPDATE_DELAY;
 
 bool displayHUD = false;
 
-std::vector<Model *> modelList;
-std::vector<LightPtr> sceneLights;
-std::vector<Text *> textObjects;
-std::vector<LightIcon *> lightIcons;
+std::vector<ModelPtr> models;
 
+DrawTargets dtModels;
+DrawTargets dtTexts;
+DrawTargets dtLightIcons;
+
+DListPtr dl_illum;
+DListPtr dl_trans;
+DListPtr dl_text;
+
+std::vector<LightPtr> sceneLights;
 size_t nLights = 0;
 
 Window *window;
@@ -99,61 +109,63 @@ int main() {
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     // Setup scene objects
-    Model *tetrahedron = new Tetrahedron;
+    ModelPtr tetrahedron(new Tetrahedron());
     tetrahedron->setPosition(glm::vec3(0.0f, 0.0f, 3.0f));
     tetrahedron->setScale(glm::vec3(0.4f));
+    tetrahedron->load(errCode);
 
-    Model *cube = new Cube;
+    ModelPtr cube(new Cube());
     cube->setPosition(glm::vec3(-3.0f, 0.0f, 6.0f));
     cube->setScale(glm::vec3(0.4f));
+    cube->load(errCode);
 
-    Model *earth = new Sphere;
+    ModelPtr earth(new Sphere());
     earth->setPosition(glm::vec3(3.0f, 0.0f, 6.0f));
     earth->setRotation(glm::vec3(0.0f, 1.0f, 0.0f), 0.0f);
     earth->setScale(glm::vec3(0.4f));
+    earth->load(errCode);
 
-    Model *starfighter = new Model("Arc170");
+    ModelPtr starfighter(new Model("Arc170"));
     starfighter->setPosition(glm::vec3(0.0f, 0.0f, 10.0f));
     starfighter->setRotation(glm::vec3(0.0f, 1.0f, 0.0f), 180.0f);
     starfighter->setScale(glm::vec3(0.002f));
+    starfighter->load(errCode);
 
-    Terrain *floor = new Terrain("Grass", {5, 5}, {5.0f, 5.0f});
+    ModelPtr floor(new Terrain("Grass", {5, 5}, {5.0f, 5.0f}));
     floor->setPosition(glm::vec3(0.0f, -3.0f, 0.0f));
     floor->setRotation(glm::vec3(1.0f), 0.0f);
+    floor->load(errCode);
 
-    modelList = {tetrahedron, cube, earth, starfighter, floor};
-
-    for (auto it = modelList.begin(); it != modelList.end() && errCode == ERROR_OK; it++)
-      (*it)->load(errCode);
+    models = {tetrahedron, cube, earth, starfighter, floor};
 
     // Setup HUD elements
-    Text *fpsLabelText = new Text(HUD_FONT, relToScreenPos({0.7f, 0.95f}), 1.0f, COLOR_SEAWEED);
+    TextPtr fpsLabelText(new Text(HUD_FONT, relToScreenPos({0.7f, 0.95f}), 1.0f, COLOR_SEAWEED));
     fpsLabelText->setText("FPS:");
-    Text *fpsValueText = new Text(HUD_FONT, relToScreenPos({0.8f, 0.95f}), 1.0f, COLOR_SEAWEED);
+    TextPtr fpsValueText(new Text(HUD_FONT, relToScreenPos({0.8f, 0.95f}), 1.0f, COLOR_SEAWEED));
 
-    Text *xPosLabelText = new Text(HUD_FONT, relToScreenPos({0.7f, 0.85f}), 1.0f, COLOR_RED);
+    TextPtr xPosLabelText(new Text(HUD_FONT, relToScreenPos({0.7f, 0.85f}), 1.0f, COLOR_RED));
     xPosLabelText->setText("X:");
-    Text *xPosValueText = new Text(HUD_FONT, relToScreenPos({0.8f, 0.85f}), 1.0f, COLOR_RED);
+    TextPtr xPosValueText(new Text(HUD_FONT, relToScreenPos({0.8f, 0.85f}), 1.0f, COLOR_RED));
 
-    Text *yPosLabelText = new Text(HUD_FONT, relToScreenPos({0.7f, 0.8f}), 1.0f, COLOR_GREEN);
+    TextPtr yPosLabelText(new Text(HUD_FONT, relToScreenPos({0.7f, 0.8f}), 1.0f, COLOR_GREEN));
     yPosLabelText->setText("Y:");
-    Text *yPosValueText = new Text(HUD_FONT, relToScreenPos({0.8f, 0.8f}), 1.0f, COLOR_GREEN);
+    TextPtr yPosValueText(new Text(HUD_FONT, relToScreenPos({0.8f, 0.8f}), 1.0f, COLOR_GREEN));
 
-    Text *zPosLabelText = new Text(HUD_FONT, relToScreenPos({0.7f, 0.75f}), 1.0f, COLOR_BLUE);
+    TextPtr zPosLabelText(new Text(HUD_FONT, relToScreenPos({0.7f, 0.75f}), 1.0f, COLOR_BLUE));
     zPosLabelText->setText("Z:");
-    Text *zPosValueText = new Text(HUD_FONT, relToScreenPos({0.8f, 0.75f}), 1.0f, COLOR_BLUE);
+    TextPtr zPosValueText(new Text(HUD_FONT, relToScreenPos({0.8f, 0.75f}), 1.0f, COLOR_BLUE));
 
-    Text *pitchLabelText = new Text(HUD_FONT, relToScreenPos({0.7f, 0.65f}), 1.0f, COLOR_YELLOW);
+    TextPtr pitchLabelText(new Text(HUD_FONT, relToScreenPos({0.7f, 0.65f}), 1.0f, COLOR_YELLOW));
     pitchLabelText->setText("Pitch:");
-    Text *pitchValueText = new Text(HUD_FONT, relToScreenPos({0.8f, 0.65f}), 1.0f, COLOR_YELLOW);
+    TextPtr pitchValueText(new Text(HUD_FONT, relToScreenPos({0.8f, 0.65f}), 1.0f, COLOR_YELLOW));
 
-    Text *yawLabelText = new Text(HUD_FONT, relToScreenPos({0.7f, 0.6f}), 1.0f, COLOR_VIOLET);
+    TextPtr yawLabelText(new Text(HUD_FONT, relToScreenPos({0.7f, 0.6f}), 1.0f, COLOR_VIOLET));
     yawLabelText->setText("Yaw:");
-    Text *yawValueText = new Text(HUD_FONT, relToScreenPos({0.8f, 0.6f}), 1.0f, COLOR_VIOLET);
+    TextPtr yawValueText(new Text(HUD_FONT, relToScreenPos({0.8f, 0.6f}), 1.0f, COLOR_VIOLET));
 
-    textObjects = {fpsLabelText,   fpsValueText,   xPosLabelText, xPosValueText,
-                   yPosLabelText,  yPosValueText,  zPosLabelText, zPosValueText,
-                   pitchLabelText, pitchValueText, yawLabelText,  yawValueText};
+    dtTexts = {fpsLabelText,   fpsValueText,   xPosLabelText, xPosValueText,
+               yPosLabelText,  yPosValueText,  zPosLabelText, zPosValueText,
+               pitchLabelText, pitchValueText, yawLabelText,  yawValueText};
 
     // Setup scene lights
     LightPtr light01 =
@@ -170,11 +182,11 @@ int main() {
     nLights = std::min(sceneLights.size(), (size_t)MAX_LIGHTS);
 
     // Setup light icons
-    LightIcon *li01 = new LightIcon("DirectionalLight");
-    LightIcon *li02 = new LightIcon("PointLight");
-    LightIcon *li03 = new LightIcon("SpotLight");
+    LiPtr li01(new LightIcon("DirectionalLight"));
+    LiPtr li02(new LightIcon("PointLight"));
+    LiPtr li03(new LightIcon("SpotLight"));
 
-    lightIcons = {li01, li02, li03};
+    dtLightIcons = {li01, li02, li03};
 
     // Setup lighting shader
     auto lightingShader = Resources::GetShader("Lighting");
@@ -189,29 +201,33 @@ int main() {
                                                  (GLfloat)window->getHeight(), 0.0f, 1.0f);
     textShader->setMat4("projection", orthoProjection, errCode);
 
-    // Setup light icon particle shader
-    auto liShader = Resources::GetShader("LightIconParticle");
-    liShader->compile(errCode);
-    liShader->setMat4("projection", orthoProjection, errCode);
+    // Setup drawlists
+    dtModels = DrawTargets(models.begin(), models.end());
+    dl_illum = DrawListBuilder::CreateDrawList(dtModels, "Lighting");
+    dl_illum = DrawListBuilder::AddIllumination(std::move(dl_illum),
+                                                {"DirectionalLight", "PointLight", "SpotLight"});
+
+    dl_trans = DrawListBuilder::CreateDrawList(dtLightIcons, "LightIconParticle");
+    dl_trans = DrawListBuilder::AddTransparency(std::move(dl_trans));
+
+    dl_text = DrawListBuilder::CreateDrawList(dtTexts, "Text");
 
     // Setup camera
     Camera::init(glm::vec3(0.0f), {0.0f, 1.0f, 0.0f}, 90.0f, 0.0f, FOV, window->getAspectRatio(),
                  NEAR_PLANE, FAR_PLANE);
-    auto camera = Camera::getInstance();
 
     // Main program loop
     while (!window->getShouldClose()) {
-      // Get time elapsed since last cycle
-      GLfloat timeNow = static_cast<GLfloat>(glfwGetTime());
-      deltaTime = timeNow - lastTime;
-      lastTime = timeNow;
+      // Update the timer
+      Timer::Update();
+
       if (fpsBufferIdx < FPS_BUFFER_SIZE)
-        fpsBuffer[fpsBufferIdx++] = 1.0f / deltaTime;
+        fpsBuffer[fpsBufferIdx++] = 1.0f / Timer::GetDeltaTime();
 
       // Handle user input events
       glfwPollEvents();
-      camera->keyControl(window->getKeys(), deltaTime);
-      camera->mouseControl(window->getDeltaX(), window->getDeltaY(), deltaTime);
+      Camera::keyControl(window->getKeys());
+      Camera::mouseControl(window->getDeltaX(), window->getDeltaY());
 
       if (window->getToggleKey(GLFW_KEY_M, NULL))
         displayHUD = !displayHUD;
@@ -220,32 +236,13 @@ int main() {
       glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-      // Apply lights to lighting shader
-      lightingShader->use();
-      for (size_t i = 0; i < nLights; i++)
-        sceneLights[i]->use(*lightingShader, i, errCode);
+      // Update all models
+      for (const auto &model : models)
+        model->update(errCode);
 
-      // Add camera parameters to lighting shader
-      lightingShader->setMat4("view", camera->getView(), errCode);
-      lightingShader->setMat4("projection", camera->getProjection(), errCode);
-      lightingShader->setVec3("viewPos", camera->getPosition(), errCode);
-
-      // Update and draw each model
-      for (const auto &model : modelList) {
-        model->update(errCode, deltaTime);
-        model->draw(*lightingShader, errCode);
-
-        if (errCode != ERROR_OK)
-          throw std::runtime_error("An error occurred while processing model " +
-                                   std::to_string(model->_id) + ".");
-      }
-
-      // Draw light icons
-      liShader->use();
-      liShader->setMat4("view", camera->getView(), errCode);
-      liShader->setMat4("projection", camera->getProjection(), errCode);
-      for (const auto &icon : lightIcons)
-        icon->draw(*liShader, errCode);
+      // Draw all models and light icons
+      dl_illum->draw(errCode);
+      dl_trans->draw(errCode);
 
       // Draw HUD elements to screen
       if (displayHUD) {
@@ -258,23 +255,16 @@ int main() {
           fpsUpdateTime -= FPS_UPDATE_DELAY;
           fpsBufferIdx = 0;
         } else {
-          fpsUpdateTime += deltaTime;
+          fpsUpdateTime += Timer::GetDeltaTime();
         }
 
-        const auto &cameraPos = camera->getPosition();
+        xPosValueText->setText(toStringDp(Camera::getPosition().x, 3));
+        yPosValueText->setText(toStringDp(Camera::getPosition().y, 3));
+        zPosValueText->setText(toStringDp(Camera::getPosition().z, 3));
+        pitchValueText->setText(toStringDp(Camera::getPitch(), 1));
+        yawValueText->setText(toStringDp(Camera::getYaw(), 1));
 
-        xPosValueText->setText(toStringDp(cameraPos.x, 3));
-        yPosValueText->setText(toStringDp(cameraPos.y, 3));
-        zPosValueText->setText(toStringDp(cameraPos.z, 3));
-        pitchValueText->setText(toStringDp(camera->getPitch(), 1));
-        yawValueText->setText(toStringDp(camera->getYaw(), 1));
-
-        textShader->use();
-        for (auto it = textObjects.begin(); it != textObjects.end() && errCode == ERROR_OK; ++it)
-          (*it)->draw(*textShader, errCode);
-
-        if (errCode != ERROR_OK)
-          throw std::runtime_error("An error occurred while drawing HUD element.");
+        dl_text->draw(errCode);
       }
 
       window->swapBuffers();
