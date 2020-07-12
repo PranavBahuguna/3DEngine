@@ -2,18 +2,38 @@
 
 #include <stdexcept>
 
-// Constructor
-Window::Window(const std::string &name, WindowMode wMode, GLint width, GLint height)
-    : m_name(name), m_wMode(wMode), m_width(width), m_height(height), m_lastX(0.0f), m_lastY(0.0f),
-      m_mouseFirstMoved(true) {
+static WndPtr instance = nullptr;
 
+// Constructor - zero all parameters
+Window::Window()
+    : m_width(0), m_height(0), m_lastX(0.0f), m_lastY(0.0f), m_deltaX(0.0f), m_deltaY(0.0f),
+      m_mouseFirstMoved(true), m_mainWindow(nullptr) {
+
+  std::fill_n(m_keys, NUM_KEYS, false);
   std::fill_n(m_toggleKeys, NUM_KEYS, true);
 }
 
-// Initialises the windows properties
-void Window::initialize(ERROR &errCode) {
+// Get window singleton instance
+WndPtr Window::GetInstance() {
+  if (instance == nullptr)
+    instance = WndPtr(new Window());
+
+  return instance;
+}
+
+// Defaults width / height to 800/600 (applicable only if in windowed mode)
+void Window::Init(const std::string &name, WindowMode wMode, ERROR &errCode) {
+  Window::Init(name, wMode, 800, 600, errCode);
+}
+
+// Initialise all window properties
+void Window::Init(const std::string &name, WindowMode wMode, int width, int height,
+                  ERROR &errCode) {
   if (errCode != ERROR_OK)
     return;
+
+  if (instance == nullptr)
+    instance = GetInstance();
 
   // Initialise GLFW
   if (glfwInit() != GLFW_TRUE) {
@@ -34,26 +54,30 @@ void Window::initialize(ERROR &errCode) {
 
   // Set window dimensions from screen if fullscreen enabled
   GLFWmonitor *monitor = nullptr;
-  if (m_wMode == WindowMode::FULLSCREEN || m_wMode == WindowMode::FULLSCREEN_WINDOWED) {
+  if (wMode == WindowMode::FULLSCREEN || wMode == WindowMode::FULLSCREEN_WINDOWED) {
     auto primaryMonitor = glfwGetPrimaryMonitor();
     const GLFWvidmode *mode = glfwGetVideoMode(primaryMonitor);
-    m_width = mode->width;
-    m_height = mode->height;
+    instance->m_width = mode->width;
+    instance->m_height = mode->height;
 
     // Use the primary monitor only if we want fullscreen without window
-    if (m_wMode == WindowMode::FULLSCREEN)
+    if (wMode == WindowMode::FULLSCREEN)
       monitor = primaryMonitor;
+  } else {
+    instance->m_height = height;
+    instance->m_width = width;
   }
 
   // Initialiase window with given dimension
-  m_mainWindow = glfwCreateWindow(m_width, m_height, m_name.c_str(), monitor, NULL);
-  if (m_mainWindow == nullptr) {
+  instance->m_mainWindow =
+      glfwCreateWindow(instance->m_width, instance->m_height, name.c_str(), monitor, NULL);
+  if (instance->m_mainWindow == nullptr) {
     errCode = ERROR_GLFW_WINDOW_CREATE_FAILED;
     printErrorMsg(errCode);
     return;
   }
   // Set context for GLEW to use
-  glfwMakeContextCurrent(m_mainWindow);
+  glfwMakeContextCurrent(instance->m_mainWindow);
 
   // Allow modern extension features
   glewExperimental = GL_TRUE;
@@ -66,41 +90,42 @@ void Window::initialize(ERROR &errCode) {
   }
 
   // Setup viewport size
-  glViewport(0, 0, m_width, m_height);
+  glViewport(0, 0, instance->m_width, instance->m_height);
 
   // Setup keyboard and mouse handlers
-  glfwSetKeyCallback(m_mainWindow, keyHandler);
-  glfwSetCursorPosCallback(m_mainWindow, mouseHandler);
+  glfwSetKeyCallback(instance->m_mainWindow, instance->KeyHandler);
+  glfwSetCursorPosCallback(instance->m_mainWindow, instance->MouseHandler);
   // Remove cursor from screen
-  glfwSetInputMode(m_mainWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+  glfwSetInputMode(instance->m_mainWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
-  glfwSetWindowUserPointer(m_mainWindow, this);
+  // glfwSetWindowUserPointer(instance->m_mainWindow, &instance);
 }
 
 // Destructor - destroy window and terminate
 Window::~Window() {
-  glfwDestroyWindow(m_mainWindow);
+  glfwDestroyWindow(instance->m_mainWindow);
   glfwTerminate();
 }
 
 // Obtains and resets change in x-position
-GLfloat Window::getDeltaX() {
-  GLfloat deltaX = m_deltaX;
-  m_deltaX = 0.0f;
+float Window::GetDeltaX() {
+  WndPtr wnd = GetInstance();
+  float deltaX = wnd->m_deltaX;
+  wnd->m_deltaX = 0.0f;
   return deltaX;
 }
 
 // Obtains and resets change in y-position
-GLfloat Window::getDeltaY() {
-  GLfloat deltaY = m_deltaY;
-  m_deltaY = 0.0f;
+float Window::GetDeltaY() {
+  WndPtr wnd = GetInstance();
+  float deltaY = wnd->m_deltaY;
+  wnd->m_deltaY = 0.0f;
   return deltaY;
 }
 
 // Handles key input
-void Window::keyHandler(GLFWwindow *window, int key, int scancode, int action, int mods) {
-
-  Window *thisWindow = static_cast<Window *>(glfwGetWindowUserPointer(window));
+void Window::KeyHandler(GLFWwindow *window, int key, int scancode, int action, int mods) {
+  WndPtr wnd = GetInstance();
 
   if (key < 0 || key >= NUM_KEYS) {
     printErrorMsg(ERROR_INPUT_KEY_OUT_OF_RANGE, key);
@@ -111,49 +136,50 @@ void Window::keyHandler(GLFWwindow *window, int key, int scancode, int action, i
     glfwSetWindowShouldClose(window, GLFW_TRUE);
 
   if (action == GLFW_PRESS)
-    thisWindow->m_keys[key] = true;
+    wnd->m_keys[key] = true;
   if (action == GLFW_RELEASE)
-    thisWindow->m_keys[key] = false;
+    wnd->m_keys[key] = false;
 }
 
 // Handles mouse input
-void Window::mouseHandler(GLFWwindow *window, double xPos, double yPos) {
+void Window::MouseHandler(GLFWwindow *window, double xPos, double yPos) {
+  WndPtr wnd = GetInstance();
 
-  Window *thisWindow = static_cast<Window *>(glfwGetWindowUserPointer(window));
+  float fxPos = static_cast<float>(xPos);
+  float fyPos = static_cast<float>(yPos);
 
-  GLfloat fxPos = static_cast<GLfloat>(xPos);
-  GLfloat fyPos = static_cast<GLfloat>(yPos);
-
-  if (thisWindow->m_mouseFirstMoved) {
-    thisWindow->m_lastX = fxPos;
-    thisWindow->m_lastY = fyPos;
-    thisWindow->m_mouseFirstMoved = false;
+  if (wnd->m_mouseFirstMoved) {
+    wnd->m_lastX = fxPos;
+    wnd->m_lastY = fyPos;
+    wnd->m_mouseFirstMoved = false;
   }
 
-  thisWindow->m_deltaX = fxPos - thisWindow->m_lastX;
-  thisWindow->m_deltaY = thisWindow->m_lastY - fyPos;
+  wnd->m_deltaX = fxPos - wnd->m_lastX;
+  wnd->m_deltaY = wnd->m_lastY - fyPos;
 
-  thisWindow->m_lastX = fxPos;
-  thisWindow->m_lastY = fyPos;
+  wnd->m_lastX = fxPos;
+  wnd->m_lastY = fyPos;
 }
 
 // A toggle key can be queried during the rendering loop. It will return true the first time it is
 // called if the corresponding key is pressed, but will return false on subsequent calls until the
 // key is released and pressed again.
-bool Window::getToggleKey(int key, ERROR *errCode) {
+bool Window::GetToggleKey(int key, ERROR *errCode) {
   if (key < 0 || key >= NUM_KEYS) {
     *errCode = ERROR_INPUT_KEY_OUT_OF_RANGE;
     printErrorMsg(*errCode, key);
     return false;
   }
 
-  if (m_keys[key]) {
-    if (m_toggleKeys[key]) {
-      m_toggleKeys[key] = false;
+  WndPtr wnd = GetInstance();
+
+  if (wnd->m_keys[key]) {
+    if (wnd->m_toggleKeys[key]) {
+      wnd->m_toggleKeys[key] = false;
       return true;
     }
   } else {
-    m_toggleKeys[key] = true;
+    wnd->m_toggleKeys[key] = true;
   }
 
   return false;

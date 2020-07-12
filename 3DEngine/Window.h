@@ -2,53 +2,64 @@
 
 #include "Error.h"
 
+#include <memory>
 #include <string>
+
 // clang-format off
-#include <GL\glew.h>
-#include <GLFW\glfw3.h>
+#include <GL/glew.h>
+#include <GLFW/glfw3.h>
+#include <glm/glm.hpp>
 // clang-format on
 
 #define NUM_KEYS 512
+
+class Window;
+typedef std::shared_ptr<Window> WndPtr;
 
 enum class WindowMode { WINDOWED, FULLSCREEN_WINDOWED, FULLSCREEN };
 
 class Window {
 public:
-  Window(const std::string &name, WindowMode wMode = WindowMode::WINDOWED, GLint width = 800,
-         GLint height = 600);
   ~Window();
 
-  void initialize(ERROR &errCode);
+  static void Init(const std::string &name, WindowMode wMode, ERROR &errCode);
+  static void Init(const std::string &name, WindowMode wMode, int width, int height,
+                   ERROR &errCode);
 
-  GLint getWidth() const { return m_width; }
-  GLint getHeight() const { return m_height; }
-  GLfloat getAspectRatio() const { return (GLfloat)m_width / (GLfloat)m_height; }
-  bool getShouldClose() const { return glfwWindowShouldClose(m_mainWindow); }
-  void swapBuffers() const { glfwSwapBuffers(m_mainWindow); }
+  static int GetWidth() { return GetInstance()->m_width; }
+  static int GetHeight() { return GetInstance()->m_height; }
+  static float GetAspectRatio() { return (float)GetWidth() / (float)GetHeight(); }
+  static glm::vec2 RelToWinPos(const glm::vec2 &pos) {
+    return {pos.x * GetWidth(), pos.y * GetHeight()};
+  }
+  static float GetDeltaX();
+  static float GetDeltaY();
 
-  GLfloat getDeltaX();
-  GLfloat getDeltaY();
+  static bool GetShouldClose() { return glfwWindowShouldClose(GetMainWindow()); }
+  static void SwapBuffers() { glfwSwapBuffers(GetMainWindow()); }
 
-  const bool *getKeys() const { return m_keys; }
-  bool getToggleKey(int key, ERROR *errCode);
+  static const bool *GetKeys() { return GetInstance()->m_keys; }
+  static bool GetToggleKey(int key, ERROR *errCode);
 
 private:
-  static void keyHandler(GLFWwindow *window, int key, int scancode, int action, int mods);
-  static void mouseHandler(GLFWwindow *window, double xPos, double yPos);
+  Window(); // prevent construction of this class
+
+  static WndPtr GetInstance();
+  static GLFWwindow *GetMainWindow() { return GetInstance()->m_mainWindow; }
+  static void KeyHandler(GLFWwindow *window, int key, int scancode, int action, int mods);
+  static void MouseHandler(GLFWwindow *window, double xPos, double yPos);
 
   GLFWwindow *m_mainWindow;
-  std::string m_name;
-  WindowMode m_wMode;
 
-  GLint m_width;
-  GLint m_height;
+  int m_width;
+  int m_height;
 
   bool m_keys[NUM_KEYS];
   bool m_toggleKeys[NUM_KEYS];
 
-  GLfloat m_lastX;
-  GLfloat m_lastY;
-  GLfloat m_deltaX;
-  GLfloat m_deltaY;
+  float m_lastX;
+  float m_lastY;
+  float m_deltaX;
+  float m_deltaY;
   bool m_mouseFirstMoved;
 };

@@ -17,6 +17,14 @@ public:
     const auto ilDrawList = new IlluminationDrawList(std::move(drawList));
     ilDrawList->setLights(lightNames);
 
+    ERROR errCode = ERROR_OK;
+    ShaderPtr _shader = ilDrawList->getShader();
+    if (!_shader->isCompiled()) {
+      _shader->setPreprocessor(GL_FRAGMENT_SHADER, "MAX_LIGHTS", 8);
+      _shader->compile(errCode);
+    }
+    _shader->setInt("nLights", static_cast<int>(lightNames.size()), errCode);
+
     return DListPtr(ilDrawList);
   }
 

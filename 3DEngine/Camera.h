@@ -12,30 +12,26 @@ typedef std::shared_ptr<Camera> CamPtr;
 
 class Camera {
 public:
-  // Prevent copying of this camera object
-  Camera(Camera const &) = delete;
-  void operator=(Camera const &) = delete;
+  static void Init(const glm::vec3 &pos, const glm::vec3 &up, float yaw, float pitch, float fov,
+                   float near, float far);
 
-  static void init(glm::vec3 position, glm::vec3 up, GLfloat yaw, GLfloat pitch, GLfloat fov,
-                   GLfloat aspectRatio, GLfloat near, GLfloat far);
+  static void KeyControl() { GetInstance()->_keyControl(); };
+  static void MouseControl() { GetInstance()->_mouseControl(); };
 
-  static void keyControl(const bool *keys);
-  static void mouseControl(float deltaX, float deltaY);
-
-  static glm::mat4 getView() { return getInstance()->m_view; }
-  static glm::mat4 getProjection() { return getInstance()->m_projection; }
-  static glm::vec3 getPosition() { return getInstance()->m_position; }
-  static GLfloat getPitch() { return getInstance()->m_pitch; }
-  static GLfloat getYaw()  { return getInstance()->m_yaw; }
+  static glm::mat4 GetView() { return GetInstance()->m_view; }
+  static glm::mat4 GetProjection() { return GetInstance()->m_projection; }
+  static glm::vec3 GetPosition() { return GetInstance()->m_position; }
+  static float GetPitch() { return GetInstance()->m_pitch; }
+  static float GetYaw() { return GetInstance()->m_yaw; }
 
 private:
   Camera(); // prevent construction of this class
 
-  static CamPtr getInstance();
+  static CamPtr GetInstance();
 
   void updateDirection();
-  void _keyControl(const bool *keys);
-  void _mouseControl(GLfloat deltaX, GLfloat deltaY);
+  void _keyControl();
+  void _mouseControl();
 
   glm::vec3 m_position;
   glm::vec3 m_front;
@@ -43,8 +39,8 @@ private:
   glm::vec3 m_right;
   glm::vec3 m_worldUp;
 
-  GLfloat m_yaw;
-  GLfloat m_pitch;
+  float m_yaw;
+  float m_pitch;
 
   glm::mat4 m_view;
   glm::mat4 m_projection;

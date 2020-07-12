@@ -14,7 +14,7 @@ Camera::Camera()
       m_projection(0) {}
 
 // Get camera singleton instance
-CamPtr Camera::getInstance() {
+CamPtr Camera::GetInstance() {
   if (instance == nullptr)
     instance = CamPtr(new Camera());
 
@@ -22,33 +22,24 @@ CamPtr Camera::getInstance() {
 }
 
 // Initialise all camera properties
-void Camera::init(glm::vec3 position, glm::vec3 up, GLfloat yaw, GLfloat pitch, GLfloat fov,
-                  GLfloat aspectRatio, GLfloat near, GLfloat far) {
+void Camera::Init(const glm::vec3 &pos, const glm::vec3 &up, float yaw, float pitch, float fov,
+                  float near, float far) {
   if (instance == nullptr)
-    instance = getInstance();
+    instance = GetInstance();
 
-  instance->m_position = position;
+  instance->m_position = pos;
   instance->m_worldUp = up;
   instance->m_yaw = yaw;
   instance->m_pitch = pitch;
 
-  instance->m_projection = glm::perspective(fov, aspectRatio, near, far);
+  instance->m_projection = glm::perspective(fov, Window::GetAspectRatio(), near, far);
   instance->updateDirection();
 }
 
-// Static key handler interface
-void Camera::keyControl(const bool *keys) {
-  getInstance()->_keyControl(keys);
-}
-
-// Static mouse handler interface
-void Camera::mouseControl(float deltaX, float deltaY) {
-  getInstance()->_mouseControl(deltaX, deltaY);
-}
-
 // Handles key input to the camera
-void Camera::_keyControl(const bool *keys) {
+void Camera::_keyControl() {
   float deltaTime = Timer::GetDeltaTime();
+  const auto &keys = Window::GetKeys();
 
   if (keys[GLFW_KEY_W])
     m_position += m_front * MOVE_SPEED * deltaTime;
@@ -82,8 +73,10 @@ void Camera::_keyControl(const bool *keys) {
 }
 
 // Handles mouse input to the camera
-void Camera::_mouseControl(GLfloat deltaX, GLfloat deltaY) {
+void Camera::_mouseControl() {
   float deltaTime = Timer::GetDeltaTime();
+  float deltaX = Window::GetDeltaX();
+  float deltaY = Window::GetDeltaY();
 
   // Update yaw and pitch
   m_yaw += deltaX * TURN_SPEED * deltaTime;

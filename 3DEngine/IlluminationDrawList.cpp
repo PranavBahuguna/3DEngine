@@ -20,9 +20,9 @@ void IlluminationDrawList::draw(ERROR &errCode) {
   for (size_t i = 0; i < m_lights.size(); i++)
     m_lights[i]->use(*_shader, i, errCode);
 
-  _shader->setMat4("projection", Camera::getProjection(), errCode);
-  _shader->setMat4("view", Camera::getView(), errCode);
-  _shader->setVec3("viewPos", Camera::getPosition(), errCode);
+  _shader->setMat4("projection", Camera::GetProjection(), errCode);
+  _shader->setMat4("view", Camera::GetView(), errCode);
+  _shader->setVec3("viewPos", Camera::GetPosition(), errCode);
 
   DrawListDecorator::draw(errCode);
 }

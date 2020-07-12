@@ -17,14 +17,8 @@
 #include <iomanip>
 #include <numeric>
 #include <sstream>
-#include <stdexcept>
-#include <string>
-#include <vector>
 
-#include <GLFW/glfw3.h>
-#include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
 
 #define WINDOW_WIDTH 1600
 #define WINDOW_HEIGHT 1200
@@ -46,7 +40,6 @@
 #define COLOR_VIOLET glm::vec4(0.3569f, 0.0392f, 0.5686f, 1.0f)
 #define FPS_UPDATE_DELAY 0.5f
 #define FPS_BUFFER_SIZE 8
-#define MAX_LIGHTS 8
 
 using ModelPtr = std::shared_ptr<Model>;
 using TextPtr = std::shared_ptr<Text>;
@@ -73,18 +66,11 @@ DListPtr dl_text;
 std::vector<LightPtr> sceneLights;
 size_t nLights = 0;
 
-Window *window;
-
 // Converts a float to string with a number of decimal places
 static std::string toStringDp(float f, size_t dp) {
   std::stringstream ss;
   ss << std::fixed << std::setprecision(dp) << f;
   return ss.str();
-}
-
-// Converts from a relative position to screen position
-static glm::vec2 relToScreenPos(const glm::vec2 &pos) {
-  return {pos.x * window->getWidth(), pos.y * window->getHeight()};
 }
 
 int main() {
@@ -94,8 +80,7 @@ int main() {
                                        : (FULLSCREEN_WINDOWS) ? WindowMode::FULLSCREEN_WINDOWED
                                                               : WindowMode::WINDOWED;
 
-    window = new Window("Test window", wMode, WINDOW_WIDTH, WINDOW_HEIGHT);
-    window->initialize(errCode);
+    Window::Init("Test window", wMode, WINDOW_WIDTH, WINDOW_HEIGHT, errCode);
 
     // Allow objects to obscure other objects behind them
     glEnable(GL_DEPTH_TEST);
@@ -139,29 +124,33 @@ int main() {
     models = {tetrahedron, cube, earth, starfighter, floor};
 
     // Setup HUD elements
-    TextPtr fpsLabelText(new Text(HUD_FONT, relToScreenPos({0.7f, 0.95f}), 1.0f, COLOR_SEAWEED));
+    TextPtr fpsLabelText(
+        new Text(HUD_FONT, Window::RelToWinPos({0.7f, 0.95f}), 1.0f, COLOR_SEAWEED));
     fpsLabelText->setText("FPS:");
-    TextPtr fpsValueText(new Text(HUD_FONT, relToScreenPos({0.8f, 0.95f}), 1.0f, COLOR_SEAWEED));
+    TextPtr fpsValueText(
+        new Text(HUD_FONT, Window::RelToWinPos({0.8f, 0.95f}), 1.0f, COLOR_SEAWEED));
 
-    TextPtr xPosLabelText(new Text(HUD_FONT, relToScreenPos({0.7f, 0.85f}), 1.0f, COLOR_RED));
+    TextPtr xPosLabelText(new Text(HUD_FONT, Window::RelToWinPos({0.7f, 0.85f}), 1.0f, COLOR_RED));
     xPosLabelText->setText("X:");
-    TextPtr xPosValueText(new Text(HUD_FONT, relToScreenPos({0.8f, 0.85f}), 1.0f, COLOR_RED));
+    TextPtr xPosValueText(new Text(HUD_FONT, Window::RelToWinPos({0.8f, 0.85f}), 1.0f, COLOR_RED));
 
-    TextPtr yPosLabelText(new Text(HUD_FONT, relToScreenPos({0.7f, 0.8f}), 1.0f, COLOR_GREEN));
+    TextPtr yPosLabelText(new Text(HUD_FONT, Window::RelToWinPos({0.7f, 0.8f}), 1.0f, COLOR_GREEN));
     yPosLabelText->setText("Y:");
-    TextPtr yPosValueText(new Text(HUD_FONT, relToScreenPos({0.8f, 0.8f}), 1.0f, COLOR_GREEN));
+    TextPtr yPosValueText(new Text(HUD_FONT, Window::RelToWinPos({0.8f, 0.8f}), 1.0f, COLOR_GREEN));
 
-    TextPtr zPosLabelText(new Text(HUD_FONT, relToScreenPos({0.7f, 0.75f}), 1.0f, COLOR_BLUE));
+    TextPtr zPosLabelText(new Text(HUD_FONT, Window::RelToWinPos({0.7f, 0.75f}), 1.0f, COLOR_BLUE));
     zPosLabelText->setText("Z:");
-    TextPtr zPosValueText(new Text(HUD_FONT, relToScreenPos({0.8f, 0.75f}), 1.0f, COLOR_BLUE));
+    TextPtr zPosValueText(new Text(HUD_FONT, Window::RelToWinPos({0.8f, 0.75f}), 1.0f, COLOR_BLUE));
 
-    TextPtr pitchLabelText(new Text(HUD_FONT, relToScreenPos({0.7f, 0.65f}), 1.0f, COLOR_YELLOW));
+    TextPtr pitchLabelText(
+        new Text(HUD_FONT, Window::RelToWinPos({0.7f, 0.65f}), 1.0f, COLOR_YELLOW));
     pitchLabelText->setText("Pitch:");
-    TextPtr pitchValueText(new Text(HUD_FONT, relToScreenPos({0.8f, 0.65f}), 1.0f, COLOR_YELLOW));
+    TextPtr pitchValueText(
+        new Text(HUD_FONT, Window::RelToWinPos({0.8f, 0.65f}), 1.0f, COLOR_YELLOW));
 
-    TextPtr yawLabelText(new Text(HUD_FONT, relToScreenPos({0.7f, 0.6f}), 1.0f, COLOR_VIOLET));
+    TextPtr yawLabelText(new Text(HUD_FONT, Window::RelToWinPos({0.7f, 0.6f}), 1.0f, COLOR_VIOLET));
     yawLabelText->setText("Yaw:");
-    TextPtr yawValueText(new Text(HUD_FONT, relToScreenPos({0.8f, 0.6f}), 1.0f, COLOR_VIOLET));
+    TextPtr yawValueText(new Text(HUD_FONT, Window::RelToWinPos({0.8f, 0.6f}), 1.0f, COLOR_VIOLET));
 
     dtTexts = {fpsLabelText,   fpsValueText,   xPosLabelText, xPosValueText,
                yPosLabelText,  yPosValueText,  zPosLabelText, zPosValueText,
@@ -179,7 +168,7 @@ int main() {
         0.045f, 0.0075f, {0.0f, -1.0f, 0.0f}, 20.0f, 25.0f);
 
     sceneLights = {light01, light02, light03};
-    nLights = std::min(sceneLights.size(), (size_t)MAX_LIGHTS);
+    nLights = std::min(sceneLights.size(), (size_t)8);
 
     // Setup light icons
     LiPtr li01(new LightIcon("DirectionalLight"));
@@ -188,17 +177,11 @@ int main() {
 
     dtLightIcons = {li01, li02, li03};
 
-    // Setup lighting shader
-    auto lightingShader = Resources::GetShader("Lighting");
-    lightingShader->setPreprocessor(GL_FRAGMENT_SHADER, "MAX_LIGHTS", MAX_LIGHTS);
-    lightingShader->compile(errCode);
-    lightingShader->setInt("nLights", (int)nLights, errCode);
-
     // Setup text shader
     auto textShader = Resources::GetShader("Text");
     textShader->compile(errCode);
-    const glm::mat4 orthoProjection = glm::ortho(0.0f, (GLfloat)window->getWidth(), 0.0f,
-                                                 (GLfloat)window->getHeight(), 0.0f, 1.0f);
+    const glm::mat4 orthoProjection =
+        glm::ortho(0.0f, (float)Window::GetWidth(), 0.0f, (float)Window::GetHeight(), 0.0f, 1.0f);
     textShader->setMat4("projection", orthoProjection, errCode);
 
     // Setup drawlists
@@ -213,11 +196,10 @@ int main() {
     dl_text = DrawListBuilder::CreateDrawList(dtTexts, "Text");
 
     // Setup camera
-    Camera::init(glm::vec3(0.0f), {0.0f, 1.0f, 0.0f}, 90.0f, 0.0f, FOV, window->getAspectRatio(),
-                 NEAR_PLANE, FAR_PLANE);
+    Camera::Init(glm::vec3(0.0f), {0.0f, 1.0f, 0.0f}, 90.0f, 0.0f, FOV, NEAR_PLANE, FAR_PLANE);
 
     // Main program loop
-    while (!window->getShouldClose()) {
+    while (!Window::GetShouldClose()) {
       // Update the timer
       Timer::Update();
 
@@ -226,10 +208,10 @@ int main() {
 
       // Handle user input events
       glfwPollEvents();
-      Camera::keyControl(window->getKeys());
-      Camera::mouseControl(window->getDeltaX(), window->getDeltaY());
+      Camera::KeyControl();
+      Camera::MouseControl();
 
-      if (window->getToggleKey(GLFW_KEY_M, NULL))
+      if (Window::GetToggleKey(GLFW_KEY_M, NULL))
         displayHUD = !displayHUD;
 
       // Clear window
@@ -258,16 +240,16 @@ int main() {
           fpsUpdateTime += Timer::GetDeltaTime();
         }
 
-        xPosValueText->setText(toStringDp(Camera::getPosition().x, 3));
-        yPosValueText->setText(toStringDp(Camera::getPosition().y, 3));
-        zPosValueText->setText(toStringDp(Camera::getPosition().z, 3));
-        pitchValueText->setText(toStringDp(Camera::getPitch(), 1));
-        yawValueText->setText(toStringDp(Camera::getYaw(), 1));
+        xPosValueText->setText(toStringDp(Camera::GetPosition().x, 3));
+        yPosValueText->setText(toStringDp(Camera::GetPosition().y, 3));
+        zPosValueText->setText(toStringDp(Camera::GetPosition().z, 3));
+        pitchValueText->setText(toStringDp(Camera::GetPitch(), 1));
+        yawValueText->setText(toStringDp(Camera::GetYaw(), 1));
 
         dl_text->draw(errCode);
       }
 
-      window->swapBuffers();
+      Window::SwapBuffers();
     }
   } catch (std::exception &e) {
     printf(e.what());
