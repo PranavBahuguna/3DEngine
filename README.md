@@ -1,7 +1,7 @@
 # 3DEngine
 A custom 3D rendering engine, written in C++ with OpenGL. Will be steadily adding more features to this over time.
 
-# Example screenshot (as of 23/06/2020)
+# Example screenshot (as of 14/07/2020)
 ![](example.png)
 
 # Dependencies
@@ -25,3 +25,5 @@ There are several libraries that are used in this project, and each can be linke
 - **Mouse** - Look around
 - **Esc** - Exit
 - **M** - Toggle HUD
+- **O / Mouse Scroll Down** - Decrease FOV (zoom in)
+- **P / Mouse Scroll Up** - Decrease FOV (zoom out)
