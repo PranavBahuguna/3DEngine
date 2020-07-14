@@ -5,36 +5,54 @@
 
 #define MOVE_SPEED 5.0f
 #define TURN_SPEED 60.0f
+#define ZOOM_SPEED 25.0f
+#define MIN_FOV 10.0f
+#define MAX_FOV 120.0f
 
-static CamPtr instance = nullptr;
+static CamPtr _instance = nullptr;
 
 // Constructor - zero all parameters
 Camera::Camera()
-    : m_position(0), m_up(0), m_yaw(0), m_pitch(0), m_right(0), m_front(0), m_worldUp(0), m_view(0),
-      m_projection(0) {}
-
-// Get camera singleton instance
-CamPtr Camera::GetInstance() {
-  if (instance == nullptr)
-    instance = CamPtr(new Camera());
-
-  return instance;
-}
+    : m_position(0), m_up(0), m_yaw(0), m_pitch(0), m_right(0), m_front(0), m_worldUp(0),
+      m_fov(0), m_near(0), m_far(0), m_view(0), m_projection(0) {}
 
 // Initialise all camera properties
 void Camera::Init(const glm::vec3 &pos, const glm::vec3 &up, float yaw, float pitch, float fov,
                   float near, float far) {
-  if (instance == nullptr)
-    instance = GetInstance();
+  if (_instance == nullptr)
+    _instance = CamPtr(new Camera());
 
-  instance->m_position = pos;
-  instance->m_worldUp = up;
-  instance->m_yaw = yaw;
-  instance->m_pitch = pitch;
+  _instance->m_position = pos;
+  _instance->m_worldUp = up;
+  _instance->m_yaw = yaw;
+  _instance->m_pitch = pitch;
 
-  instance->m_projection = glm::perspective(fov, Window::GetAspectRatio(), near, far);
-  instance->updateDirection();
+  _instance->m_fov = fov;
+  _instance->m_near = near;
+  _instance->m_far = far;
+
+  _instance->updateDirection();
+  _instance->updateProjection();
 }
+
+// Static handler utility methods
+glm::mat4 Camera::GetView() { return _instance->m_view; }
+
+glm::mat4 Camera::GetProjection() { return _instance->m_projection; }
+
+glm::vec3 Camera::GetPosition() { return _instance->m_position; }
+
+float Camera::GetPitch() { return _instance->m_pitch; }
+
+float Camera::GetYaw() { return _instance->m_yaw; }
+
+float Camera::GetFOV() { return _instance->m_fov; }
+
+void Camera::KeyControl() { _instance->_keyControl(); };
+
+void Camera::MouseControl() { _instance->_mouseControl(); };
+
+void Camera::MouseScrollControl() { _instance->_mouseScrollControl(); }
 
 // Handles key input to the camera
 void Camera::_keyControl() {
@@ -70,9 +88,19 @@ void Camera::_keyControl() {
 
   if (keys[GLFW_KEY_DOWN])
     m_pitch -= TURN_SPEED * deltaTime;
+
+  if (keys[GLFW_KEY_O]) {
+    m_fov -= ZOOM_SPEED * deltaTime;
+    _instance->updateProjection();
+  }
+
+  if (keys[GLFW_KEY_P]) {
+    m_fov += ZOOM_SPEED * deltaTime;
+    _instance->updateProjection();
+  }
 }
 
-// Handles mouse input to the camera
+// Handles mouse movement input to the camera
 void Camera::_mouseControl() {
   float deltaTime = Timer::GetDeltaTime();
   float deltaX = Window::GetDeltaX();
@@ -97,6 +125,23 @@ void Camera::_mouseControl() {
   updateDirection();
 }
 
+// Handles mouse scroll input to the camera
+void Camera::_mouseScrollControl() {
+  float deltaTime = Timer::GetDeltaTime();
+  float yOffset = Window::GetOffsetY();
+
+  // Update fov
+  _instance->m_fov += yOffset * ZOOM_SPEED * deltaTime;
+
+  // Clamp fov values
+  if (_instance->m_fov < MIN_FOV)
+    _instance->m_fov = MIN_FOV;
+  if (_instance->m_fov > MAX_FOV)
+    _instance->m_fov = MAX_FOV;
+
+  _instance->updateProjection();
+}
+
 // Update the camera's direction
 void Camera::updateDirection() {
   // Calculate the front vector
@@ -111,4 +156,10 @@ void Camera::updateDirection() {
 
   // Calculate the camera view
   m_view = glm::lookAt(m_position, m_position + m_front, m_up);
+}
+
+// Update the camera's projection
+void Camera::updateProjection() {
+  m_projection =
+      glm::perspective(glm::radians(_instance->m_fov), Window::GetAspectRatio(), m_near, m_far);
 }

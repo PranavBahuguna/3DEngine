@@ -7,7 +7,8 @@
 
 class Text : public Drawable {
 public:
-  Text(const std::string &font, const glm::vec2 &pos, const GLfloat scale, const glm::vec4 &color);
+  Text(const std::string &font, const glm::vec2 &pos, const GLfloat scale, const glm::vec4 &color,
+       const std::string &text = "");
 
   void draw(const Shader &shader, ERROR &errCode) const override;
   void setText(const std::string &text) { m_text = text; }

@@ -8,30 +8,35 @@
 #include <glm/glm.hpp>
 
 class Camera;
-typedef std::shared_ptr<Camera> CamPtr;
+typedef std::unique_ptr<Camera> CamPtr;
 
 class Camera {
 public:
+  ~Camera() {}
+
   static void Init(const glm::vec3 &pos, const glm::vec3 &up, float yaw, float pitch, float fov,
                    float near, float far);
 
-  static void KeyControl() { GetInstance()->_keyControl(); };
-  static void MouseControl() { GetInstance()->_mouseControl(); };
+  static void KeyControl();
+  static void MouseControl();
+  static void MouseScrollControl();
 
-  static glm::mat4 GetView() { return GetInstance()->m_view; }
-  static glm::mat4 GetProjection() { return GetInstance()->m_projection; }
-  static glm::vec3 GetPosition() { return GetInstance()->m_position; }
-  static float GetPitch() { return GetInstance()->m_pitch; }
-  static float GetYaw() { return GetInstance()->m_yaw; }
+  static glm::mat4 GetView();
+  static glm::mat4 GetProjection();
+  static glm::vec3 GetPosition();
+  static float GetPitch();
+  static float GetYaw();
+  static float GetFOV();
 
-private:
   Camera(); // prevent construction of this class
 
-  static CamPtr GetInstance();
-
+private:
   void updateDirection();
+  void updateProjection();
+
   void _keyControl();
   void _mouseControl();
+  void _mouseScrollControl();
 
   glm::vec3 m_position;
   glm::vec3 m_front;
@@ -41,6 +46,10 @@ private:
 
   float m_yaw;
   float m_pitch;
+
+  float m_fov;
+  float m_near;
+  float m_far;
 
   glm::mat4 m_view;
   glm::mat4 m_projection;

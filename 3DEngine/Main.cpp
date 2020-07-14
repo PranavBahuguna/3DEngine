@@ -38,6 +38,7 @@
 #define COLOR_BLUE glm::vec4(0.1961f, 0.3216f, 0.4824f, 1.0f)
 #define COLOR_YELLOW glm::vec4(0.9922f, 0.80f, 0.051f, 1.0f)
 #define COLOR_VIOLET glm::vec4(0.3569f, 0.0392f, 0.5686f, 1.0f)
+#define COLOR_GREY glm::vec4(0.6667f, 0.6627f, 0.6784f, 1.0f)
 #define FPS_UPDATE_DELAY 0.5f
 #define FPS_BUFFER_SIZE 8
 
@@ -124,37 +125,36 @@ int main() {
     models = {tetrahedron, cube, earth, starfighter, floor};
 
     // Setup HUD elements
-    TextPtr fpsLabelText(
-        new Text(HUD_FONT, Window::RelToWinPos({0.7f, 0.95f}), 1.0f, COLOR_SEAWEED));
-    fpsLabelText->setText("FPS:");
-    TextPtr fpsValueText(
-        new Text(HUD_FONT, Window::RelToWinPos({0.8f, 0.95f}), 1.0f, COLOR_SEAWEED));
+    TextPtr fpsLabel(
+        new Text(HUD_FONT, Window::RelToWinPos({0.7f, 0.95f}), 1.0f, COLOR_SEAWEED, "FPS:"));
+    TextPtr fpsValue(new Text(HUD_FONT, Window::RelToWinPos({0.8f, 0.95f}), 1.0f, COLOR_SEAWEED));
 
-    TextPtr xPosLabelText(new Text(HUD_FONT, Window::RelToWinPos({0.7f, 0.85f}), 1.0f, COLOR_RED));
-    xPosLabelText->setText("X:");
-    TextPtr xPosValueText(new Text(HUD_FONT, Window::RelToWinPos({0.8f, 0.85f}), 1.0f, COLOR_RED));
+    TextPtr xPosLabel(
+        new Text(HUD_FONT, Window::RelToWinPos({0.7f, 0.85f}), 1.0f, COLOR_RED, "X:"));
+    TextPtr xPosValue(new Text(HUD_FONT, Window::RelToWinPos({0.8f, 0.85f}), 1.0f, COLOR_RED));
 
-    TextPtr yPosLabelText(new Text(HUD_FONT, Window::RelToWinPos({0.7f, 0.8f}), 1.0f, COLOR_GREEN));
-    yPosLabelText->setText("Y:");
-    TextPtr yPosValueText(new Text(HUD_FONT, Window::RelToWinPos({0.8f, 0.8f}), 1.0f, COLOR_GREEN));
+    TextPtr yPosLabel(
+        new Text(HUD_FONT, Window::RelToWinPos({0.7f, 0.8f}), 1.0f, COLOR_GREEN, "Y:"));
+    TextPtr yPosValue(new Text(HUD_FONT, Window::RelToWinPos({0.8f, 0.8f}), 1.0f, COLOR_GREEN));
 
-    TextPtr zPosLabelText(new Text(HUD_FONT, Window::RelToWinPos({0.7f, 0.75f}), 1.0f, COLOR_BLUE));
-    zPosLabelText->setText("Z:");
-    TextPtr zPosValueText(new Text(HUD_FONT, Window::RelToWinPos({0.8f, 0.75f}), 1.0f, COLOR_BLUE));
+    TextPtr zPosLabel(
+        new Text(HUD_FONT, Window::RelToWinPos({0.7f, 0.75f}), 1.0f, COLOR_BLUE, "Z:"));
+    TextPtr zPosValue(new Text(HUD_FONT, Window::RelToWinPos({0.8f, 0.75f}), 1.0f, COLOR_BLUE));
 
-    TextPtr pitchLabelText(
-        new Text(HUD_FONT, Window::RelToWinPos({0.7f, 0.65f}), 1.0f, COLOR_YELLOW));
-    pitchLabelText->setText("Pitch:");
-    TextPtr pitchValueText(
-        new Text(HUD_FONT, Window::RelToWinPos({0.8f, 0.65f}), 1.0f, COLOR_YELLOW));
+    TextPtr pitchLabel(
+        new Text(HUD_FONT, Window::RelToWinPos({0.7f, 0.65f}), 1.0f, COLOR_YELLOW, "Pitch:"));
+    TextPtr pitchValue(new Text(HUD_FONT, Window::RelToWinPos({0.8f, 0.65f}), 1.0f, COLOR_YELLOW));
 
-    TextPtr yawLabelText(new Text(HUD_FONT, Window::RelToWinPos({0.7f, 0.6f}), 1.0f, COLOR_VIOLET));
-    yawLabelText->setText("Yaw:");
-    TextPtr yawValueText(new Text(HUD_FONT, Window::RelToWinPos({0.8f, 0.6f}), 1.0f, COLOR_VIOLET));
+    TextPtr yawLabel(
+        new Text(HUD_FONT, Window::RelToWinPos({0.7f, 0.6f}), 1.0f, COLOR_VIOLET, "Yaw:"));
+    TextPtr yawValue(new Text(HUD_FONT, Window::RelToWinPos({0.8f, 0.6f}), 1.0f, COLOR_VIOLET));
 
-    dtTexts = {fpsLabelText,   fpsValueText,   xPosLabelText, xPosValueText,
-               yPosLabelText,  yPosValueText,  zPosLabelText, zPosValueText,
-               pitchLabelText, pitchValueText, yawLabelText,  yawValueText};
+    TextPtr fovLabel(
+        new Text(HUD_FONT, Window::RelToWinPos({0.7f, 0.5f}), 1.0f, COLOR_GREY, "FOV:"));
+    TextPtr fovValue(new Text(HUD_FONT, Window::RelToWinPos({0.8f, 0.5f}), 1.0f, COLOR_GREY));
+
+    dtTexts = {fpsLabel,  fpsValue,   xPosLabel,  xPosValue, yPosLabel, yPosValue, zPosLabel,
+               zPosValue, pitchLabel, pitchValue, yawLabel,  yawValue,  fovLabel,  fovValue};
 
     // Setup scene lights
     LightPtr light01 =
@@ -210,6 +210,7 @@ int main() {
       glfwPollEvents();
       Camera::KeyControl();
       Camera::MouseControl();
+      Camera::MouseScrollControl();
 
       if (Window::GetToggleKey(GLFW_KEY_M, NULL))
         displayHUD = !displayHUD;
@@ -233,18 +234,19 @@ int main() {
           GLfloat avgFps =
               std::accumulate(fpsBuffer.begin(), fpsBuffer.begin() + fpsBufferIdx, 0.0f) /
               std::max(fpsBufferIdx, (size_t)1);
-          fpsValueText->setText(toStringDp(avgFps, 1));
+          fpsValue->setText(toStringDp(avgFps, 1));
           fpsUpdateTime -= FPS_UPDATE_DELAY;
           fpsBufferIdx = 0;
         } else {
           fpsUpdateTime += Timer::GetDeltaTime();
         }
 
-        xPosValueText->setText(toStringDp(Camera::GetPosition().x, 3));
-        yPosValueText->setText(toStringDp(Camera::GetPosition().y, 3));
-        zPosValueText->setText(toStringDp(Camera::GetPosition().z, 3));
-        pitchValueText->setText(toStringDp(Camera::GetPitch(), 1));
-        yawValueText->setText(toStringDp(Camera::GetYaw(), 1));
+        xPosValue->setText(toStringDp(Camera::GetPosition().x, 3));
+        yPosValue->setText(toStringDp(Camera::GetPosition().y, 3));
+        zPosValue->setText(toStringDp(Camera::GetPosition().z, 3));
+        pitchValue->setText(toStringDp(Camera::GetPitch(), 1));
+        yawValue->setText(toStringDp(Camera::GetYaw(), 1));
+        fovValue->setText(toStringDp(Camera::GetFOV(), 1));
 
         dl_text->draw(errCode);
       }

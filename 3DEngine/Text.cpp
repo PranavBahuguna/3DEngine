@@ -1,10 +1,10 @@
 #include "Text.h"
 
 // Constructor
-Text::Text(const std::string &font, const glm::vec2 &pos,
-           const GLfloat scale, const glm::vec4 &color)
+Text::Text(const std::string &font, const glm::vec2 &pos, const GLfloat scale,
+           const glm::vec4 &color, const std::string &text)
     : Drawable({pos.x, pos.y, 0.0f}), m_font(Resources::GetFont(font)), m_scale(scale),
-      m_color(color) {
+      m_color(color), m_text(text) {
 
   // Configure VAO / VBO for texture quads and bind buffer data
   glGenVertexArrays(1, &m_VAO);
