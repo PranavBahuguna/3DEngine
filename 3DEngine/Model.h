@@ -13,9 +13,16 @@ public:
   virtual void update(ERROR &errCode) {}
 
   void draw(const Shader &shader, ERROR &errCode) const override;
-  void setPosition(const glm::vec3 &pos);
-  void setRotation(const glm::vec3 &euler, float angle);
-  void setScale(const glm::vec3 &scale);
+
+  const glm::vec3 &getPos() { return m_pos; }
+  const glm::vec3 &getEuler() { return m_euler; }
+  float getAngle() { return m_angle; }
+  const glm::vec3 &getScale() { return m_scale; }
+
+  void setPos(const glm::vec3 &pos) { m_pos = pos; }
+  void setEuler(const glm::vec3 &euler) { m_euler = euler; }
+  void setAngle(float angle) { m_angle = angle; }
+  void setScale(const glm::vec3 &scale) { m_scale = scale; }
 
 protected:
   glm::mat4 getMatrix() const;

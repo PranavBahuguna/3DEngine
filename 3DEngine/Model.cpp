@@ -29,18 +29,6 @@ void Model::draw(const Shader &shader, ERROR &errCode) const {
   }
 }
 
-// Set model position
-void Model::setPosition(const glm::vec3 &pos) { m_pos = pos; }
-
-// Set model rotation and angle
-void Model::setRotation(const glm::vec3 &euler, float angle) {
-  m_euler = euler;
-  m_angle = angle;
-}
-
-// Set model scale
-void Model::setScale(const glm::vec3 &scale) { m_scale = scale; }
-
 // Gets the model matrix
 glm::mat4 Model::getMatrix() const {
   auto matrix = glm::mat4(1.0f);

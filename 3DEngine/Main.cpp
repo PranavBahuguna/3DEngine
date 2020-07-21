@@ -1,14 +1,12 @@
 #define TINYOBJLOADER_IMPLEMENTATION
 
 #include "Camera.h"
-#include "Cube.h"
 #include "DrawListBuilder.h"
 #include "Drawable.h"
+#include "GameObject.h"
 #include "Light.h"
 #include "LightIcon.h"
-#include "Sphere.h"
 #include "Terrain.h"
-#include "Tetrahedron.h"
 #include "Text.h"
 #include "Timer.h"
 #include "Window.h"
@@ -42,7 +40,6 @@
 #define FPS_UPDATE_DELAY 0.5f
 #define FPS_BUFFER_SIZE 8
 
-using ModelPtr = std::shared_ptr<Model>;
 using TextPtr = std::shared_ptr<Text>;
 using LiPtr = std::shared_ptr<LightIcon>;
 
@@ -95,32 +92,37 @@ int main() {
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     // Setup scene objects
-    ModelPtr tetrahedron(new Tetrahedron());
-    tetrahedron->setPosition(glm::vec3(0.0f, 0.0f, 3.0f));
+    ModelPtr tetrahedron(new Model("Tetrahedron"));
+    tetrahedron->setPos(glm::vec3(0.0f, 0.0f, 3.0f));
     tetrahedron->setScale(glm::vec3(0.4f));
     tetrahedron->load(errCode);
 
-    ModelPtr cube(new Cube());
-    cube->setPosition(glm::vec3(-3.0f, 0.0f, 6.0f));
+    ModelPtr cube(new Model("Cube"));
+    cube->setPos(glm::vec3(-3.0f, 0.0f, 6.0f));
     cube->setScale(glm::vec3(0.4f));
     cube->load(errCode);
 
-    ModelPtr earth(new Sphere());
-    earth->setPosition(glm::vec3(3.0f, 0.0f, 6.0f));
-    earth->setRotation(glm::vec3(0.0f, 1.0f, 0.0f), 0.0f);
+    ModelPtr earth(new Model("Sphere"));
+    earth->setPos(glm::vec3(3.0f, 0.0f, 6.0f));
+    earth->setEuler(glm::vec3(0.0f, 1.0f, 0.0f));
     earth->setScale(glm::vec3(0.4f));
     earth->load(errCode);
 
     ModelPtr starfighter(new Model("Arc170"));
-    starfighter->setPosition(glm::vec3(0.0f, 0.0f, 10.0f));
-    starfighter->setRotation(glm::vec3(0.0f, 1.0f, 0.0f), 180.0f);
+    starfighter->setPos(glm::vec3(0.0f, 0.0f, 10.0f));
+    starfighter->setEuler(glm::vec3(0.0f, 1.0f, 0.0f));
+    starfighter->setAngle(180.0f);
     starfighter->setScale(glm::vec3(0.002f));
     starfighter->load(errCode);
 
     ModelPtr floor(new Terrain("Grass", {5, 5}, {5.0f, 5.0f}));
-    floor->setPosition(glm::vec3(0.0f, -3.0f, 0.0f));
-    floor->setRotation(glm::vec3(1.0f), 0.0f);
+    floor->setPos(glm::vec3(0.0f, -3.0f, 0.0f));
+    floor->setEuler(glm::vec3(1.0f));
     floor->load(errCode);
+
+    GameObject earthObj("Earth");
+    earthObj.setModel(earth);
+    earthObj.loadScript("Earth", errCode);
 
     models = {tetrahedron, cube, earth, starfighter, floor};
 
@@ -222,6 +224,8 @@ int main() {
       // Update all models
       for (const auto &model : models)
         model->update(errCode);
+
+      earthObj.update(errCode);
 
       // Draw all models and light icons
       dl_illum->draw(errCode);
