@@ -18,6 +18,8 @@ public:
   void updateFunc(ERROR &errCode) { callFunc("update", errCode); }
 
 private:
+  sol::state lua;
+
   void load(const std::string &filename, ERROR &errCode);
   void callFunc(const std::string &funcName, ERROR &errCode);
   void luaError(ERROR &errCode, const sol::error &solErr) const;

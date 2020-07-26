@@ -2,10 +2,19 @@
 
 #include <stdexcept>
 
-GameObject::GameObject(const std::string &name) : _name(name) {}
+GameObject::GameObject(ModelPtr model) : m_model(model) { 
+  ERROR errCode = ERROR_OK;
+  model->load(errCode); 
+}
+
+GameObject::GameObject(ModelPtr model, const std::string &scriptName) : GameObject(model) {
+  loadScript(scriptName);
+  ERROR errCode = ERROR_OK;
+  init(errCode);
+}
 
 // Loads and attaches the Lua script to this
-void GameObject::loadScript(const std::string &name, ERROR &errCode) {
+void GameObject::loadScript(const std::string &name) {
   const std::string filename = "Scripts/" + name + ".lua";
   m_script = ScriptPtr(new Script(filename, *this));
 }

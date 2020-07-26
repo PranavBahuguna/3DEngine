@@ -205,7 +205,10 @@
     <ClInclude Include="Window.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Scripts\Cube.lua" />
     <None Include="Scripts\Earth.lua" />
+    <None Include="Scripts\Starfighter.lua" />
+    <None Include="Scripts\Tetrahedron.lua" />
     <None Include="Shaders\LightIconParticle.frag" />
     <None Include="Shaders\LightIconParticle.vert" />
     <None Include="Shaders\Text.frag" />

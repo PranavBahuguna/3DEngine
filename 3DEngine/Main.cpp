@@ -52,6 +52,7 @@ GLfloat fpsUpdateTime = FPS_UPDATE_DELAY;
 bool displayHUD = false;
 
 std::vector<ModelPtr> models;
+std::vector<GameObject *> gameObjects;
 
 DrawTargets dtModels;
 DrawTargets dtTexts;
@@ -93,37 +94,22 @@ int main() {
 
     // Setup scene objects
     ModelPtr tetrahedron(new Model("Tetrahedron"));
-    tetrahedron->setPos(glm::vec3(0.0f, 0.0f, 3.0f));
-    tetrahedron->setScale(glm::vec3(0.4f));
-    tetrahedron->load(errCode);
-
     ModelPtr cube(new Model("Cube"));
-    cube->setPos(glm::vec3(-3.0f, 0.0f, 6.0f));
-    cube->setScale(glm::vec3(0.4f));
-    cube->load(errCode);
-
     ModelPtr earth(new Model("Sphere"));
-    earth->setPos(glm::vec3(3.0f, 0.0f, 6.0f));
-    earth->setEuler(glm::vec3(0.0f, 1.0f, 0.0f));
-    earth->setScale(glm::vec3(0.4f));
-    earth->load(errCode);
-
     ModelPtr starfighter(new Model("Arc170"));
-    starfighter->setPos(glm::vec3(0.0f, 0.0f, 10.0f));
-    starfighter->setEuler(glm::vec3(0.0f, 1.0f, 0.0f));
-    starfighter->setAngle(180.0f);
-    starfighter->setScale(glm::vec3(0.002f));
-    starfighter->load(errCode);
 
-    ModelPtr floor(new Terrain("Grass", {5, 5}, {5.0f, 5.0f}));
+    ModelPtr floor(new Terrain("Grass", {5, 5}, {10.0f, 10.0f}));
     floor->setPos(glm::vec3(0.0f, -3.0f, 0.0f));
     floor->setEuler(glm::vec3(1.0f));
     floor->load(errCode);
 
-    GameObject earthObj("Earth");
-    earthObj.setModel(earth);
-    earthObj.loadScript("Earth", errCode);
+    GameObject* earthObj(new GameObject(earth, "Earth"));
+    GameObject* tetrahedronObj(new GameObject(tetrahedron, "Tetrahedron"));
+    GameObject* cubeObj(new GameObject(cube, "Cube"));
+    GameObject* starfighterObj(new GameObject(starfighter, "Starfighter"));
+    GameObject* floorObj(new GameObject(floor));
 
+    gameObjects = {earthObj, tetrahedronObj, cubeObj, starfighterObj, floorObj};
     models = {tetrahedron, cube, earth, starfighter, floor};
 
     // Setup HUD elements
@@ -221,11 +207,9 @@ int main() {
       glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-      // Update all models
-      for (const auto &model : models)
-        model->update(errCode);
-
-      earthObj.update(errCode);
+      // Update all gameobjects
+      for (const auto &gameObject : gameObjects)
+        gameObject->update(errCode);
 
       // Draw all models and light icons
       dl_illum->draw(errCode);

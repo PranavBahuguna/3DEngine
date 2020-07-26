@@ -10,7 +10,6 @@ public:
   Model(const std::string &name);
 
   virtual void load(ERROR &errCode);
-  virtual void update(ERROR &errCode) {}
 
   void draw(const Shader &shader, ERROR &errCode) const override;
 
@@ -21,7 +20,7 @@ public:
 
   void setPos(const glm::vec3 &pos) { m_pos = pos; }
   void setEuler(const glm::vec3 &euler) { m_euler = euler; }
-  void setAngle(float angle) { m_angle = angle; }
+  void setAngle(float angle) { m_angle = fmod(angle, 360.0f); }
   void setScale(const glm::vec3 &scale) { m_scale = scale; }
 
 protected:

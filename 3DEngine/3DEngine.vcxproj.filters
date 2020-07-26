@@ -198,7 +198,16 @@
     <None Include="Shaders\LightIconParticle.vert">
       <Filter>Shaders</Filter>
     </None>
+    <None Include="Scripts\Cube.lua">
+      <Filter>Scripts</Filter>
+    </None>
     <None Include="Scripts\Earth.lua">
+      <Filter>Scripts</Filter>
+    </None>
+    <None Include="Scripts\Starfighter.lua">
+      <Filter>Scripts</Filter>
+    </None>
+    <None Include="Scripts\Tetrahedron.lua">
       <Filter>Scripts</Filter>
     </None>
   </ItemGroup>

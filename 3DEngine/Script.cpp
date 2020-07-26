@@ -4,19 +4,34 @@
 #include <filesystem>
 #include <stdexcept>
 
-static sol::state lua;
-
 Script::Script(const std::string &filename, const GameObject &gameObject) {
   ERROR errCode = ERROR_OK;
-  lua.open_libraries(sol::lib::base);
+  lua.open_libraries(sol::lib::base, sol::lib::math);
 
   load(filename, errCode);
   if (errCode != ERROR_OK)
     throw std::runtime_error("An error occurred while loading script (" + filename + ").");
 
-  // Register all required functions
+  // Add userdata types
+  lua.new_usertype<glm::vec3>(
+      "vec3", sol::constructors<glm::vec3(float), glm::vec3(float, float, float)>());
+  lua.new_usertype<glm::mat4>("mat4", sol::constructors<glm::mat4(float)>());
+
+  // GameObject functions
+  lua.set_function("getPos", &GameObject::getPos, gameObject);
+  lua.set_function("getEuler", &GameObject::getEuler, gameObject);
   lua.set_function("getAngle", &GameObject::getAngle, gameObject);
+  lua.set_function("getScale", &GameObject::getScale, gameObject);
+  lua.set_function("setPos", &GameObject::setPos, gameObject);
+  lua.set_function("setEuler", &GameObject::setEuler, gameObject);
   lua.set_function("setAngle", &GameObject::setAngle, gameObject);
+  lua.set_function("setScale", &GameObject::setScale, gameObject);
+
+  // Math functions
+  lua.set_function("sin", [](float angle) { return sin(glm::radians(angle)); });
+  lua.set_function("cos", [](float angle) { return cos(glm::radians(angle)); });
+
+  // Timer
   lua.set_function("getDeltaTime", &Timer::GetDeltaTime);
 }
 
