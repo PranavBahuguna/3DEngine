@@ -13,19 +13,20 @@ Script::Script(const std::string &filename, const GameObject &gameObject) {
     throw std::runtime_error("An error occurred while loading script (" + filename + ").");
 
   // Add userdata types
-  lua.new_usertype<glm::vec3>(
-      "vec3", sol::constructors<glm::vec3(float), glm::vec3(float, float, float)>());
-  lua.new_usertype<glm::mat4>("mat4", sol::constructors<glm::mat4(float)>());
+  lua.new_usertype<glm::vec3>("vec3",
+                              sol::constructors<glm::vec3(float), glm::vec3(float, float, float)>(),
+                              "x", &glm::vec3::x, "y", &glm::vec3::y, "z", &glm::vec3::z);
 
   // GameObject functions
   lua.set_function("getPos", &GameObject::getPos, gameObject);
   lua.set_function("getEuler", &GameObject::getEuler, gameObject);
-  lua.set_function("getAngle", &GameObject::getAngle, gameObject);
   lua.set_function("getScale", &GameObject::getScale, gameObject);
   lua.set_function("setPos", &GameObject::setPos, gameObject);
   lua.set_function("setEuler", &GameObject::setEuler, gameObject);
-  lua.set_function("setAngle", &GameObject::setAngle, gameObject);
   lua.set_function("setScale", &GameObject::setScale, gameObject);
+  lua.set_function("move", &GameObject::move, gameObject);
+  lua.set_function("rotate", &GameObject::rotate, gameObject);
+  lua.set_function("scale", &GameObject::scale, gameObject);
 
   // Math functions
   lua.set_function("sin", [](float angle) { return sin(glm::radians(angle)); });
