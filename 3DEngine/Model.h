@@ -11,7 +11,7 @@ public:
 
   virtual void load(ERROR &errCode);
 
-  void draw(const Shader &shader, ERROR &errCode) const override;
+  void draw(ERROR &errCode, const Shader &shader) const override;
 
   const glm::vec3 &getPos() { return m_pos; }
   const glm::vec3 &getEuler() { return m_euler; }

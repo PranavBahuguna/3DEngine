@@ -27,7 +27,7 @@
     <Filter Include="Source Files\GameObject">
       <UniqueIdentifier>{fa1719a7-9696-4dec-9566-3fca2d1e7e7c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\ThirdParty">
+    <Filter Include="ThirdParty">
       <UniqueIdentifier>{32735c7a-cd63-4bbe-906b-9ee40f1ae188}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -65,9 +65,6 @@
     <ClCompile Include="Text.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Terrain.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="AssetLoader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -97,6 +94,9 @@
     </ClCompile>
     <ClCompile Include="Script.cpp">
       <Filter>Source Files\GameObject</Filter>
+    </ClCompile>
+    <ClCompile Include="Plane.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -133,9 +133,6 @@
     <ClInclude Include="Text.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Terrain.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Light.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -161,10 +158,10 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="stb_image.h">
-      <Filter>Header Files\ThirdParty</Filter>
+      <Filter>ThirdParty</Filter>
     </ClInclude>
     <ClInclude Include="tiny_obj_loader.h">
-      <Filter>Header Files\ThirdParty</Filter>
+      <Filter>ThirdParty</Filter>
     </ClInclude>
     <ClInclude Include="AssetLoader.h">
       <Filter>Header Files</Filter>
@@ -176,7 +173,10 @@
       <Filter>Header Files\GameObject</Filter>
     </ClInclude>
     <ClInclude Include="sol.hpp">
-      <Filter>Header Files\ThirdParty</Filter>
+      <Filter>ThirdParty</Filter>
+    </ClInclude>
+    <ClInclude Include="Plane.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

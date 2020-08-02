@@ -12,13 +12,19 @@
 LightIcon::LightIcon(const std::string &lightName) {
   ERROR errCode = ERROR_OK;
 
-  // Try getting the light
+  // Try getting the light and texture
   m_light = Resources::FindLight(lightName);
   if (m_light == nullptr) {
-    errCode = ERROR_MISSING_LIGHT;
-    printErrorMsg(errCode, lightName);
-    throw std::invalid_argument("An error occurred while constructing light icon");
+    errCode = printErrorMsg(ERROR_MISSING_LIGHT, lightName);
+  } else {
+    const std::string textureName = "light-icons.png";
+    m_texture = Resources::GetTexture(textureName);
+    if (m_texture == nullptr)
+      errCode = printErrorMsg(ERROR_MISSING_LIGHT, textureName);
   }
+
+  if (errCode != ERROR_OK)
+    throw std::invalid_argument("An error occurred while constructing light icon.");
 
   // Position for directional lights is in a fixed location (with offset for light direction).
   // Position for other lights is at light location.
@@ -32,7 +38,6 @@ LightIcon::LightIcon(const std::string &lightName) {
     m_pos = lightPos;
 
   // Get the appropriate icon from the sprite map
-  m_texture = Resources::GetTexture("light-icons.png");
   glm::vec2 texIndices = {0, 0};
 
   switch (lightType) {
@@ -72,16 +77,13 @@ LightIcon::LightIcon(const std::string &lightName) {
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, 0);
   }
-
-  if (errCode != ERROR_OK)
-    throw std::invalid_argument("An error occurred while constructing light icon");
 }
 
 // Draws a light icon onto the screen
-void LightIcon::draw(const Shader &shader, ERROR &errCode) const {
+void LightIcon::draw(ERROR &errCode, const Shader &shader) const {
   // Pass shader parameters
-  shader.setVec4("color", glm::vec4(m_light->getTotalColor(), 1.0f), errCode);
-  shader.setMat4("model", glm::translate(glm::mat4(1.0f), m_pos), errCode);
+  shader.setVec4("color", glm::vec4(m_light->getTotalColor(), 1.0f));
+  shader.setMat4("model", glm::translate(glm::mat4(1.0f), m_pos));
 
   // Use texture and draw vertices
   m_texture->use();

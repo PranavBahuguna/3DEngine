@@ -18,11 +18,11 @@ void IlluminationDrawList::draw(ERROR &errCode) {
 
   // Apply all lights to the shader
   for (size_t i = 0; i < m_lights.size(); i++)
-    m_lights[i]->use(*_shader, i, errCode);
+    m_lights[i]->use(*_shader, i);
 
-  _shader->setMat4("projection", Camera::GetProjection(), errCode);
-  _shader->setMat4("view", Camera::GetView(), errCode);
-  _shader->setVec3("viewPos", Camera::GetPosition(), errCode);
+  _shader->setMat4("projection", Camera::GetProjection());
+  _shader->setMat4("view", Camera::GetView());
+  _shader->setVec3("viewPos", Camera::GetPosition());
 
   DrawListDecorator::draw(errCode);
 }

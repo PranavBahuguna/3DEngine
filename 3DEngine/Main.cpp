@@ -6,7 +6,7 @@
 #include "GameObject.h"
 #include "Light.h"
 #include "LightIcon.h"
-#include "Terrain.h"
+#include "Plane.h"
 #include "Text.h"
 #include "Timer.h"
 #include "Window.h"
@@ -14,9 +14,6 @@
 #include <algorithm>
 #include <iomanip>
 #include <numeric>
-#include <sstream>
-
-#include <glm/gtc/matrix_transform.hpp>
 
 #define WINDOW_WIDTH 1600
 #define WINDOW_HEIGHT 1200
@@ -39,6 +36,7 @@
 #define COLOR_GREY glm::vec4(0.6667f, 0.6627f, 0.6784f, 1.0f)
 #define FPS_UPDATE_DELAY 0.5f
 #define FPS_BUFFER_SIZE 8
+#define MAX_LIGHTS 8
 
 using TextPtr = std::shared_ptr<Text>;
 using LiPtr = std::shared_ptr<LightIcon>;
@@ -65,12 +63,8 @@ DListPtr dl_text;
 std::vector<LightPtr> sceneLights;
 size_t nLights = 0;
 
-// Converts a float to string with a number of decimal places
-static std::string toStringDp(float f, size_t dp) {
-  std::stringstream ss;
-  ss << std::fixed << std::setprecision(dp) << f;
-  return ss.str();
-}
+// forward declarations
+static std::string toStringDp(float, size_t);
 
 int main() {
   try {
@@ -79,7 +73,7 @@ int main() {
                                        : (FULLSCREEN_WINDOWS) ? WindowMode::FULLSCREEN_WINDOWED
                                                               : WindowMode::WINDOWED;
 
-    Window::Init("Test window", wMode, WINDOW_WIDTH, WINDOW_HEIGHT, errCode);
+    Window::Init("Test window", wMode, WINDOW_WIDTH, WINDOW_HEIGHT);
 
     // Allow objects to obscure other objects behind them
     glEnable(GL_DEPTH_TEST);
@@ -98,16 +92,16 @@ int main() {
     ModelPtr earth(new Model("Sphere"));
     ModelPtr starfighter(new Model("Arc170"));
 
-    ModelPtr floor(new Terrain("Grass", {5, 5}, {10.0f, 10.0f}));
+    ModelPtr floor(new Plane("Grass", {5, 5}, {10.0f, 10.0f}));
     floor->setPos(glm::vec3(0.0f, -3.0f, 0.0f));
     floor->setEuler(glm::vec3(1.0f));
     floor->load(errCode);
 
-    GameObject* earthObj(new GameObject(earth, "Earth"));
-    GameObject* tetrahedronObj(new GameObject(tetrahedron, "Tetrahedron"));
-    GameObject* cubeObj(new GameObject(cube, "Cube"));
-    GameObject* starfighterObj(new GameObject(starfighter, "Starfighter"));
-    GameObject* floorObj(new GameObject(floor));
+    GameObject *earthObj(new GameObject(earth, "Earth"));
+    GameObject *tetrahedronObj(new GameObject(tetrahedron, "Tetrahedron"));
+    GameObject *cubeObj(new GameObject(cube, "Cube"));
+    GameObject *starfighterObj(new GameObject(starfighter, "Starfighter"));
+    GameObject *floorObj(new GameObject(floor));
 
     gameObjects = {earthObj, tetrahedronObj, cubeObj, starfighterObj, floorObj};
     models = {tetrahedron, cube, earth, starfighter, floor};
@@ -148,9 +142,9 @@ int main() {
     LightPtr light01 =
         Resources::CreateDirectionalLight("DirectionalLight", glm::vec3(0.25f), glm::vec3(1.0f),
                                           glm::vec3(1.0f), {1.0f, 1.0f, -1.0f});
-    LightPtr light02 = Resources::CreatePointLight(
-        "PointLight", glm::vec3(0.25f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(1.0f),
-        glm::vec3(4.0f, 4.0f, -4.0f), 1.0f, 0.045f, 0.0075f);
+    LightPtr light02 =
+        Resources::CreatePointLight("PointLight", glm::vec3(0.25f), glm::vec3(1.0f, 0.0f, 0.0f),
+                                    glm::vec3(1.0f), {4.0f, 4.0f, -4.0f}, 1.0f, 0.045f, 0.0075f);
     LightPtr light03 = Resources::CreateSpotLight(
         "SpotLight", glm::vec3(0.25f), glm::vec3(1.0f), glm::vec3(1.0f), {-4.0f, 10.0f, 3.0f}, 1.0f,
         0.045f, 0.0075f, {0.0f, -1.0f, 0.0f}, 20.0f, 25.0f);
@@ -165,12 +159,9 @@ int main() {
 
     dtLightIcons = {li01, li02, li03};
 
-    // Setup text shader
-    auto textShader = Resources::GetShader("Text");
-    textShader->compile(errCode);
-    const glm::mat4 orthoProjection =
-        glm::ortho(0.0f, (float)Window::GetWidth(), 0.0f, (float)Window::GetHeight(), 0.0f, 1.0f);
-    textShader->setMat4("projection", orthoProjection, errCode);
+    // Setup lighting shader
+    auto lightingShader = Resources::GetShader("Lighting");
+    lightingShader->setPreprocessor(GL_FRAGMENT_SHADER, "MAX_LIGHTS", MAX_LIGHTS);
 
     // Setup drawlists
     dtModels = DrawTargets(models.begin(), models.end());
@@ -182,6 +173,7 @@ int main() {
     dl_trans = DrawListBuilder::AddTransparency(std::move(dl_trans));
 
     dl_text = DrawListBuilder::CreateDrawList(dtTexts, "Text");
+    dl_text = DrawListBuilder::AddOrthoProjection(std::move(dl_text));
 
     // Setup camera
     Camera::Init(glm::vec3(0.0f), {0.0f, 1.0f, 0.0f}, 90.0f, 0.0f, FOV, NEAR_PLANE, FAR_PLANE);
@@ -200,7 +192,7 @@ int main() {
       Camera::MouseControl();
       Camera::MouseScrollControl();
 
-      if (Window::GetToggleKey(GLFW_KEY_M, NULL))
+      if (Window::GetToggleKey(errCode, GLFW_KEY_M))
         displayHUD = !displayHUD;
 
       // Clear window
@@ -239,12 +231,23 @@ int main() {
         dl_text->draw(errCode);
       }
 
+      if (errCode != ERROR_OK)
+        throw std::runtime_error("An error occurred while runnning this level.");
+
       Window::SwapBuffers();
     }
+
   } catch (std::exception &e) {
     printf(e.what());
     return EXIT_FAILURE;
   }
 
   return EXIT_SUCCESS;
+}
+
+// Converts a float to string with a number of decimal places
+static std::string toStringDp(float f, size_t dp) {
+  std::stringstream ss;
+  ss << std::fixed << std::setprecision(dp) << f;
+  return ss.str();
 }

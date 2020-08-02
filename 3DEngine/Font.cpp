@@ -13,18 +13,13 @@ Font::Font(const std::string &name) : m_name(name), m_characters{} {
   FT_Library ft;
   FT_Error ftErrCode = FT_Init_FreeType(&ft);
   if (ftErrCode != FT_Err_Ok) {
-    errCode = ERROR_CANNOT_INITIALISE_FREETYPE;
-    printErrorMsg(errCode, ftErrCode, getFTErrorMsg(ftErrCode));
-  }
-
-  if (errCode == ERROR_OK) {
+    errCode = printErrorMsg(ERROR_CANNOT_INITIALISE_FREETYPE, ftErrCode, getFTErrorMsg(ftErrCode));
+  } else {
     // Get file path and try loading font
     const std::string path = "Fonts/" + name + ".ttf";
-    errCode = load(path, ft);
 
-    // If font load fails, try loading the default font instead
-    if (errCode != ERROR_OK)
-      errCode = load(DEFAULT_FONT, ft);
+    if (load(path, ft) != ERROR_OK)
+      errCode = load(DEFAULT_FONT, ft); // try loading default font instead
   }
 
   if (errCode != ERROR_OK)
@@ -33,33 +28,28 @@ Font::Font(const std::string &name) : m_name(name), m_characters{} {
 
 // Loads font from the given file path
 ERROR Font::load(const std::string &filepath, FT_Library &ft) {
-  ERROR errCode = ERROR_OK;
-
   // Try loading font face
   FT_Face face;
   FT_Error ftErrCode = FT_New_Face(ft, filepath.c_str(), 0, &face);
-  if (ftErrCode != FT_Err_Ok) {
-    errCode = ERROR_FONT_LOAD_FAILED;
-    printErrorMsg(errCode, m_name.c_str(), ftErrCode, getFTErrorMsg(ftErrCode));
-    return errCode;
-  }
+  if (ftErrCode != FT_Err_Ok)
+    return printErrorMsg(ERROR_FONT_LOAD_FAILED, m_name.c_str(), ftErrCode,
+                         getFTErrorMsg(ftErrCode));
 
   // Set font pixel size
   ftErrCode = FT_Set_Pixel_Sizes(face, 0, FONT_PIXEL_SIZE);
-  if (ftErrCode != FT_Err_Ok) {
-    errCode = ERROR_FONT_LOAD_FAILED;
-    printErrorMsg(errCode, m_name.c_str(), ftErrCode, getFTErrorMsg(ftErrCode));
-    return errCode;
-  }
+  if (ftErrCode != FT_Err_Ok)
+    return printErrorMsg(ERROR_FONT_LOAD_FAILED, m_name.c_str(), ftErrCode,
+                         getFTErrorMsg(ftErrCode));
 
   glPixelStorei(GL_UNPACK_ALIGNMENT, 1); // disable byte-alignment restriction
 
+  ERROR errCode = ERROR_OK;
   for (unsigned char c = 0; c < CHAR_ARRAY_SIZE; c++) {
     // Load character glyph
     ftErrCode = FT_Load_Char(face, c, FT_LOAD_RENDER);
     if (ftErrCode != FT_Err_Ok) {
-      printErrorMsg(ERROR_FONT_GLYPH_LOAD_FAILED, (int)c, m_name.c_str(), ftErrCode,
-                    getFTErrorMsg(ftErrCode));
+      errCode = printErrorMsg(ERROR_FONT_GLYPH_LOAD_FAILED, (int)c, m_name.c_str(), ftErrCode,
+                              getFTErrorMsg(ftErrCode));
       continue;
     }
 
@@ -90,14 +80,10 @@ ERROR Font::load(const std::string &filepath, FT_Library &ft) {
 }
 
 // Retrieves font character from store
-const Character *Font::getCharacter(const unsigned char c, ERROR &errCode) const {
-  if (errCode != ERROR_OK)
-    return NULL;
-
+const Character *Font::getCharacter(ERROR &errCode, const unsigned char c) const {
   if (c >= CHAR_ARRAY_SIZE) {
-    errCode = ERROR_FONT_CHARACTER_OUT_OF_RANGE;
-    printErrorMsg(errCode, c, m_name.c_str());
-    return NULL;
+    errCode = printErrorMsg(ERROR_FONT_CHARACTER_OUT_OF_RANGE, c, m_name.c_str());
+    return nullptr;
   }
 
   return &m_characters[c];

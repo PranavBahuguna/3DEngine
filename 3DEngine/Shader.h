@@ -2,6 +2,8 @@
 
 #include "Error.h"
 
+#include <unordered_map>
+
 #include <GL/glew.h>
 #include <glm/glm.hpp>
 
@@ -13,26 +15,25 @@ public:
   Shader(const std::string &name);
   ~Shader();
 
-  void compile(ERROR &errCode, bool useShader = true);
+  void compile(bool useShader = true);
 
   void use() const;
-  GLint getUniformId(const std::string &param, ERROR &errCode) const;
+  GLint getUniformId(const std::string &param) const;
 
   // Uniform setter utility functions
-  void setBool(const std::string &name, bool value, ERROR &errCode) const;
-  void setInt(const std::string &name, int value, ERROR &errCode) const;
-  void setUint(const std::string &name, unsigned int value, ERROR &errCode) const;
-  void setFloat(const std::string &name, float value, ERROR &errCode) const;
-  void setVec2(const std::string &name, const glm::vec2 &value, ERROR &errCode) const;
-  void setVec2(const std::string &name, GLfloat x, GLfloat y, ERROR &errCode) const;
-  void setVec3(const std::string &name, const glm::vec3 &value, ERROR &errCode) const;
-  void setVec3(const std::string &name, GLfloat x, GLfloat y, GLfloat z, ERROR &errCode) const;
-  void setVec4(const std::string &name, const glm::vec4 &value, ERROR &errCode) const;
-  void setVec4(const std::string &name, GLfloat x, GLfloat y, GLfloat z, GLfloat w,
-               ERROR &errCode) const;
-  void setMat2(const std::string &name, const glm::mat2 &value, ERROR &errCode) const;
-  void setMat3(const std::string &name, const glm::mat3 &value, ERROR &errCode) const;
-  void setMat4(const std::string &name, const glm::mat4 &value, ERROR &errCode) const;
+  void setBool(const std::string &name, bool value) const;
+  void setInt(const std::string &name, int value) const;
+  void setUint(const std::string &name, unsigned int value) const;
+  void setFloat(const std::string &name, float value) const;
+  void setVec2(const std::string &name, const glm::vec2 &value) const;
+  void setVec2(const std::string &name, GLfloat x, GLfloat y) const;
+  void setVec3(const std::string &name, const glm::vec3 &value) const;
+  void setVec3(const std::string &name, GLfloat x, GLfloat y, GLfloat z) const;
+  void setVec4(const std::string &name, const glm::vec4 &value) const;
+  void setVec4(const std::string &name, GLfloat x, GLfloat y, GLfloat z, GLfloat w) const;
+  void setMat2(const std::string &name, const glm::mat2 &value) const;
+  void setMat3(const std::string &name, const glm::mat3 &value) const;
+  void setMat4(const std::string &name, const glm::mat4 &value) const;
 
   // Preprocessor setter utility functions
   void setPreprocessor(GLenum type, const std::string &name, const std::string &value);
@@ -43,11 +44,10 @@ public:
   bool isCompiled() { return m_isCompiled; }
 
 private:
-  void load(const std::string &filename, GLenum type, GLuint &shaderId, ERROR &errCode);
+  void load(ERROR &errCode, const std::string &filename, GLenum type, GLuint &shaderId);
   void linkPrograms(ERROR &errCode);
-  void bindUniforms(ERROR &errCode);
-
-  void preprocess(std::string &shaderSource, GLenum type, ERROR &errCode) const;
+  void bindUniforms();
+  void preprocess(ERROR &errCode, std::string &shaderSource, GLenum type) const;
 
   char *getShaderErrorLog(GLuint id) const;
   char *getProgramErrorLog(GLuint id) const;

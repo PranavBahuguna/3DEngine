@@ -5,7 +5,6 @@
 class IlluminationDrawList : public DrawListDecorator {
 public:
   IlluminationDrawList(DListPtr drawList);
-  ~IlluminationDrawList() = default;
 
   void draw(ERROR &errCode) override;
 

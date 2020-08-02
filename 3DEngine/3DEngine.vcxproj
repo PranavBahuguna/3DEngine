@@ -168,7 +168,7 @@
     <ClCompile Include="Script.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="Mesh.cpp" />
-    <ClCompile Include="Terrain.cpp" />
+    <ClCompile Include="Plane.cpp" />
     <ClCompile Include="Text.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="Main.cpp" />
@@ -196,7 +196,7 @@
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="sol.hpp" />
     <ClInclude Include="stb_image.h" />
-    <ClInclude Include="Terrain.h" />
+    <ClInclude Include="Plane.h" />
     <ClInclude Include="Text.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="Timer.h" />

@@ -14,13 +14,12 @@ class Script {
 public:
   Script(const std::string &name, const GameObject &gameObject);
 
-  void initFunc(ERROR &errCode) { callFunc("init", errCode); }
-  void updateFunc(ERROR &errCode) { callFunc("update", errCode); }
+  void initFunc(ERROR &errCode) { callFunc(errCode, "init"); }
+  void updateFunc(ERROR &errCode) { callFunc(errCode, "update"); }
 
 private:
   sol::state lua;
 
-  void load(const std::string &filename, ERROR &errCode);
-  void callFunc(const std::string &funcName, ERROR &errCode);
-  void luaError(ERROR &errCode, const sol::error &solErr) const;
+  void load(ERROR &errCode, const std::string &filename);
+  void callFunc(ERROR &errCode, const std::string &funcName);
 };

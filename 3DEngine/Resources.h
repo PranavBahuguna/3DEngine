@@ -7,6 +7,7 @@
 #include "Texture.h"
 
 #include <memory>
+#include <unordered_map>
 
 typedef std::shared_ptr<Mesh> MeshPtr;
 typedef std::shared_ptr<Material> MatPtr;

@@ -20,9 +20,9 @@ Text::Text(const std::string &font, const glm::vec2 &pos, const GLfloat scale,
 }
 
 // Draws a text string onto the screen
-void Text::draw(const Shader &shader, ERROR &errCode) const {
+void Text::draw(ERROR &errCode, const Shader &shader) const {
   // Pass shader parameters and activate
-  shader.setVec4("textColor", m_color, errCode);
+  shader.setVec4("textColor", m_color);
   glActiveTexture(GL_TEXTURE0);
   glBindVertexArray(m_VAO);
 
@@ -30,7 +30,9 @@ void Text::draw(const Shader &shader, ERROR &errCode) const {
 
   // Iterate and draw each character
   for (const char &c : m_text) {
-    const Character *ch = m_font->getCharacter(c, errCode);
+    const auto &ch = m_font->getCharacter(errCode, c);
+    if (errCode != ERROR_OK)
+      break;
 
     // Calculate position and size for the given character
     GLfloat xPos = xStart + ch->bearing.x * m_scale;

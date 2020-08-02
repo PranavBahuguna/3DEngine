@@ -5,10 +5,10 @@
 #include <stdexcept>
 
 Script::Script(const std::string &filename, const GameObject &gameObject) {
-  ERROR errCode = ERROR_OK;
   lua.open_libraries(sol::lib::base, sol::lib::math);
 
-  load(filename, errCode);
+  ERROR errCode = ERROR_OK;
+  load(errCode, filename);
   if (errCode != ERROR_OK)
     throw std::runtime_error("An error occurred while loading script (" + filename + ").");
 
@@ -37,22 +37,22 @@ Script::Script(const std::string &filename, const GameObject &gameObject) {
 }
 
 // Load a Lua script from filename
-void Script::load(const std::string &filename, ERROR &errCode) {
+void Script::load(ERROR &errCode, const std::string &filename) {
   // Check if file exists
   if (!std::filesystem::exists(filename)) {
-    errCode = ERROR_FILE_LOAD_FAILED;
-    printErrorMsg(errCode, filename.c_str());
-    return;
+    errCode = printErrorMsg(ERROR_FILE_LOAD_FAILED, filename.c_str());
+  } else {
+    // Try loading the file
+    auto result = lua.script_file(filename);
+    if (!result.valid()) {
+      sol::error err = result;
+      errCode = printErrorMsg(ERROR_LUA_ERROR, err.what());
+    }
   }
-
-  // Try loading the file
-  auto result = lua.script_file(filename);
-  if (!result.valid())
-    luaError(errCode, result);
 }
 
 // Calls a lua script function with error handling
-void Script::callFunc(const std::string &funcName, ERROR &errCode) {
+void Script::callFunc(ERROR &errCode, const std::string &funcName) {
   sol::protected_function f = lua[funcName];
   if (!f.valid())
     return; // function not defined, ignore
@@ -62,12 +62,8 @@ void Script::callFunc(const std::string &funcName, ERROR &errCode) {
 
   // Call the function and handle any errors
   auto result = f();
-  if (!result.valid())
-    luaError(errCode, result);
-}
-
-// Handles Lua errors from script
-void Script::luaError(ERROR &errCode, const sol::error &solErr) const {
-  errCode = ERROR_LUA_ERROR;
-  printErrorMsg(errCode, solErr.what());
+  if (!result.valid()) {
+    sol::error err = result;
+    errCode = printErrorMsg(ERROR_LUA_ERROR, err.what());
+  }
 }

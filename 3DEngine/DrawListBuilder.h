@@ -3,8 +3,11 @@
 #include "IlluminationDrawList.h"
 #include "TransparencyDrawList.h"
 
+#include <glm/gtc/matrix_transform.hpp>
+
 class DrawListBuilder {
 public:
+  // Basic draw list sets targets and shader
   static DListPtr CreateDrawList(DrawTargets targets, const std::string &shader) {
     DListPtr basicDrawList = DListPtr(new BasicDrawList());
     basicDrawList->setTargets(std::move(targets));
@@ -13,23 +16,28 @@ public:
     return basicDrawList;
   }
 
+  // Sets the max number of lights and number of available lights for the shader
   static DListPtr AddIllumination(DListPtr drawList, const std::vector<std::string> &lightNames) {
     const auto ilDrawList = new IlluminationDrawList(std::move(drawList));
     ilDrawList->setLights(lightNames);
 
-    ERROR errCode = ERROR_OK;
     ShaderPtr _shader = ilDrawList->getShader();
-    if (!_shader->isCompiled()) {
-      _shader->setPreprocessor(GL_FRAGMENT_SHADER, "MAX_LIGHTS", 8);
-      _shader->compile(errCode);
-    }
-    _shader->setInt("nLights", static_cast<int>(lightNames.size()), errCode);
+    _shader->setInt("nLights", static_cast<int>(lightNames.size()));
 
     return DListPtr(ilDrawList);
   }
 
+  // Allows sorting of targets by distance from camera enabled for the drawlist
   static DListPtr AddTransparency(DListPtr drawList) {
     return DListPtr(new TransparencyDrawList(std::move(drawList)));
+  }
+
+  // Applies orthographic projection for all drawlist targets
+  static DListPtr AddOrthoProjection(DListPtr drawList) {
+    ShaderPtr _shader = drawList->getShader();
+    _shader->setMat4("projection", glm::ortho(0.0f, (float)Window::GetWidth(), 0.0f,
+                                              (float)Window::GetHeight(), 0.0f, 1.0f));
+    return drawList;
   }
 
 private:

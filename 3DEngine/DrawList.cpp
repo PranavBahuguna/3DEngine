@@ -4,10 +4,8 @@
 
 void DrawList::setShader(const std::string &name) {
   m_shader = Resources::GetShader(name);
-  if (!m_shader->isCompiled()) {
-    ERROR errCode = ERROR_OK;
-    m_shader->compile(errCode);
-  }
+  if (!m_shader->isCompiled())
+    m_shader->compile();
 }
 
 void DrawList::setTargets(DrawTargets targets) { m_drawTargets = targets; }
@@ -17,14 +15,9 @@ void BasicDrawList::draw(ERROR &errCode) {
   ShaderPtr _shader = getShader();
   _shader->use();
 
-  const auto &_targets = getTargets();
-  auto targetIt = _targets.begin();
-  for (; targetIt != _targets.end() && errCode == ERROR_OK; ++targetIt)
-    (*targetIt)->draw(*_shader, errCode);
-
-  if (errCode != ERROR_OK)
-    throw std::runtime_error("An error occurred while drawing target (" +
-                             std::to_string((*targetIt)->_id) + ").");
+  const auto &targets = getTargets();
+  for (auto it = targets.begin(); it != targets.end() && errCode == ERROR_OK; ++it)
+    (*it)->draw(errCode, *_shader);
 }
 
 DrawListDecorator::DrawListDecorator(DListPtr drawList) : _drawList(std::move(drawList)) {}

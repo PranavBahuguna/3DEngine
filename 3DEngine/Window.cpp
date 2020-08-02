@@ -14,81 +14,75 @@ Window::Window()
 }
 
 // Defaults width / height to 800/600 (applicable only if in windowed mode)
-void Window::Init(const std::string &name, WindowMode wMode, ERROR &errCode) {
-  Window::Init(name, wMode, 800, 600, errCode);
+void Window::Init(const std::string &name, WindowMode wMode) {
+  Window::Init(name, wMode, 800, 600);
 }
 
 // Initialise all window properties
-void Window::Init(const std::string &name, WindowMode wMode, int width, int height,
-                  ERROR &errCode) {
-  if (errCode != ERROR_OK)
-    return;
-
+void Window::Init(const std::string &name, WindowMode wMode, int width, int height) {
   if (_instance == nullptr)
     _instance = WndPtr(new Window());
 
   // Initialise GLFW
+  ERROR errCode = ERROR_OK;
   if (glfwInit() != GLFW_TRUE) {
-    errCode = ERROR_GLFW_INIT_FAILED;
-    printErrorMsg(errCode);
-    return;
-  }
-
-  // Setup GFLW window properties
-  // OpenGL version
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-  glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-  // Core profile - no backwards compatibility
-  glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-  // Allow forwards compatibility
-  glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-
-  // Set window dimensions from screen if fullscreen enabled
-  GLFWmonitor *monitor = nullptr;
-  if (wMode == WindowMode::FULLSCREEN || wMode == WindowMode::FULLSCREEN_WINDOWED) {
-    auto primaryMonitor = glfwGetPrimaryMonitor();
-    const GLFWvidmode *mode = glfwGetVideoMode(primaryMonitor);
-    _instance->m_width = mode->width;
-    _instance->m_height = mode->height;
-
-    // Use the primary monitor only if we want fullscreen without window
-    if (wMode == WindowMode::FULLSCREEN)
-      monitor = primaryMonitor;
+    errCode = printErrorMsg(ERROR_GLFW_INIT_FAILED);
   } else {
-    _instance->m_height = height;
-    _instance->m_width = width;
+    // Setup GFLW window properties
+    // OpenGL version
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    // Core profile - no backwards compatibility
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    // Allow forwards compatibility
+    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+
+    // Set window dimensions from screen if fullscreen enabled
+    GLFWmonitor *monitor = nullptr;
+    if (wMode == WindowMode::FULLSCREEN || wMode == WindowMode::FULLSCREEN_WINDOWED) {
+      auto primaryMonitor = glfwGetPrimaryMonitor();
+      const GLFWvidmode *mode = glfwGetVideoMode(primaryMonitor);
+      _instance->m_width = mode->width;
+      _instance->m_height = mode->height;
+
+      // Use the primary monitor only if we want fullscreen without window
+      if (wMode == WindowMode::FULLSCREEN)
+        monitor = primaryMonitor;
+    } else {
+      _instance->m_height = height;
+      _instance->m_width = width;
+    }
+
+    // Initialiase window with given dimension
+    _instance->m_mainWindow =
+        glfwCreateWindow(_instance->m_width, _instance->m_height, name.c_str(), monitor, NULL);
+    if (_instance->m_mainWindow == nullptr) {
+      errCode = printErrorMsg(ERROR_GLFW_WINDOW_CREATE_FAILED);
+    } else {
+      // Set context for GLEW to use
+      glfwMakeContextCurrent(_instance->m_mainWindow);
+
+      // Allow modern extension features
+      glewExperimental = GL_TRUE;
+
+      // Initialise GLEW
+      if (glewInit() != GLEW_OK) {
+        errCode = printErrorMsg(ERROR_GLEW_INIT_FAILED);
+      } else {
+        // Setup viewport size
+        glViewport(0, 0, _instance->m_width, _instance->m_height);
+        // Setup keyboard and mouse handlers
+        glfwSetKeyCallback(_instance->m_mainWindow, _instance->KeyHandler);
+        glfwSetCursorPosCallback(_instance->m_mainWindow, _instance->MouseHandler);
+        glfwSetScrollCallback(_instance->m_mainWindow, _instance->MouseScrollHandler);
+        // Remove cursor from screen
+        glfwSetInputMode(_instance->m_mainWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+      }
+    }
   }
 
-  // Initialiase window with given dimension
-  _instance->m_mainWindow =
-      glfwCreateWindow(_instance->m_width, _instance->m_height, name.c_str(), monitor, NULL);
-  if (_instance->m_mainWindow == nullptr) {
-    errCode = ERROR_GLFW_WINDOW_CREATE_FAILED;
-    printErrorMsg(errCode);
-    return;
-  }
-  // Set context for GLEW to use
-  glfwMakeContextCurrent(_instance->m_mainWindow);
-
-  // Allow modern extension features
-  glewExperimental = GL_TRUE;
-
-  // Initialise GLEW
-  if (glewInit() != GLEW_OK) {
-    errCode = ERROR_GLEW_INIT_FAILED;
-    printErrorMsg(errCode);
-    return;
-  }
-
-  // Setup viewport size
-  glViewport(0, 0, _instance->m_width, _instance->m_height);
-  // Setup keyboard and mouse handlers
-  glfwSetKeyCallback(_instance->m_mainWindow, _instance->KeyHandler);
-  glfwSetCursorPosCallback(_instance->m_mainWindow, _instance->MouseHandler);
-  glfwSetScrollCallback(_instance->m_mainWindow, _instance->MouseScrollHandler);
-  // Remove cursor from screen
-  glfwSetInputMode(_instance->m_mainWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+  if (errCode != ERROR_OK)
+    throw std::runtime_error("An error occurred while iniitialising window.");
 }
 
 // Destructor - destroy window and terminate
@@ -164,10 +158,9 @@ const bool *Window::GetKeys() { return _instance->m_keys; }
 // A toggle key can be queried during the rendering loop. It will return true the first time it is
 // called if the corresponding key is pressed, but will return false on subsequent calls until the
 // key is released and pressed again.
-bool Window::GetToggleKey(int key, ERROR *errCode) {
+bool Window::GetToggleKey(ERROR &errCode, int key) {
   if (key < 0 || key >= NUM_KEYS) {
-    *errCode = ERROR_INPUT_KEY_OUT_OF_RANGE;
-    printErrorMsg(*errCode, key);
+    errCode = printErrorMsg(ERROR_INPUT_KEY_OUT_OF_RANGE, key);
     return false;
   }
 

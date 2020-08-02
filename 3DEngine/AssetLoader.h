@@ -9,11 +9,10 @@ template <typename T> using AssetPtrs = std::vector<std::shared_ptr<T>>;
 
 class AssetLoader {
 public:
-  static void loadMeshes(const std::string &name, AssetPtrs<Mesh> &meshes,
-                         AssetPtrs<Material> &materials, AssetPtrs<Texture> &textures,
-                         ERROR &errCode);
-  static void loadMaterials(const std::string &name, AssetPtrs<Material> &materials,
-                            AssetPtrs<Texture> &textures, ERROR &errCode);
+  static void loadMeshes(ERROR &errCode, const std::string &name, AssetPtrs<Mesh> &meshes,
+                         AssetPtrs<Material> &materials, AssetPtrs<Texture> &textures);
+  static void loadMaterials(ERROR &errCode, const std::string &name, AssetPtrs<Material> &materials,
+                            AssetPtrs<Texture> &textures);
 
 private:
   static void buildMeshes(AssetPtrs<Mesh> &meshes, const std::string &name,

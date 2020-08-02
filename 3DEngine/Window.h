@@ -22,9 +22,8 @@ class Window {
 public:
   ~Window();
 
-  static void Init(const std::string &name, WindowMode wMode, ERROR &errCode);
-  static void Init(const std::string &name, WindowMode wMode, int width, int height,
-                   ERROR &errCode);
+  static void Init(const std::string &name, WindowMode wMode);
+  static void Init(const std::string &name, WindowMode wMode, int width, int height);
 
   static int GetWidth();
   static int GetHeight();
@@ -41,7 +40,7 @@ public:
   static void SwapBuffers();
 
   static const bool *GetKeys();
-  static bool GetToggleKey(int key, ERROR *errCode);
+  static bool GetToggleKey(ERROR &errCode, int key);
 
 private:
   Window(); // prevent construction of this class

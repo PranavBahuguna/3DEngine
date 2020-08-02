@@ -2,9 +2,9 @@
 
 #include "Model.h"
 
-class Terrain : public Model {
+class Plane : public Model {
 public:
-  Terrain(const std::string &name, const glm::uvec2 &nTiles, const glm::vec2 &tileDimensions,
+  Plane(const std::string &name, const glm::uvec2 &nTiles, const glm::vec2 &tileDimensions,
           const glm::vec2 &tileTexMapping = {1.0f, 1.0f});
 
   void load(ERROR &errCode) override;

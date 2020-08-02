@@ -5,6 +5,8 @@
 
 #include <stdexcept>
 
+#define ERROR_TEXTURE "Textures/error.jpg"
+
 // Constructor
 Texture::Texture(const std::string &filename)
     : m_textureID(0), m_width(0), m_height(0), m_bitDepth(0) {
@@ -14,9 +16,7 @@ Texture::Texture(const std::string &filename)
 
   if (load(path) != ERROR_OK) {
     // Try loading the error texture instead
-    const std::string errTexture = "Textures/error.jpg";
-
-    if (load(errTexture) != ERROR_OK)
+    if (load(ERROR_TEXTURE) != ERROR_OK)
       throw std::runtime_error("An error occurred while loading texture.");
   }
 }
@@ -30,13 +30,11 @@ ERROR Texture::load(const std::string &filepath) {
 
   // Try loading the texture from path
   unsigned char *texData = stbi_load(filepath.c_str(), &m_width, &m_height, &m_bitDepth, 0);
-  if (texData == nullptr) {
-    errCode = ERROR_FILE_LOAD_FAILED;
-    printErrorMsg(errCode, filepath.c_str());
-  }
+  if (texData == nullptr)
+    return printErrorMsg(errCode, filepath.c_str());
 
   // Set the texture format
-  setFormat(m_bitDepth, errCode);
+  setFormat(errCode, m_bitDepth);
 
   if (errCode == ERROR_OK) {
     // Bind the texture and set its properties
@@ -57,10 +55,7 @@ ERROR Texture::load(const std::string &filepath) {
 }
 
 // Sets the texture format based on the number of channels found (bit depth)
-void Texture::setFormat(int channels, ERROR &errCode) {
-  if (errCode != ERROR_OK)
-    return;
-
+void Texture::setFormat(ERROR &errCode, int channels) {
   // Number of channels must be between 1 and 4
   if (channels >= 1 && channels <= 4) {
     // clang-format off

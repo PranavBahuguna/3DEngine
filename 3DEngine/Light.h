@@ -11,8 +11,7 @@ public:
         GLfloat linear = 0.0f, GLfloat quadratic = 0.0f, const glm::vec3 &coneDir = glm::vec3(0.0f),
         GLfloat innerConeAngle = 0.0f, GLfloat outerConeAngle = 0.0f);
 
-  void use(const Shader &shader, size_t index, ERROR &errCode) const;
-  void update(ERROR &errCode){};
+  void use(const Shader &shader, size_t index) const;
 
   LightType getType() const;
   glm::vec4 getPosition() const;

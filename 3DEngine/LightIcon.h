@@ -10,9 +10,8 @@
 class LightIcon : public Drawable {
 public:
   LightIcon(const std::string &lightName);
-  ~LightIcon() {}
 
-  void draw(const Shader &shader, ERROR &errCode) const override;
+  void draw(ERROR &errCode, const Shader &shader) const override;
 
 private:
   TexPtr m_texture;

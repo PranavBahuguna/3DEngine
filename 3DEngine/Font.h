@@ -20,7 +20,7 @@ class Font {
 public:
   Font(const std::string &name);
 
-  const Character *getCharacter(const unsigned char c, ERROR &errCode) const;
+  const Character *getCharacter(ERROR &errCode, const unsigned char c) const;
 
 private:
   ERROR load(const std::string &filepath, FT_Library &ft);

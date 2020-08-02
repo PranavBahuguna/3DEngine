@@ -20,8 +20,8 @@ void TransparencyDrawList::draw(ERROR &errCode) {
 
   ShaderPtr _shader = getShader();
   _shader->use();
-  _shader->setMat4("view", Camera::GetView(), errCode);
-  _shader->setMat4("projection", Camera::GetProjection(), errCode);
+  _shader->setMat4("view", Camera::GetView());
+  _shader->setMat4("projection", Camera::GetProjection());
 
   DrawListDecorator::draw(errCode);
 }

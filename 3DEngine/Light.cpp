@@ -24,26 +24,26 @@ Light::Light(LightType type, const glm::vec3 &ambient, const glm::vec3 &diffuse,
 }
 
 // Supply shader with light data
-void Light::use(const Shader &shader, size_t index, ERROR &errCode) const {
+void Light::use(const Shader &shader, size_t index) const {
   // Get the shader uniform name prefix
   std::ostringstream ss;
   ss << "lights[" << index << "].";
   const std::string prefix = ss.str();
 
-  shader.setVec3(prefix + "ambient", m_ambient, errCode);
-  shader.setVec3(prefix + "diffuse", m_diffuse, errCode);
-  shader.setVec3(prefix + "specular", m_specular, errCode);
-  shader.setVec4(prefix + "position", m_position, errCode);
+  shader.setVec3(prefix + "ambient", m_ambient);
+  shader.setVec3(prefix + "diffuse", m_diffuse);
+  shader.setVec3(prefix + "specular", m_specular);
+  shader.setVec4(prefix + "position", m_position);
 
   if (m_type == LightType::POINT_LIGHT || m_type == LightType::SPOT_LIGHT) {
-    shader.setFloat(prefix + "constant", m_constant, errCode);
-    shader.setFloat(prefix + "linear", m_linear, errCode);
-    shader.setFloat(prefix + "quadratic", m_quadratic, errCode);
+    shader.setFloat(prefix + "constant", m_constant);
+    shader.setFloat(prefix + "linear", m_linear);
+    shader.setFloat(prefix + "quadratic", m_quadratic);
 
     if (m_type == LightType::SPOT_LIGHT) {
-      shader.setVec3(prefix + "coneDir", m_coneDir, errCode);
-      shader.setFloat(prefix + "innerConeAngle", m_innerConeAngle, errCode);
-      shader.setFloat(prefix + "outerConeAngle", m_outerConeAngle, errCode);
+      shader.setVec3(prefix + "coneDir", m_coneDir);
+      shader.setFloat(prefix + "innerConeAngle", m_innerConeAngle);
+      shader.setFloat(prefix + "outerConeAngle", m_outerConeAngle);
     }
   }
 }

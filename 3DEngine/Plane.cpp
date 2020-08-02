@@ -1,10 +1,10 @@
-#include "Terrain.h"
+#include "Plane.h"
 #include "AssetLoader.h"
 
 #include <fstream>
 
 // Constructor
-Terrain::Terrain(const std::string &name, const glm::uvec2 &nTiles, const glm::vec2 &tileDimensions,
+Plane::Plane(const std::string &name, const glm::uvec2 &nTiles, const glm::vec2 &tileDimensions,
                  const glm::vec2 &tileTexMapping)
     : Model(name), m_nTiles(nTiles), m_tileDimensions(tileDimensions),
       m_tileTexMapping(tileTexMapping) {
@@ -13,17 +13,17 @@ Terrain::Terrain(const std::string &name, const glm::uvec2 &nTiles, const glm::v
 }
 
 // Creates the mesh and relevant materials
-void Terrain::load(ERROR &errCode) {
+void Plane::load(ERROR &errCode) {
   // Use existing mesh if available, otherwise generate the mesh
   m_meshes[0] = Resources::FindMesh(m_name);
   if (m_meshes[0] == nullptr)
     generateMesh();
 
-  AssetLoader::loadMaterials(m_name, m_materials, m_textures, errCode);
+  AssetLoader::loadMaterials(errCode, m_name, m_materials, m_textures);
 }
 
-// Constructs terrain mesh
-void Terrain::generateMesh() {
+// Constructs plane mesh
+void Plane::generateMesh() {
   size_t nVertices = ((size_t)m_nTiles.x + 1) * ((size_t)m_nTiles.y + 1);
   std::vector<GLfloat> vertices(nVertices * 3);
   std::vector<GLfloat> texCoords(nVertices * 2);

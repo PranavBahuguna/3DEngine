@@ -5,7 +5,8 @@
 #include <glm/gtc/type_ptr.hpp>
 
 // Constructor
-Shader::Shader(const std::string &name) : m_name(name), m_progId(0), m_vertId(0), m_fragId(0) {}
+Shader::Shader(const std::string &name)
+    : m_name(name), m_progId(0), m_vertId(0), m_fragId(0), m_isCompiled(false) {}
 
 // Destructor
 Shader::~Shader() {
@@ -17,39 +18,43 @@ Shader::~Shader() {
 }
 
 // Load all shader files and compiles them
-void Shader::compile(ERROR &errCode, bool useShader) {
+void Shader::compile(bool useShader) {
   // Get file paths
   const std::string vertPath = "Shaders/" + m_name + ".vert";
   const std::string fragPath = "Shaders/" + m_name + ".frag";
 
   // Load vertex and fragment shaders
-  load(vertPath, GL_VERTEX_SHADER, m_vertId, errCode);
-  load(fragPath, GL_FRAGMENT_SHADER, m_fragId, errCode);
+  ERROR errCode = ERROR_OK;
+  load(errCode, vertPath, GL_VERTEX_SHADER, m_vertId);
+  load(errCode, fragPath, GL_FRAGMENT_SHADER, m_fragId);
   linkPrograms(errCode);
-  bindUniforms(errCode);
 
-  if (errCode == ERROR_OK) {
-    m_isCompiled = true;
-    if (useShader)
-      use(); // switch current program to this shader
-  }
+  if (errCode != ERROR_OK)
+    throw std::runtime_error("An error occurred during shader program compilation.");
+
+  bindUniforms();
+  m_isCompiled = true;
+  if (useShader)
+    use(); // switch current program to this shader
 }
 
 // Loads shader from file
-void Shader::load(const std::string &filename, GLenum type, GLuint &shaderId, ERROR &errCode) {
+void Shader::load(ERROR &errCode, const std::string &filename, GLenum type, GLuint &shaderId) {
   if (errCode != ERROR_OK)
     return;
 
-  // Open the file
+  // Try opening the file
   std::ifstream file(filename.c_str());
-
   if (file) {
     // Get shader source code from file
     std::string source;
     source.assign((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
 
     // Find and set any preprocessor values
-    preprocess(source, type, errCode);
+    preprocess(errCode, source, type);
+    if (errCode != ERROR_OK)
+      return;
+
     const char *cSource = source.c_str();
 
     // Create and compile shader
@@ -61,13 +66,10 @@ void Shader::load(const std::string &filename, GLenum type, GLuint &shaderId, ER
     GLint isCompiled = GL_FALSE;
     glGetShaderiv(shaderId, GL_COMPILE_STATUS, &isCompiled);
 
-    if (!isCompiled) {
-      errCode = ERROR_SHADER_COMPILE_FAILED;
-      printErrorMsg(errCode, shaderId, getShaderErrorLog(shaderId));
-    }
+    if (!isCompiled)
+      errCode = printErrorMsg(ERROR_SHADER_COMPILE_FAILED, shaderId, getShaderErrorLog(shaderId));
   } else {
-    errCode = ERROR_FILE_LOAD_FAILED;
-    printErrorMsg(errCode, filename.c_str());
+    errCode = printErrorMsg(ERROR_FILE_LOAD_FAILED, filename.c_str());
   }
 }
 
@@ -78,8 +80,7 @@ void Shader::linkPrograms(ERROR &errCode) {
 
   m_progId = glCreateProgram();
   if (!m_progId) {
-    errCode = ERROR_SHADER_PROGRAM_CREATE_FAILED;
-    printErrorMsg(errCode, m_progId);
+    errCode = printErrorMsg(ERROR_SHADER_PROGRAM_CREATE_FAILED, m_progId);
     return;
   }
 
@@ -98,21 +99,14 @@ void Shader::linkPrograms(ERROR &errCode) {
     glGetProgramiv(m_progId, GL_VALIDATE_STATUS, &isValid);
 
     if (!isValid)
-      errCode = ERROR_SHADER_PROGRAM_INVALID;
+      errCode = printErrorMsg(ERROR_SHADER_PROGRAM_INVALID, getProgramErrorLog(m_progId));
   } else {
-    errCode = ERROR_SHADER_PROGRAM_LINKING_FAILED;
+    errCode = printErrorMsg(ERROR_SHADER_PROGRAM_LINKING_FAILED, getProgramErrorLog(m_progId));
   }
-
-  // Report any errors that occurred
-  if (errCode != ERROR_OK)
-    printErrorMsg(errCode, getProgramErrorLog(m_progId));
 }
 
 // Finds all uniforms in the shader program and binds each to an id
-void Shader::bindUniforms(ERROR &errCode) {
-  if (errCode != ERROR_OK)
-    return;
-
+void Shader::bindUniforms() {
   GLint count;
   GLchar name[MAX_PARAM_LENGTH];
 
@@ -125,10 +119,7 @@ void Shader::bindUniforms(ERROR &errCode) {
 }
 
 // Set preprocessor values into shader source code string
-void Shader::preprocess(std::string &shaderSource, GLenum type, ERROR &errCode) const {
-  if (errCode != ERROR_OK)
-    return;
-
+void Shader::preprocess(ERROR &errCode, std::string &shaderSource, GLenum type) const {
   // Check if target shader type exists in the map
   const auto preprocessorIt = m_preprocessorMap.find(type);
   if (preprocessorIt == m_preprocessorMap.end())
@@ -140,17 +131,17 @@ void Shader::preprocess(std::string &shaderSource, GLenum type, ERROR &errCode) 
     size_t strStartPos = shaderSource.find(preprocessorStr);
 
     if (strStartPos == std::string::npos) {
-      errCode = ERROR_SHADER_PREPROCESSOR_NOT_FOUND;
-      printErrorMsg(errCode, name.c_str(), m_name.c_str());
+      errCode = printErrorMsg(ERROR_SHADER_PREPROCESSOR_NOT_FOUND, name.c_str(), m_name.c_str());
+      break;
+    } else {
+      // Find the next newline char
+      size_t strEndPos = strStartPos + preprocessorStr.size();
+      size_t newlinePos = shaderSource.find("\n", strEndPos);
+      size_t replaceLen = newlinePos - strEndPos;
+
+      // Replace all characters after the name string to the newline with the preprocessor value
+      shaderSource.replace(strEndPos, replaceLen, " " + value);
     }
-
-    // Find the next newline char
-    size_t strEndPos = strStartPos + preprocessorStr.size();
-    size_t newlinePos = shaderSource.find("\n", strEndPos);
-    size_t replaceLen = newlinePos - strEndPos;
-
-    // Replace all characters after the name string to the newline with the preprocessor value
-    shaderSource.replace(strEndPos, replaceLen, " " + value);
   }
 }
 
@@ -158,14 +149,10 @@ void Shader::preprocess(std::string &shaderSource, GLenum type, ERROR &errCode) 
 void Shader::use() const { glUseProgram(m_progId); }
 
 // Gets the id of a uniform from the shader program
-GLint Shader::getUniformId(const std::string &name, ERROR &errCode) const {
-  if (errCode != ERROR_OK)
-    return -1;
-
+GLint Shader::getUniformId(const std::string &name) const {
   const auto it = m_uniformMap.find(name);
   if (it == m_uniformMap.end()) {
-    errCode = ERROR_SHADER_MISSING_PARAMETER;
-    printErrorMsg(errCode, name.c_str());
+    printErrorMsg(ERROR_SHADER_MISSING_PARAMETER, name.c_str());
     return -1;
   }
 
@@ -174,58 +161,56 @@ GLint Shader::getUniformId(const std::string &name, ERROR &errCode) const {
 
 // Uniform setter utility functions. The shader must first be compiled and in current usage
 // for any of these functions to be used.
-void Shader::setBool(const std::string &name, bool value, ERROR &errCode) const {
-  glUniform1i(getUniformId(name, errCode), value);
+void Shader::setBool(const std::string &name, bool value) const {
+  glUniform1i(getUniformId(name), value);
 }
 
-void Shader::setInt(const std::string &name, int value, ERROR &errCode) const {
-  glUniform1i(getUniformId(name, errCode), value);
+void Shader::setInt(const std::string &name, int value) const {
+  glUniform1i(getUniformId(name), value);
 }
 
-void Shader::setUint(const std::string &name, unsigned int value, ERROR &errCode) const {
-  glUniform1ui(getUniformId(name, errCode), value);
+void Shader::setUint(const std::string &name, unsigned int value) const {
+  glUniform1ui(getUniformId(name), value);
 }
 
-void Shader::setFloat(const std::string &name, float value, ERROR &errCode) const {
-  glUniform1f(getUniformId(name, errCode), value);
+void Shader::setFloat(const std::string &name, float value) const {
+  glUniform1f(getUniformId(name), value);
 }
 
-void Shader::setVec2(const std::string &name, const glm::vec2 &value, ERROR &errCode) const {
-  glUniform2fv(getUniformId(name, errCode), 1, glm::value_ptr(value));
+void Shader::setVec2(const std::string &name, const glm::vec2 &value) const {
+  glUniform2fv(getUniformId(name), 1, glm::value_ptr(value));
 }
 
-void Shader::setVec2(const std::string &name, GLfloat x, GLfloat y, ERROR &errCode) const {
-  glUniform2f(getUniformId(name, errCode), x, y);
+void Shader::setVec2(const std::string &name, GLfloat x, GLfloat y) const {
+  glUniform2f(getUniformId(name), x, y);
 }
 
-void Shader::setVec3(const std::string &name, const glm::vec3 &value, ERROR &errCode) const {
-  glUniform3fv(getUniformId(name, errCode), 1, glm::value_ptr(value));
+void Shader::setVec3(const std::string &name, const glm::vec3 &value) const {
+  glUniform3fv(getUniformId(name), 1, glm::value_ptr(value));
 }
 
-void Shader::setVec3(const std::string &name, GLfloat x, GLfloat y, GLfloat z,
-                     ERROR &errCode) const {
-  glUniform3f(getUniformId(name, errCode), x, y, z);
+void Shader::setVec3(const std::string &name, GLfloat x, GLfloat y, GLfloat z) const {
+  glUniform3f(getUniformId(name), x, y, z);
 }
 
-void Shader::setVec4(const std::string &name, const glm::vec4 &value, ERROR &errCode) const {
-  glUniform4fv(getUniformId(name, errCode), 1, glm::value_ptr(value));
+void Shader::setVec4(const std::string &name, const glm::vec4 &value) const {
+  glUniform4fv(getUniformId(name), 1, glm::value_ptr(value));
 }
 
-void Shader::setVec4(const std::string &name, GLfloat x, GLfloat y, GLfloat z, GLfloat w,
-                     ERROR &errCode) const {
-  glUniform4f(getUniformId(name, errCode), x, y, z, w);
+void Shader::setVec4(const std::string &name, GLfloat x, GLfloat y, GLfloat z, GLfloat w) const {
+  glUniform4f(getUniformId(name), x, y, z, w);
 }
 
-void Shader::setMat2(const std::string &name, const glm::mat2 &value, ERROR &errCode) const {
-  glUniformMatrix2fv(getUniformId(name, errCode), 1, GL_FALSE, glm::value_ptr(value));
+void Shader::setMat2(const std::string &name, const glm::mat2 &value) const {
+  glUniformMatrix2fv(getUniformId(name), 1, GL_FALSE, glm::value_ptr(value));
 }
 
-void Shader::setMat3(const std::string &name, const glm::mat3 &value, ERROR &errCode) const {
-  glUniformMatrix3fv(getUniformId(name, errCode), 1, GL_FALSE, glm::value_ptr(value));
+void Shader::setMat3(const std::string &name, const glm::mat3 &value) const {
+  glUniformMatrix3fv(getUniformId(name), 1, GL_FALSE, glm::value_ptr(value));
 }
 
-void Shader::setMat4(const std::string &name, const glm::mat4 &value, ERROR &errCode) const {
-  glUniformMatrix4fv(getUniformId(name, errCode), 1, GL_FALSE, glm::value_ptr(value));
+void Shader::setMat4(const std::string &name, const glm::mat4 &value) const {
+  glUniformMatrix4fv(getUniformId(name), 1, GL_FALSE, glm::value_ptr(value));
 }
 
 // Adds an entry to the preprocessor values map to use when compiling the shader.

@@ -16,7 +16,7 @@ public:
 
 private:
   ERROR load(const std::string &filepath);
-  void setFormat(int channels, ERROR &errCode);
+  void setFormat(ERROR &errCode, int channels);
 
   GLuint m_textureID;
   GLenum m_format;

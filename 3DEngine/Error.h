@@ -4,7 +4,6 @@
 #include <initializer_list>
 #include <stdarg.h>
 #include <string>
-#include <unordered_map>
 
 typedef uint32_t ERROR;
 
@@ -31,8 +30,14 @@ typedef uint32_t ERROR;
 #define ERROR_LUA_ERROR                         19
 // clang-format on
 
-static void printErrorMsg(ERROR errCode, ...) {
+// If error reference is not required for a function, this macro may be used as a placeholder
+#define error_placeholder details::placeholder(ERROR())
 
+namespace details {
+inline ERROR &placeholder(ERROR &&e) { return e; }
+} // namespace details
+
+static ERROR printErrorMsg(ERROR errCode, ...) {
   std::string errHeader = "Error " + std::to_string(errCode) + " - ";
   std::string errBody;
 
@@ -107,4 +112,6 @@ static void printErrorMsg(ERROR errCode, ...) {
   va_start(args, errCode);
   vprintf(errMsg.c_str(), args);
   va_end(args);
+
+  return errCode;
 }

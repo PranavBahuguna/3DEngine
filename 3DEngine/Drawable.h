@@ -11,7 +11,7 @@ public:
 
   GLuint _id;
 
-  virtual void draw(const Shader &shader, ERROR &errCode) const = 0;
+  virtual void draw(ERROR &errCode, const Shader &shader) const = 0;
 
   glm::vec3 getPos() const { return m_pos; }
 

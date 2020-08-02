@@ -7,12 +7,8 @@
 #define MATERIALS_DIR "Materials/"
 
 // Load a mesh from .obj file with it's associated materials and textures
-void AssetLoader::loadMeshes(const std::string &name, AssetPtrs<Mesh> &meshes,
-                             AssetPtrs<Material> &materials, AssetPtrs<Texture> &textures,
-                             ERROR &errCode) {
-  if (errCode != ERROR_OK)
-    return;
-
+void AssetLoader::loadMeshes(ERROR &errCode, const std::string &name, AssetPtrs<Mesh> &meshes,
+                             AssetPtrs<Material> &materials, AssetPtrs<Texture> &textures) {
   std::string filename = MODELS_DIR + name + ".obj";
   tinyobj::attrib_t attrib;
   std::vector<tinyobj::shape_t> shapes;
@@ -28,23 +24,17 @@ void AssetLoader::loadMeshes(const std::string &name, AssetPtrs<Mesh> &meshes,
   if (!success) {
     printf(warn.c_str());
     printf(err.c_str());
-
-    errCode = ERROR_FILE_LOAD_FAILED;
-    printErrorMsg(errCode, filename.c_str());
+    errCode = printErrorMsg(ERROR_FILE_LOAD_FAILED, filename.c_str());
+    return;
   }
 
-  if (errCode == ERROR_OK) {
-    buildMeshes(meshes, name, attrib, shapes, mats);
-    buildMaterials(materials, textures, mats);
-  }
+  buildMeshes(meshes, name, attrib, shapes, mats);
+  buildMaterials(materials, textures, mats);
 }
 
 // Load materials from .mtl file with any associated textures only
-void AssetLoader::loadMaterials(const std::string &name, AssetPtrs<Material> &materials,
-                                AssetPtrs<Texture> &textures, ERROR &errCode) {
-  if (errCode != ERROR_OK)
-    return;
-
+void AssetLoader::loadMaterials(ERROR &errCode, const std::string &name,
+                                AssetPtrs<Material> &materials, AssetPtrs<Texture> &textures) {
   std::string filename = MATERIALS_DIR + name + ".mtl";
   std::map<std::string, int> matMap;
   std::vector<tinyobj::material_t> mats;
@@ -59,13 +49,11 @@ void AssetLoader::loadMaterials(const std::string &name, AssetPtrs<Material> &ma
   if (!success) {
     printf(warn.c_str());
     printf(err.c_str());
-
-    errCode = ERROR_FILE_LOAD_FAILED;
-    printErrorMsg(errCode, filename.c_str());
+    errCode = printErrorMsg(ERROR_FILE_LOAD_FAILED, filename.c_str());
+    return;
   }
 
-  if (errCode == ERROR_OK)
-    buildMaterials(materials, textures, mats);
+  buildMaterials(materials, textures, mats);
 }
 
 // Construct meshes based on data loaded from .obj file
