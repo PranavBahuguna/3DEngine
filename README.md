@@ -1,15 +1,35 @@
 # 3DEngine
-A custom 3D rendering engine, written in C++ with OpenGL. Will be steadily adding more features to this over time.
+A custom 3D rendering engine, written in C++ with OpenGL. Will be steadily adding more features to
+this over time.
 
 # Example screenshot (as of 14/07/2020)
 ![](example.png)
 
-# Dependencies
-There are several libraries that are used in this project, and each can be linked by creating the following environment variables pointing to the library locations:
-- **GLEW** - $(GLEW_DIR) - OpenGL Extension Wrangler Library.
-- **GLFW** - $(GLFW_DIR) - OpenGL Graphics Library Framework.
-- **GLM** - $(GLM_DIR) - OpenGL Mathematics Library.
-- **FreeType** - $(FREETYPE_DIR) - FreeType Library - build and link to release version.
+# Cloning the repo
+There are several third-party libraries that are used in this project. They are stored in the
+ThirdParty repo, which is a submodule of this repository. Simply cloning the 3DEngine repo isn't
+enough as the ThirdParty submodule is not automatically cloned with it.
+
+To clone the ThirdParty submodule as well, the following set of commands can be run:
+
+```
+git clone https://github.com/PranavBahuguna/3DEngine
+git submodule init
+git submodule update
+```
+
+Or to clone the repo and submodules in one go:
+
+```
+git clone --recurse-submodules https://github.com/PranavBahuguna/3DEngine
+```
+
+# Features
+- Model loading system (using wavefront .obj format).
+- Model texturing and materials system.
+- Real-time lighting (point, directional and cone lights).
+- 2D font and text rendering.
+- Game object scripting with Lua.
 
 # Controls
 - **A** - Left
@@ -26,4 +46,4 @@ There are several libraries that are used in this project, and each can be linke
 - **Esc** - Exit
 - **M** - Toggle HUD
 - **O / Mouse Scroll Down** - Decrease FOV (zoom in)
-- **P / Mouse Scroll Up** - Decrease FOV (zoom out)
+- **P / Mouse Scroll Up** - Increase FOV (zoom out)
