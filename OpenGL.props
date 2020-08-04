@@ -1,16 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ImportGroup Label="PropertySheets" />
-  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Label="UserMacros">
+    <ThirdPartyLibs>$(SolutionDir)/ThirdParty/libs</ThirdPartyLibs>
+    <ThirdPartyHeaders>$(SolutionDir)/ThirdParty/headers</ThirdPartyHeaders>
+  </PropertyGroup>
   <PropertyGroup />
   <ItemDefinitionGroup>
     <ClCompile>
-      <AdditionalIncludeDirectories>$(GLEW_DIR)/include;$(GLFW_DIR)/include;$(GLM_DIR);$(FREETYPE_DIR)/include/freetype2;$(LUA_DIR)/include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ThirdPartyHeaders);$(ThirdPartyLibs)/glew-2.1.0/include;$(ThirdPartyLibs)/glfw-3.3.2/include;$(ThirdPartyLibs)/glm;$(ThirdPartyLibs)/freetype-2.10.2-win64/include/freetype2;$(ThirdPartyLibs)/lua-5.4.0_Win64_dll16_lib/include;</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>$(GLEW_DIR)/lib/Release/x64;$(GLFW_DIR)/lib-vc2019;$(FREETYPE_DIR)/lib;$(LUA_DIR);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ThirdPartyLibs)/glew-2.1.0/lib/Release/x64;$(ThirdPartyLibs)/glfw-3.3.2/lib-vc2019;$(ThirdPartyLibs)/freetype-2.10.2-win64/lib;$(ThirdPartyLibs)/lua-5.4.0_Win64_dll16_lib/;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>opengl32.lib;glew32.lib;glfw3.lib;freetype.lib;lua54.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <BuildMacro Include="ThirdPartyLibs">
+      <Value>$(ThirdPartyLibs)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="ThirdPartyHeaders">
+      <Value>$(ThirdPartyHeaders)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+  </ItemGroup>
 </Project>

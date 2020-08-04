@@ -27,9 +27,6 @@
     <Filter Include="Source Files\GameObject">
       <UniqueIdentifier>{fa1719a7-9696-4dec-9566-3fca2d1e7e7c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ThirdParty">
-      <UniqueIdentifier>{32735c7a-cd63-4bbe-906b-9ee40f1ae188}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Shader.cpp">
@@ -157,12 +154,6 @@
     <ClInclude Include="Timer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="stb_image.h">
-      <Filter>ThirdParty</Filter>
-    </ClInclude>
-    <ClInclude Include="tiny_obj_loader.h">
-      <Filter>ThirdParty</Filter>
-    </ClInclude>
     <ClInclude Include="AssetLoader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -171,9 +162,6 @@
     </ClInclude>
     <ClInclude Include="Script.h">
       <Filter>Header Files\GameObject</Filter>
-    </ClInclude>
-    <ClInclude Include="sol.hpp">
-      <Filter>ThirdParty</Filter>
     </ClInclude>
     <ClInclude Include="Plane.h">
       <Filter>Header Files</Filter>

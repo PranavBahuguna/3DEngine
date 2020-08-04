@@ -95,6 +95,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -126,6 +127,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -194,13 +196,10 @@
     <ClInclude Include="Script.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="Mesh.h" />
-    <ClInclude Include="sol.hpp" />
-    <ClInclude Include="stb_image.h" />
     <ClInclude Include="Plane.h" />
     <ClInclude Include="Text.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="Timer.h" />
-    <ClInclude Include="tiny_obj_loader.h" />
     <ClInclude Include="TransparencyDrawList.h" />
     <ClInclude Include="Window.h" />
   </ItemGroup>
