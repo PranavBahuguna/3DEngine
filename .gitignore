@@ -356,8 +356,5 @@ MigrationBackup/
 # Ionide (cross platform F# VS Code tools) working folder
 .ionide/
 
-# NonEuclidean
-NonEuclidean/
-
-# Do not ignore wavefront .obj files in Meshes folder
-!3DEngine/Meshes/*.obj
+# Do not ignore wavefront .obj files in Models folder
+!3DEngine/Models/*.obj
