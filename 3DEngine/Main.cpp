@@ -43,9 +43,9 @@ using LiPtr = std::shared_ptr<LightIcon>;
 
 ERROR errCode = ERROR_OK;
 
-std::vector<GLfloat> fpsBuffer(FPS_BUFFER_SIZE);
+std::vector<float> fpsBuffer(FPS_BUFFER_SIZE);
 size_t fpsBufferIdx = 0;
-GLfloat fpsUpdateTime = FPS_UPDATE_DELAY;
+float fpsUpdateTime = FPS_UPDATE_DELAY;
 
 bool displayHUD = false;
 
@@ -59,9 +59,6 @@ DrawTargets dtLightIcons;
 DListPtr dl_illum;
 DListPtr dl_trans;
 DListPtr dl_text;
-
-std::vector<LightPtr> sceneLights;
-size_t nLights = 0;
 
 // forward declarations
 static std::string toStringDp(float, size_t);
@@ -139,18 +136,14 @@ int main() {
                zPosValue, pitchLabel, pitchValue, yawLabel,  yawValue,  fovLabel,  fovValue};
 
     // Setup scene lights
-    LightPtr light01 =
-        Resources::CreateDirectionalLight("DirectionalLight", glm::vec3(0.25f), glm::vec3(1.0f),
-                                          glm::vec3(1.0f), {1.0f, 1.0f, -1.0f});
+    LightPtr light01 = Resources::CreateDirectionalLight("DirectionalLight", {1.0f, 1.0f, -1.0f},
+                                                         glm::vec3(1.0f), 0.25f, 1.0f, 1.0f);
     LightPtr light02 =
-        Resources::CreatePointLight("PointLight", glm::vec3(0.25f), glm::vec3(1.0f, 0.0f, 0.0f),
-                                    glm::vec3(1.0f), {4.0f, 4.0f, -4.0f}, 1.0f, 0.045f, 0.0075f);
-    LightPtr light03 = Resources::CreateSpotLight(
-        "SpotLight", glm::vec3(0.25f), glm::vec3(1.0f), glm::vec3(1.0f), {-4.0f, 10.0f, 3.0f}, 1.0f,
-        0.045f, 0.0075f, {0.0f, -1.0f, 0.0f}, 20.0f, 25.0f);
-
-    sceneLights = {light01, light02, light03};
-    nLights = std::min(sceneLights.size(), (size_t)8);
+        Resources::CreatePointLight("PointLight", {4.0f, 4.0f, -4.0f}, {1.0f, 0.0f, 0.0f}, 0.25f,
+                                    1.0f, 1.0f, 1.0f, 0.045f, 0.0075f);
+    LightPtr light03 = Resources::CreateSpotLight("SpotLight", {-4.0f, 10.0f, 3.0f}, glm::vec3(1.0f), 0.25f, 1.0f,
+                                   1.0f, 1.0f, 0.045f,
+        0.0075f, {0.0f, -1.0f, 0.0f}, 20.0f, 25.0f);
 
     // Setup light icons
     LiPtr li01(new LightIcon("DirectionalLight"));
@@ -211,7 +204,7 @@ int main() {
       if (displayHUD) {
         if (fpsUpdateTime >= FPS_UPDATE_DELAY) {
           // Calculate average fps from buffer
-          GLfloat avgFps =
+          float avgFps =
               std::accumulate(fpsBuffer.begin(), fpsBuffer.begin() + fpsBufferIdx, 0.0f) /
               std::max(fpsBufferIdx, (size_t)1);
           fpsValue->setText(toStringDp(avgFps, 1));

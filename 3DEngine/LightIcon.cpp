@@ -82,7 +82,7 @@ LightIcon::LightIcon(const std::string &lightName) {
 // Draws a light icon onto the screen
 void LightIcon::draw(ERROR &errCode, const Shader &shader) const {
   // Pass shader parameters
-  shader.setVec4("color", glm::vec4(m_light->getTotalColor(), 1.0f));
+  shader.setVec4("color", glm::vec4(m_light->getColor(), 1.0f));
   shader.setMat4("model", glm::translate(glm::mat4(1.0f), m_pos));
 
   // Use texture and draw vertices

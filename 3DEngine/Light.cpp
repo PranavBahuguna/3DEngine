@@ -3,11 +3,10 @@
 #include <sstream>
 
 // Constructor
-Light::Light(LightType type, const glm::vec3 &ambient, const glm::vec3 &diffuse,
-             const glm::vec3 &specular, const glm::vec3 &position, GLfloat constant, GLfloat linear,
-             GLfloat quadratic, const glm::vec3 &coneDir, GLfloat innerConeAngle,
-             GLfloat outerConeAngle)
-    : m_type(type), m_ambient(ambient), m_diffuse(diffuse), m_specular(specular),
+Light::Light(LightType type, const glm::vec3 &position, const glm::vec3 &color, float ambient,
+             float diffuse, float specular, float constant, float linear, float quadratic,
+             const glm::vec3 &coneDir, float innerConeAngle, float outerConeAngle)
+    : m_type(type), m_color(color), m_ambient(ambient), m_diffuse(diffuse), m_specular(specular),
       m_constant(constant), m_linear(linear), m_quadratic(quadratic), m_coneDir(coneDir),
       m_innerConeAngle(0.0f), m_outerConeAngle(0.0f) {
 
@@ -30,10 +29,11 @@ void Light::use(const Shader &shader, size_t index) const {
   ss << "lights[" << index << "].";
   const std::string prefix = ss.str();
 
-  shader.setVec3(prefix + "ambient", m_ambient);
-  shader.setVec3(prefix + "diffuse", m_diffuse);
-  shader.setVec3(prefix + "specular", m_specular);
   shader.setVec4(prefix + "position", m_position);
+  shader.setVec3(prefix + "color", m_color);
+  shader.setFloat(prefix + "ambientStrength", m_ambient);
+  shader.setFloat(prefix + "diffuseStrength", m_diffuse);
+  shader.setFloat(prefix + "specularStrength", m_specular);
 
   if (m_type == LightType::POINT_LIGHT || m_type == LightType::SPOT_LIGHT) {
     shader.setFloat(prefix + "constant", m_constant);
@@ -46,15 +46,4 @@ void Light::use(const Shader &shader, size_t index) const {
       shader.setFloat(prefix + "outerConeAngle", m_outerConeAngle);
     }
   }
-}
-
-// Returns the light type
-LightType Light::getType() const { return m_type; }
-
-// Returns this light's position
-glm::vec4 Light::getPosition() const { return m_position; }
-
-// Returns a normalized summation of this light's ambient diffuse and specular colors
-glm::vec3 Light::getTotalColor() const {
-  return glm::normalize(m_ambient + m_diffuse + m_specular);
 }

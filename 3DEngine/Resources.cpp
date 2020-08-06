@@ -5,9 +5,9 @@ MeshPtr Resources::FindMesh(const std::string &name) {
   return (mesh.expired()) ? mesh.lock() : nullptr;
 }
 
-MeshPtr Resources::CreateMesh(const std::string &name, const std::vector<GLfloat> &vertices,
-                              const std::vector<GLfloat> &texCoords,
-                              const std::vector<GLfloat> &normals,
+MeshPtr Resources::CreateMesh(const std::string &name, const std::vector<float> &vertices,
+                              const std::vector<float> &texCoords,
+                              const std::vector<float> &normals,
                               const std::vector<GLuint> &indices) {
   auto &mesh = meshMap[name];
   MeshPtr newMesh(new Mesh(vertices, texCoords, normals, indices));
@@ -22,7 +22,7 @@ MatPtr Resources::FindMaterial(const std::string &name) {
 
 MatPtr Resources::CreateMaterial(const std::string &name, const glm::vec3 &ambient,
                                  const glm::vec3 &diffuse, const glm::vec3 &specular,
-                                 GLfloat shininess) {
+                                 float shininess) {
   auto &material = materialMap[name];
   MatPtr newMaterial(new Material(ambient, diffuse, specular, shininess));
   material = newMaterial;
@@ -34,34 +34,36 @@ LightPtr Resources::FindLight(const std::string &name) {
   return (light.expired()) ? nullptr : light.lock();
 }
 
-LightPtr Resources::CreateDirectionalLight(const std::string &name, const glm::vec3 &ambient,
-                                           const glm::vec3 &diffuse, const glm::vec3 &specular,
-                                           const glm::vec3 &direction) {
+LightPtr Resources::CreateDirectionalLight(const std::string &name, const glm::vec3 &direction,
+                                           const glm::vec3 &color, float ambient, float diffuse,
+                                           float specular) {
   auto &light = lightMap[name];
-  LightPtr newLight(new Light(LightType::DIRECTIONAL_LIGHT, ambient, diffuse, specular, direction));
+  LightPtr newLight(
+      new Light(LightType::DIRECTIONAL_LIGHT, direction, color, ambient, diffuse, specular));
   light = newLight;
   return newLight;
 }
 
-LightPtr Resources::CreatePointLight(const std::string &name, const glm::vec3 &ambient,
-                                     const glm::vec3 &diffuse, const glm::vec3 &specular,
-                                     const glm::vec3 &position, GLfloat constant, GLfloat linear,
-                                     GLfloat quadratic) {
+LightPtr Resources::CreatePointLight(const std::string &name, const glm::vec3 &position,
+                                     const glm::vec3 &color, float ambient, float diffuse,
+                                     float specular, float constant, float linear,
+                                     float quadratic) {
   auto &light = lightMap[name];
-  LightPtr newLight(new Light(LightType::POINT_LIGHT, ambient, diffuse, specular, position,
+  LightPtr newLight(new Light(LightType::POINT_LIGHT, position, color, ambient, diffuse, specular,
                               constant, linear, quadratic));
   light = newLight;
   return newLight;
 }
 
-LightPtr Resources::CreateSpotLight(const std::string &name, const glm::vec3 &ambient,
-                                    const glm::vec3 &diffuse, const glm::vec3 &specular,
-                                    const glm::vec3 &position, GLfloat constant, GLfloat linear,
-                                    GLfloat quadratic, const glm::vec3 &coneDir,
-                                    GLfloat innerConeAngle, GLfloat outerConeAngle) {
+LightPtr Resources::CreateSpotLight(const std::string &name, const glm::vec3 &position,
+                                    const glm::vec3 &color, float ambient, float diffuse,
+                                    float specular, float constant, float linear, float quadratic,
+                                    const glm::vec3 &coneDir, float innerConeAngle,
+                                    float outerConeAngle) {
   auto &light = lightMap[name];
-  LightPtr newLight(new Light(LightType::SPOT_LIGHT, ambient, diffuse, specular, position, constant,
-                              linear, quadratic, coneDir, innerConeAngle, outerConeAngle));
+  LightPtr newLight(new Light(LightType::SPOT_LIGHT, position, color, ambient, diffuse, specular,
+                              constant, linear, quadratic, coneDir, innerConeAngle,
+                              outerConeAngle));
   light = newLight;
   return newLight;
 }

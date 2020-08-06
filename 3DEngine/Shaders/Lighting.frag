@@ -16,10 +16,11 @@ struct Material {
 };
 
 struct Light {
-  vec3 ambient;
-  vec3 diffuse;
-  vec3 specular;
+  vec3 color;
   vec4 position;
+  float ambientStrength;
+  float diffuseStrength;
+  float specularStrength;
   float constant;
   float linear;
   float quadratic;
@@ -72,17 +73,17 @@ vec3 calcLight(Light light, Material mat, vec3 viewDir, vec3 norm, vec3 fragPos)
   }
 
   // Ambient component
-  vec3 ambient = light.ambient * mat.ambient;
+  vec3 ambient = light.ambientStrength * mat.ambient;
 
   // Diffuse component
   float diffuseFactor = max(dot(norm, lightDir), 0.0f);
-  vec3 diffuse = light.diffuse * mat.diffuse * diffuseFactor;
+  vec3 diffuse = light.diffuseStrength * mat.diffuse * diffuseFactor;
 
   // Specular component
   vec3 reflectDir = reflect(-lightDir, norm);
   float specularFactor = pow(max(dot(viewDir, reflectDir), 0.0f), mat.shininess);
-  vec3 specular = light.specular * mat.specular * specularFactor;
+  vec3 specular = light.specularStrength * mat.specular * specularFactor;
 
   // Calculate resultant output color
-  return (ambient + diffuse + specular) * attenuation;
+  return (ambient + diffuse + specular) * light.color * attenuation;
 }
