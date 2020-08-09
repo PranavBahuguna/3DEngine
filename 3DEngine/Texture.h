@@ -2,7 +2,12 @@
 
 #include "Error.h"
 
+#include <memory>
+
 #include <GL/glew.h>
+
+class Texture;
+using TexSptr = std::shared_ptr<Texture>;
 
 class Texture {
 public:

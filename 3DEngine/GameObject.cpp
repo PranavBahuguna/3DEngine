@@ -2,9 +2,9 @@
 
 #include <stdexcept>
 
-GameObject::GameObject(ModelPtr model) : GameObject(model, "") {}
+GameObject::GameObject(ModelSptr model) : GameObject(model, "") {}
 
-GameObject::GameObject(ModelPtr model, const std::string &scriptName) : m_model(model) {
+GameObject::GameObject(ModelSptr model, const std::string &scriptName) : m_model(model) {
   ERROR errCode = ERROR_OK;
 
   loadScript(scriptName);
@@ -22,7 +22,7 @@ void GameObject::loadScript(const std::string &name) {
     return;
 
   const std::string filename = "Scripts/" + name + ".lua";
-  m_script = ScriptPtr(new Script(filename, *this));
+  m_script = ScriptSptr(new Script(filename, *this));
 }
 
 // Calls the init function from attached script (if any)

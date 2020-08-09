@@ -6,15 +6,15 @@
 // Forward declarations
 class Script;
 
-using ModelPtr = std::shared_ptr<Model>;
-using ScriptPtr = std::shared_ptr<Script>;
+using ModelSptr = std::shared_ptr<Model>;
+using ScriptSptr = std::shared_ptr<Script>;
 
 class GameObject {
 public:
-  GameObject(ModelPtr model);
-  GameObject(ModelPtr model, const std::string &scriptName);
+  GameObject(ModelSptr model);
+  GameObject(ModelSptr model, const std::string &scriptName);
 
-  void setModel(const ModelPtr model) { m_model = model; }
+  void setModel(const ModelSptr model) { m_model = model; }
   void loadScript(const std::string &name);
   void init(ERROR &errCode);
   void update(ERROR &errCode);
@@ -33,6 +33,6 @@ public:
   void scale(const glm::vec3 &scale) { m_model->scale(scale); }
 
 private:
-  ModelPtr m_model;
-  ScriptPtr m_script;
+  ModelSptr m_model;
+  ScriptSptr m_script;
 };

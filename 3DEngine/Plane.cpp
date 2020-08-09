@@ -15,8 +15,7 @@ Plane::Plane(const std::string &name, const glm::uvec2 &nTiles, const glm::vec2 
 // Creates the mesh and relevant materials
 void Plane::load(ERROR &errCode) {
   // Use existing mesh if available, otherwise generate the mesh
-  m_meshes[0] = Resources::FindMesh(m_name);
-  if (m_meshes[0] == nullptr)
+  if (!Resources<Mesh>::Find(m_name, m_meshes[0]))
     generateMesh();
 
   AssetLoader::loadMaterials(errCode, m_name, m_materials, m_textures);
@@ -68,5 +67,5 @@ void Plane::generateMesh() {
     }
   }
 
-  m_meshes[0] = Resources::CreateMesh(m_name, vertices, texCoords, normals, indices);
+  m_meshes[0] = Resources<Mesh>::Get(m_name, vertices, texCoords, normals, indices);
 }

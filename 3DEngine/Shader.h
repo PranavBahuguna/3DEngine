@@ -3,12 +3,15 @@
 #include "Error.h"
 
 #include <unordered_map>
+#include <memory>
 
 #include <GL/glew.h>
 #include <glm/glm.hpp>
 
-typedef std::unordered_map<std::string, GLuint> UniformMap;
-typedef std::unordered_map<GLenum, std::unordered_map<std::string, std::string>> PreprocessorMap;
+class Shader;
+using UniformMap = std::unordered_map<std::string, GLuint>;
+using PreprocessorMap = std::unordered_map<GLenum, std::unordered_map<std::string, std::string>>;
+using ShaderSptr = std::shared_ptr<Shader>;
 
 class Shader {
 public:

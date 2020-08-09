@@ -2,6 +2,9 @@
 
 #include "Shader.h"
 
+class Light;
+using LightSptr = std::shared_ptr<Light>;
+
 enum class LightType { DIRECTIONAL_LIGHT, POINT_LIGHT, SPOT_LIGHT };
 
 class Light {

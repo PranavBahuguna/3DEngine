@@ -1,7 +1,9 @@
 #pragma once
 
 #include "Drawable.h"
+#include "Light.h"
 #include "Resources.h"
+#include "Texture.h"
 
 #include <memory>
 
@@ -14,8 +16,8 @@ public:
   void draw(ERROR &errCode, const Shader &shader) const override;
 
 private:
-  TexPtr m_texture;
-  LightPtr m_light;
+  TexSptr m_texture;
+  LightSptr m_light;
 
   std::vector<std::vector<GLfloat>> m_vertices;
 

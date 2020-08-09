@@ -4,7 +4,7 @@
 
 class TransparencyDrawList : public DrawListDecorator {
 public:
-  TransparencyDrawList(DListPtr drawList);
+  TransparencyDrawList(DrawListUptr drawList);
 
   void draw(ERROR &errCode) override;
 };

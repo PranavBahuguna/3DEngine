@@ -1,19 +1,19 @@
 #include "IlluminationDrawList.h"
 
 // Constructor
-IlluminationDrawList::IlluminationDrawList(DListPtr drawList)
+IlluminationDrawList::IlluminationDrawList(DrawListUptr drawList)
     : DrawListDecorator(std::move(drawList)) {}
 
 void IlluminationDrawList::setLights(const std::vector<std::string> &lightNames) {
   for (const auto &name : lightNames) {
-    const auto &light = Resources::FindLight(name);
-    if (light != nullptr)
+    LightSptr light;
+    if (Resources<Light>::Find(name, light))
       m_lights.push_back(light);
   }
 }
 
 void IlluminationDrawList::draw(ERROR &errCode) {
-  ShaderPtr _shader = _drawList->getShader();
+  ShaderSptr _shader = _drawList->getShader();
   _shader->use();
 
   // Apply all lights to the shader

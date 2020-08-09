@@ -2,8 +2,7 @@
 
 #include "Drawable.h"
 #include "Resources.h"
-
-#include <memory>
+#include "Font.h"
 
 class Text : public Drawable {
 public:
@@ -15,7 +14,7 @@ public:
 
 private:
   std::string m_text;
-  FontPtr m_font;
+  FontSptr m_font;
   GLfloat m_scale;
   glm::vec4 m_color;
 

@@ -49,16 +49,17 @@ float fpsUpdateTime = FPS_UPDATE_DELAY;
 
 bool displayHUD = false;
 
-std::vector<ModelPtr> models;
+std::vector<ModelSptr> models;
 std::vector<GameObject *> gameObjects;
+std::vector<LightSptr> lights;
 
 DrawTargets dtModels;
 DrawTargets dtTexts;
 DrawTargets dtLightIcons;
 
-DListPtr dl_illum;
-DListPtr dl_trans;
-DListPtr dl_text;
+DrawListUptr dl_illum;
+DrawListUptr dl_trans;
+DrawListUptr dl_text;
 
 // forward declarations
 static std::string toStringDp(float, size_t);
@@ -84,12 +85,12 @@ int main() {
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     // Setup scene objects
-    ModelPtr tetrahedron(new Model("Tetrahedron"));
-    ModelPtr cube(new Model("Cube"));
-    ModelPtr earth(new Model("Sphere"));
-    ModelPtr starfighter(new Model("Arc170"));
+    ModelSptr tetrahedron(new Model("Tetrahedron"));
+    ModelSptr cube(new Model("Cube"));
+    ModelSptr earth(new Model("Sphere"));
+    ModelSptr starfighter(new Model("Arc170"));
 
-    ModelPtr floor(new Plane("Grass", {5, 5}, {10.0f, 10.0f}));
+    ModelSptr floor(new Plane("Grass", {5, 5}, {10.0f, 10.0f}));
     floor->setPos(glm::vec3(0.0f, -3.0f, 0.0f));
     floor->setEuler(glm::vec3(1.0f));
     floor->load(errCode);
@@ -136,14 +137,17 @@ int main() {
                zPosValue, pitchLabel, pitchValue, yawLabel,  yawValue,  fovLabel,  fovValue};
 
     // Setup scene lights
-    LightPtr light01 = Resources::CreateDirectionalLight("DirectionalLight", {1.0f, 1.0f, -1.0f},
-                                                         glm::vec3(1.0f), 0.25f, 1.0f, 1.0f);
-    LightPtr light02 =
-        Resources::CreatePointLight("PointLight", {4.0f, 4.0f, -4.0f}, {1.0f, 0.0f, 0.0f}, 0.25f,
-                                    1.0f, 1.0f, 1.0f, 0.045f, 0.0075f);
-    LightPtr light03 = Resources::CreateSpotLight("SpotLight", {-4.0f, 10.0f, 3.0f}, glm::vec3(1.0f), 0.25f, 1.0f,
-                                   1.0f, 1.0f, 0.045f,
-        0.0075f, {0.0f, -1.0f, 0.0f}, 20.0f, 25.0f);
+    LightSptr light01 =
+        Resources<Light>::Create("DirectionalLight", LightType::DIRECTIONAL_LIGHT,
+                                 glm::vec3(1.0f, 1.0f, -1.0f), glm::vec3(1.0f), 0.25f, 1.0f, 1.0f);
+    LightSptr light02 = Resources<Light>::Create(
+        "PointLight", LightType::POINT_LIGHT, glm::vec3(4.0f, 4.0f, -4.0f),
+        glm::vec3(1.0f, 0.0f, 0.0f), 0.25f, 1.0f, 1.0f, 1.0f, 0.045f, 0.0075f);
+    LightSptr light03 = Resources<Light>::Create(
+        "SpotLight", LightType::SPOT_LIGHT, glm::vec3(-4.0f, 10.0f, 3.0f), glm::vec3(1.0f), 0.25f,
+        1.0f, 1.0f, 1.0f, 0.045f, 0.0075f, glm::vec3(0.0f, -1.0f, 0.0f), 20.0f, 25.0f);
+
+    lights = {light01, light02, light03};
 
     // Setup light icons
     LiPtr li01(new LightIcon("DirectionalLight"));
@@ -153,7 +157,7 @@ int main() {
     dtLightIcons = {li01, li02, li03};
 
     // Setup lighting shader
-    auto lightingShader = Resources::GetShader("Lighting");
+    auto lightingShader = Resources<Shader>::Get("Lighting", "Lighting");
     lightingShader->setPreprocessor(GL_FRAGMENT_SHADER, "MAX_LIGHTS", MAX_LIGHTS);
 
     // Setup drawlists

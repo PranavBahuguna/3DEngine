@@ -2,12 +2,17 @@
 
 #include "Error.h"
 
+#include <memory>
+
 #include <GL/glew.h>
 #include <ft2build.h>
 #include <glm/glm.hpp>
 #include FT_FREETYPE_H
 
 #define CHAR_ARRAY_SIZE 128
+
+class Font;
+using FontSptr = std::shared_ptr<Font>;
 
 struct Character {
   GLuint textureId;   // ID handle of the glyph texture

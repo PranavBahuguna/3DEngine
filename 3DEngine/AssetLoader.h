@@ -3,7 +3,10 @@
 #include "tiny_obj_loader.h"
 
 #include "Error.h"
+#include "Material.h"
+#include "Mesh.h"
 #include "Resources.h"
+#include "Texture.h"
 
 template <typename T> using AssetPtrs = std::vector<std::shared_ptr<T>>;
 

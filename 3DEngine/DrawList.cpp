@@ -3,7 +3,7 @@
 #include <stdexcept>
 
 void DrawList::setShader(const std::string &name) {
-  m_shader = Resources::GetShader(name);
+  m_shader = Resources<Shader>::Get(name, name);
   if (!m_shader->isCompiled())
     m_shader->compile();
 }
@@ -12,7 +12,7 @@ void DrawList::setTargets(DrawTargets targets) { m_drawTargets = targets; }
 
 // Basic implementation of draw uses shader program and calls the draw function of each target
 void BasicDrawList::draw(ERROR &errCode) {
-  ShaderPtr _shader = getShader();
+  ShaderSptr _shader = getShader();
   _shader->use();
 
   const auto &targets = getTargets();
@@ -20,4 +20,4 @@ void BasicDrawList::draw(ERROR &errCode) {
     (*it)->draw(errCode, *_shader);
 }
 
-DrawListDecorator::DrawListDecorator(DListPtr drawList) : _drawList(std::move(drawList)) {}
+DrawListDecorator::DrawListDecorator(DrawListUptr drawList) : _drawList(std::move(drawList)) {}

@@ -6,9 +6,9 @@
 
 class DrawList;
 
-using DrawPtr = std::shared_ptr<Drawable>;
-using DrawTargets = std::vector<DrawPtr>;
-using DListPtr = std::unique_ptr<DrawList>;
+using DrawSptr = std::shared_ptr<Drawable>;
+using DrawTargets = std::vector<DrawSptr>;
+using DrawListUptr = std::unique_ptr<DrawList>;
 
 class DrawList {
 public:
@@ -17,11 +17,11 @@ public:
   void setShader(const std::string &name);
   void setTargets(DrawTargets targets);
 
-  virtual ShaderPtr getShader() const { return m_shader; }
+  virtual ShaderSptr getShader() const { return m_shader; }
   virtual DrawTargets &getTargets() { return m_drawTargets; }
 
 private:
-  ShaderPtr m_shader;
+  ShaderSptr m_shader;
   DrawTargets m_drawTargets;
 };
 
@@ -32,13 +32,13 @@ public:
 
 class DrawListDecorator : public DrawList {
 public:
-  DrawListDecorator(DListPtr drawList);
+  DrawListDecorator(DrawListUptr drawList);
 
   void draw(ERROR &errCode) override { _drawList->draw(errCode); }
 
-  ShaderPtr getShader() const override { return _drawList->getShader(); }
+  ShaderSptr getShader() const override { return _drawList->getShader(); }
   DrawTargets &getTargets() override { return _drawList->getTargets(); }
 
 protected:
-  DListPtr _drawList;
+  DrawListUptr _drawList;
 };

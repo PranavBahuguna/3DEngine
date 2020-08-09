@@ -10,21 +10,13 @@
 
 // Constructor
 LightIcon::LightIcon(const std::string &lightName) {
-  ERROR errCode = ERROR_OK;
-
   // Try getting the light and texture
-  m_light = Resources::FindLight(lightName);
-  if (m_light == nullptr) {
-    errCode = printErrorMsg(ERROR_MISSING_LIGHT, lightName);
-  } else {
-    const std::string textureName = "light-icons.png";
-    m_texture = Resources::GetTexture(textureName);
-    if (m_texture == nullptr)
-      errCode = printErrorMsg(ERROR_MISSING_LIGHT, textureName);
+  if (!Resources<Light>::Find(lightName, m_light)) {
+    printErrorMsg(ERROR_MISSING_LIGHT, lightName);
+    throw std::invalid_argument("An error occurred while constructing light icon.");
   }
 
-  if (errCode != ERROR_OK)
-    throw std::invalid_argument("An error occurred while constructing light icon.");
+  m_texture = Resources<Texture>::Get("light-icons.png", "light-icons.png");
 
   // Position for directional lights is in a fixed location (with offset for light direction).
   // Position for other lights is at light location.

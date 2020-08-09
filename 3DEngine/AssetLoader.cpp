@@ -100,11 +100,7 @@ void AssetLoader::buildMeshes(AssetPtrs<Mesh> &meshes, const std::string &name,
   for (size_t i = 0; i < nMeshes; i++) {
     std::string meshName = name + "_" + std::to_string(i);
 
-    // Check if this mesh already exists
-    meshes[i] = Resources::FindMesh(meshName);
-    if (meshes[i] == nullptr)
-      meshes[i] =
-          Resources::CreateMesh(meshName, positions[i], texCoords[i], normals[i], indices[i]);
+    meshes[i] = Resources<Mesh>::Get(meshName, positions[i], texCoords[i], normals[i], indices[i]);
   }
 }
 
@@ -120,22 +116,21 @@ void AssetLoader::buildMaterials(AssetPtrs<Material> &materials, AssetPtrs<Textu
 
     // Load textures associated with the material
     if (!mat.diffuse_texname.empty())
-      textures[i] = Resources::GetTexture(mat.diffuse_texname);
+      textures[i] = Resources<Texture>::Get(mat.diffuse_texname, mat.diffuse_texname);
 
     // If no texture associated with the material, treat it as having an opacity texture
     if (textures[i] == nullptr)
-      textures[i] = Resources::GetTexture("opacity.png");
+      textures[i] = Resources<Texture>::Get("opacity.png", "opacity.png");
 
     // Load the material itself - check if this material already exists
-    materials[i] = Resources::FindMaterial(mat.name);
-
-    if (materials[i] == nullptr) {
+    if (!Resources<Material>::Find(mat.name, materials[i])) {
       // Create the material instead
       const auto &ambient = glm::vec3(mat.ambient[0], mat.ambient[1], mat.ambient[2]);
       const auto &diffuse = glm::vec3(mat.diffuse[0], mat.diffuse[1], mat.diffuse[2]);
       const auto &specular = glm::vec3(mat.specular[0], mat.specular[1], mat.specular[2]);
 
-      materials[i] = Resources::CreateMaterial(mat.name, ambient, diffuse, specular, mat.shininess);
+      materials[i] =
+          Resources<Material>::Create(mat.name, ambient, diffuse, specular, mat.shininess);
     }
   }
 }
