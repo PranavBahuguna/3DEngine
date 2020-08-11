@@ -2,11 +2,13 @@
 
 #include "Error.h"
 #include "Material.h"
+#include "Resource.h"
 
-class Mesh {
+class Mesh : public Resource {
 public:
-  Mesh(const std::vector<GLfloat> &vertices, const std::vector<GLfloat> &normals,
-       const std::vector<GLfloat> &texCoords, const std::vector<GLuint> &indices);
+  Mesh(const std::string &name, const std::vector<GLfloat> &vertices,
+       const std::vector<GLfloat> &normals, const std::vector<GLfloat> &texCoords,
+       const std::vector<GLuint> &indices);
   ~Mesh();
 
   void draw() const;

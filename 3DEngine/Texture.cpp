@@ -9,7 +9,7 @@
 
 // Constructor
 Texture::Texture(const std::string &filename)
-    : m_textureID(0), m_width(0), m_height(0), m_bitDepth(0) {
+    : Resource{filename}, m_textureID(0), m_width(0), m_height(0), m_bitDepth(0) {
 
   // Get file path and try loading texture
   const std::string path = "Textures/" + filename;

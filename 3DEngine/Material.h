@@ -2,10 +2,10 @@
 
 #include "Shader.h"
 
-class Material {
+class Material : public Resource {
 public:
-  Material(const glm::vec3 &ambient, const glm::vec3 &diffuse, const glm::vec3 &specular,
-           GLfloat shininess);
+  Material(const std::string &name, const glm::vec3 &ambient, const glm::vec3 &diffuse,
+           const glm::vec3 &specular, GLfloat shininess);
 
   void use(const Shader &shader) const;
 

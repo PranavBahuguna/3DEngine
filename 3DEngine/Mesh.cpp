@@ -1,11 +1,11 @@
 #include "Mesh.h"
-#include "Resources.h"
+#include "ResourceManager.h"
 
 // Constructor
-Mesh::Mesh(const std::vector<GLfloat> &vertices, const std::vector<GLfloat> &texCoords,
-           const std::vector<GLfloat> &normals, const std::vector<GLuint> &indices) {
-
-  m_nIndices = (GLsizei)indices.size();
+Mesh::Mesh(const std::string &name, const std::vector<GLfloat> &vertices,
+           const std::vector<GLfloat> &texCoords, const std::vector<GLfloat> &normals,
+           const std::vector<GLuint> &indices)
+    : Resource{name}, m_nIndices((GLsizei)indices.size()) {
 
   glGenVertexArrays(1, &m_VAO);
   glBindVertexArray(m_VAO);

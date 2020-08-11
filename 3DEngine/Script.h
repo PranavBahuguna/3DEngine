@@ -10,7 +10,7 @@
 // Forward declarations
 class GameObject;
 
-class Script {
+class Script : public Resource {
 public:
   Script(const std::string &name, const GameObject &gameObject);
 
@@ -20,6 +20,6 @@ public:
 private:
   sol::state lua;
 
-  void load(ERROR &errCode, const std::string &filename);
+  ERROR load(const std::string &filename);
   void callFunc(ERROR &errCode, const std::string &funcName);
 };

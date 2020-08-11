@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Error.h"
+#include "Resource.h"
 
 #include <memory>
 
@@ -21,7 +22,7 @@ struct Character {
   FT_Pos advance;     // Offset to advance to next glyph (1/64 pixel)
 };
 
-class Font {
+class Font : public Resource {
 public:
   Font(const std::string &name);
 
@@ -32,6 +33,4 @@ private:
   const char *getFTErrorMsg(const FT_Error &err);
 
   Character m_characters[CHAR_ARRAY_SIZE];
-
-  std::string m_name;
 };

@@ -6,7 +6,7 @@
 #define FONT_PIXEL_SIZE 64
 
 // Constructor
-Font::Font(const std::string &name) : m_name(name), m_characters{} {
+Font::Font(const std::string &name) : Resource{name}, m_characters{} {
   ERROR errCode = ERROR_OK;
 
   // Try initialising the FreeType library
@@ -32,14 +32,12 @@ ERROR Font::load(const std::string &filepath, FT_Library &ft) {
   FT_Face face;
   FT_Error ftErrCode = FT_New_Face(ft, filepath.c_str(), 0, &face);
   if (ftErrCode != FT_Err_Ok)
-    return printErrorMsg(ERROR_FONT_LOAD_FAILED, m_name.c_str(), ftErrCode,
-                         getFTErrorMsg(ftErrCode));
+    return printErrorMsg(ERROR_FONT_LOAD_FAILED, name.c_str(), ftErrCode, getFTErrorMsg(ftErrCode));
 
   // Set font pixel size
   ftErrCode = FT_Set_Pixel_Sizes(face, 0, FONT_PIXEL_SIZE);
   if (ftErrCode != FT_Err_Ok)
-    return printErrorMsg(ERROR_FONT_LOAD_FAILED, m_name.c_str(), ftErrCode,
-                         getFTErrorMsg(ftErrCode));
+    return printErrorMsg(ERROR_FONT_LOAD_FAILED, name.c_str(), ftErrCode, getFTErrorMsg(ftErrCode));
 
   glPixelStorei(GL_UNPACK_ALIGNMENT, 1); // disable byte-alignment restriction
 
@@ -48,7 +46,7 @@ ERROR Font::load(const std::string &filepath, FT_Library &ft) {
     // Load character glyph
     ftErrCode = FT_Load_Char(face, c, FT_LOAD_RENDER);
     if (ftErrCode != FT_Err_Ok) {
-      errCode = printErrorMsg(ERROR_FONT_GLYPH_LOAD_FAILED, (int)c, m_name.c_str(), ftErrCode,
+      errCode = printErrorMsg(ERROR_FONT_GLYPH_LOAD_FAILED, (int)c, name.c_str(), ftErrCode,
                               getFTErrorMsg(ftErrCode));
       continue;
     }
@@ -82,7 +80,7 @@ ERROR Font::load(const std::string &filepath, FT_Library &ft) {
 // Retrieves font character from store
 const Character *Font::getCharacter(ERROR &errCode, const unsigned char c) const {
   if (c >= CHAR_ARRAY_SIZE) {
-    errCode = printErrorMsg(ERROR_FONT_CHARACTER_OUT_OF_RANGE, c, m_name.c_str());
+    errCode = printErrorMsg(ERROR_FONT_CHARACTER_OUT_OF_RANGE, c, name.c_str());
     return nullptr;
   }
 

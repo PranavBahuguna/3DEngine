@@ -4,25 +4,15 @@
 
 GameObject::GameObject(ModelSptr model) : GameObject(model, "") {}
 
-GameObject::GameObject(ModelSptr model, const std::string &scriptName) : m_model(model) {
+GameObject::GameObject(ModelSptr model, const std::string &script)
+    : m_model(model), m_script(ResourceManager<Script>::Get(script, *this)) {
   ERROR errCode = ERROR_OK;
-
-  loadScript(scriptName);
   model->load(errCode);
   if (errCode == ERROR_OK)
     init(errCode);
 
   if (errCode != ERROR_OK)
     throw std::runtime_error("An error occurred while creating GameObject.");
-}
-
-// Loads and attaches the Lua script to this
-void GameObject::loadScript(const std::string &name) {
-  if (name.empty())
-    return;
-
-  const std::string filename = "Scripts/" + name + ".lua";
-  m_script = ScriptSptr(new Script(filename, *this));
 }
 
 // Calls the init function from attached script (if any)

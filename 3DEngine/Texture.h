@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Error.h"
+#include "Resource.h"
 
 #include <memory>
 
@@ -9,7 +10,7 @@
 class Texture;
 using TexSptr = std::shared_ptr<Texture>;
 
-class Texture {
+class Texture : public Resource {
 public:
   Texture(const std::string &filename);
   ~Texture();

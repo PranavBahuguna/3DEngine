@@ -3,7 +3,7 @@
 #include <stdexcept>
 
 void DrawList::setShader(const std::string &name) {
-  m_shader = Resources<Shader>::Get(name, name);
+  m_shader = ResourceManager<Shader>::Get(name);
   if (!m_shader->isCompiled())
     m_shader->compile();
 }

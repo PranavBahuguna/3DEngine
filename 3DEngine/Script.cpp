@@ -4,12 +4,11 @@
 #include <filesystem>
 #include <stdexcept>
 
-Script::Script(const std::string &filename, const GameObject &gameObject) {
+Script::Script(const std::string &name, const GameObject &gameObject) : Resource{name} {
   lua.open_libraries(sol::lib::base, sol::lib::math);
 
-  ERROR errCode = ERROR_OK;
-  load(errCode, filename);
-  if (errCode != ERROR_OK)
+  const std::string filename = "Scripts/" + name + ".lua";
+  if (load(filename) != ERROR_OK)
     throw std::runtime_error("An error occurred while loading script (" + filename + ").");
 
   // Add userdata types
@@ -37,18 +36,19 @@ Script::Script(const std::string &filename, const GameObject &gameObject) {
 }
 
 // Load a Lua script from filename
-void Script::load(ERROR &errCode, const std::string &filename) {
+ERROR Script::load(const std::string &filename) {
   // Check if file exists
-  if (!std::filesystem::exists(filename)) {
-    errCode = printErrorMsg(ERROR_FILE_LOAD_FAILED, filename.c_str());
-  } else {
-    // Try loading the file
-    auto result = lua.script_file(filename);
-    if (!result.valid()) {
-      sol::error err = result;
-      errCode = printErrorMsg(ERROR_LUA_ERROR, err.what());
-    }
+  if (!std::filesystem::exists(filename))
+    return printErrorMsg(ERROR_FILE_LOAD_FAILED, filename.c_str());
+
+  // Try loading the file
+  auto result = lua.script_file(filename);
+  if (!result.valid()) {
+    sol::error err = result;
+    return printErrorMsg(ERROR_LUA_ERROR, err.what());
   }
+
+  return ERROR_OK;
 }
 
 // Calls a lua script function with error handling

@@ -7,17 +7,11 @@
 #define DIRLIGHT_ICON_POS_HEIGHT 5.0f
 #define DIRLIGHT_ICON_OFFSET_FACTOR 3.0f
 #define LIGHT_ICON_SIZE 256.0f
+#define LIGHT_ICON_IMAGE "light-icons.png"
 
 // Constructor
-LightIcon::LightIcon(const std::string &lightName) {
-  // Try getting the light and texture
-  if (!Resources<Light>::Find(lightName, m_light)) {
-    printErrorMsg(ERROR_MISSING_LIGHT, lightName);
-    throw std::invalid_argument("An error occurred while constructing light icon.");
-  }
-
-  m_texture = Resources<Texture>::Get("light-icons.png", "light-icons.png");
-
+LightIcon::LightIcon(LightSptr light)
+    : m_light(light), m_texture(ResourceManager<Texture>::Get(LIGHT_ICON_IMAGE)) {
   // Position for directional lights is in a fixed location (with offset for light direction).
   // Position for other lights is at light location.
   const auto &lightType = m_light->getType();

@@ -14,8 +14,6 @@ public:
   GameObject(ModelSptr model);
   GameObject(ModelSptr model, const std::string &scriptName);
 
-  void setModel(const ModelSptr model) { m_model = model; }
-  void loadScript(const std::string &name);
   void init(ERROR &errCode);
   void update(ERROR &errCode);
 

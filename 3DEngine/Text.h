@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Drawable.h"
-#include "Resources.h"
 #include "Font.h"
 
 class Text : public Drawable {

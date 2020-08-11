@@ -6,7 +6,7 @@
 
 // Constructor
 Shader::Shader(const std::string &name)
-    : m_name(name), m_progId(0), m_vertId(0), m_fragId(0), m_isCompiled(false) {}
+    : Resource{name}, m_progId(0), m_vertId(0), m_fragId(0), m_isCompiled(false) {}
 
 // Destructor
 Shader::~Shader() {
@@ -20,8 +20,8 @@ Shader::~Shader() {
 // Load all shader files and compiles them
 void Shader::compile(bool useShader) {
   // Get file paths
-  const std::string vertPath = "Shaders/" + m_name + ".vert";
-  const std::string fragPath = "Shaders/" + m_name + ".frag";
+  const std::string vertPath = "Shaders/" + name + ".vert";
+  const std::string fragPath = "Shaders/" + name + ".frag";
 
   // Load vertex and fragment shaders
   ERROR errCode = ERROR_OK;
@@ -125,13 +125,13 @@ void Shader::preprocess(ERROR &errCode, std::string &shaderSource, GLenum type) 
   if (preprocessorIt == m_preprocessorMap.end())
     return;
 
-  for (const auto &[name, value] : preprocessorIt->second) {
+  for (const auto &[preproc, value] : preprocessorIt->second) {
     // Try finding the preprocessor string in source code
-    const std::string preprocessorStr = "#define " + name;
+    const std::string preprocessorStr = "#define " + preproc;
     size_t strStartPos = shaderSource.find(preprocessorStr);
 
     if (strStartPos == std::string::npos) {
-      errCode = printErrorMsg(ERROR_SHADER_PREPROCESSOR_NOT_FOUND, name.c_str(), m_name.c_str());
+      errCode = printErrorMsg(ERROR_SHADER_PREPROCESSOR_NOT_FOUND, preproc.c_str(), name.c_str());
       break;
     } else {
       // Find the next newline char

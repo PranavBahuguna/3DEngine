@@ -2,7 +2,7 @@
 
 #include "Camera.h"
 #include "Drawable.h"
-#include "Resources.h"
+#include "ResourceManager.h"
 
 class DrawList;
 

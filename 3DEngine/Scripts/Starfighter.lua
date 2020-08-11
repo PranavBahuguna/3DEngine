@@ -13,6 +13,9 @@ function update()
 	rotate(vec3.new(0.0, deltaAngle, 0.0))
 
 	ANGLE = ANGLE + deltaAngle
+	if (ANGLE >= 270) then
+		ANGLE = ANGLE - 360
+	end
 	local x = ORBIT_DISTANCE * sin(ANGLE)
 	local z = ORBIT_DISTANCE * cos(ANGLE)
 	setPos(vec3.new(x, 0.0, z))

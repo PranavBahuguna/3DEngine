@@ -38,8 +38,9 @@
 #define FPS_BUFFER_SIZE 8
 #define MAX_LIGHTS 8
 
-using TextPtr = std::shared_ptr<Text>;
-using LiPtr = std::shared_ptr<LightIcon>;
+using TextSptr = std::shared_ptr<Text>;
+using LiSptr = std::shared_ptr<LightIcon>;
+using GObjSptr = std::shared_ptr<GameObject>;
 
 ERROR errCode = ERROR_OK;
 
@@ -50,7 +51,7 @@ float fpsUpdateTime = FPS_UPDATE_DELAY;
 bool displayHUD = false;
 
 std::vector<ModelSptr> models;
-std::vector<GameObject *> gameObjects;
+std::vector<GObjSptr> gameObjects;
 std::vector<LightSptr> lights;
 
 DrawTargets dtModels;
@@ -95,76 +96,73 @@ int main() {
     floor->setEuler(glm::vec3(1.0f));
     floor->load(errCode);
 
-    GameObject *earthObj(new GameObject(earth, "Earth"));
-    GameObject *tetrahedronObj(new GameObject(tetrahedron, "Tetrahedron"));
-    GameObject *cubeObj(new GameObject(cube, "Cube"));
-    GameObject *starfighterObj(new GameObject(starfighter, "Starfighter"));
-    GameObject *floorObj(new GameObject(floor));
+    GObjSptr earthObj(new GameObject(earth, "Earth"));
+    GObjSptr tetrahedronObj(new GameObject(tetrahedron, "Tetrahedron"));
+    GObjSptr cubeObj(new GameObject(cube, "Cube"));
+    GObjSptr starfighterObj(new GameObject(starfighter, "Starfighter"));
+    GObjSptr floorObj(new GameObject(floor));
 
     gameObjects = {earthObj, tetrahedronObj, cubeObj, starfighterObj, floorObj};
     models = {tetrahedron, cube, earth, starfighter, floor};
 
     // Setup HUD elements
-    TextPtr fpsLabel(
+    TextSptr fpsLabel(
         new Text(HUD_FONT, Window::RelToWinPos({0.7f, 0.95f}), 1.0f, COLOR_SEAWEED, "FPS:"));
-    TextPtr fpsValue(new Text(HUD_FONT, Window::RelToWinPos({0.8f, 0.95f}), 1.0f, COLOR_SEAWEED));
+    TextSptr fpsValue(new Text(HUD_FONT, Window::RelToWinPos({0.8f, 0.95f}), 1.0f, COLOR_SEAWEED));
 
-    TextPtr xPosLabel(
+    TextSptr xPosLabel(
         new Text(HUD_FONT, Window::RelToWinPos({0.7f, 0.85f}), 1.0f, COLOR_RED, "X:"));
-    TextPtr xPosValue(new Text(HUD_FONT, Window::RelToWinPos({0.8f, 0.85f}), 1.0f, COLOR_RED));
+    TextSptr xPosValue(new Text(HUD_FONT, Window::RelToWinPos({0.8f, 0.85f}), 1.0f, COLOR_RED));
 
-    TextPtr yPosLabel(
+    TextSptr yPosLabel(
         new Text(HUD_FONT, Window::RelToWinPos({0.7f, 0.8f}), 1.0f, COLOR_GREEN, "Y:"));
-    TextPtr yPosValue(new Text(HUD_FONT, Window::RelToWinPos({0.8f, 0.8f}), 1.0f, COLOR_GREEN));
+    TextSptr yPosValue(new Text(HUD_FONT, Window::RelToWinPos({0.8f, 0.8f}), 1.0f, COLOR_GREEN));
 
-    TextPtr zPosLabel(
+    TextSptr zPosLabel(
         new Text(HUD_FONT, Window::RelToWinPos({0.7f, 0.75f}), 1.0f, COLOR_BLUE, "Z:"));
-    TextPtr zPosValue(new Text(HUD_FONT, Window::RelToWinPos({0.8f, 0.75f}), 1.0f, COLOR_BLUE));
+    TextSptr zPosValue(new Text(HUD_FONT, Window::RelToWinPos({0.8f, 0.75f}), 1.0f, COLOR_BLUE));
 
-    TextPtr pitchLabel(
+    TextSptr pitchLabel(
         new Text(HUD_FONT, Window::RelToWinPos({0.7f, 0.65f}), 1.0f, COLOR_YELLOW, "Pitch:"));
-    TextPtr pitchValue(new Text(HUD_FONT, Window::RelToWinPos({0.8f, 0.65f}), 1.0f, COLOR_YELLOW));
+    TextSptr pitchValue(new Text(HUD_FONT, Window::RelToWinPos({0.8f, 0.65f}), 1.0f, COLOR_YELLOW));
 
-    TextPtr yawLabel(
+    TextSptr yawLabel(
         new Text(HUD_FONT, Window::RelToWinPos({0.7f, 0.6f}), 1.0f, COLOR_VIOLET, "Yaw:"));
-    TextPtr yawValue(new Text(HUD_FONT, Window::RelToWinPos({0.8f, 0.6f}), 1.0f, COLOR_VIOLET));
+    TextSptr yawValue(new Text(HUD_FONT, Window::RelToWinPos({0.8f, 0.6f}), 1.0f, COLOR_VIOLET));
 
-    TextPtr fovLabel(
+    TextSptr fovLabel(
         new Text(HUD_FONT, Window::RelToWinPos({0.7f, 0.5f}), 1.0f, COLOR_GREY, "FOV:"));
-    TextPtr fovValue(new Text(HUD_FONT, Window::RelToWinPos({0.8f, 0.5f}), 1.0f, COLOR_GREY));
+    TextSptr fovValue(new Text(HUD_FONT, Window::RelToWinPos({0.8f, 0.5f}), 1.0f, COLOR_GREY));
 
     dtTexts = {fpsLabel,  fpsValue,   xPosLabel,  xPosValue, yPosLabel, yPosValue, zPosLabel,
                zPosValue, pitchLabel, pitchValue, yawLabel,  yawValue,  fovLabel,  fovValue};
 
     // Setup scene lights
-    LightSptr light01 =
-        Resources<Light>::Create("DirectionalLight", LightType::DIRECTIONAL_LIGHT,
-                                 glm::vec3(1.0f, 1.0f, -1.0f), glm::vec3(1.0f), 0.25f, 1.0f, 1.0f);
-    LightSptr light02 = Resources<Light>::Create(
-        "PointLight", LightType::POINT_LIGHT, glm::vec3(4.0f, 4.0f, -4.0f),
-        glm::vec3(1.0f, 0.0f, 0.0f), 0.25f, 1.0f, 1.0f, 1.0f, 0.045f, 0.0075f);
-    LightSptr light03 = Resources<Light>::Create(
-        "SpotLight", LightType::SPOT_LIGHT, glm::vec3(-4.0f, 10.0f, 3.0f), glm::vec3(1.0f), 0.25f,
-        1.0f, 1.0f, 1.0f, 0.045f, 0.0075f, glm::vec3(0.0f, -1.0f, 0.0f), 20.0f, 25.0f);
+    LightSptr light01(new Light(LightType::DIRECTIONAL_LIGHT, {1.0f, 1.0f, -1.0f}, glm::vec3(1.0f),
+                                0.25f, 1.0f, 1.0f));
+    LightSptr light02(new Light(LightType::POINT_LIGHT, {4.0f, 4.0f, -4.0f}, {1.0f, 0.0f, 0.0f},
+                                0.25f, 1.0f, 1.0f, 1.0f, 0.045f, 0.0075f));
+    LightSptr light03(new Light(LightType::SPOT_LIGHT, {-4.0f, 10.0f, 3.0f}, glm::vec3(1.0f), 0.25f,
+                                1.0f, 1.0f, 1.0f, 0.045f, 0.0075f, {0.0f, -1.0f, 0.0f}, 20.0f,
+                                25.0f));
 
     lights = {light01, light02, light03};
 
     // Setup light icons
-    LiPtr li01(new LightIcon("DirectionalLight"));
-    LiPtr li02(new LightIcon("PointLight"));
-    LiPtr li03(new LightIcon("SpotLight"));
+    LiSptr li01(new LightIcon(light01));
+    LiSptr li02(new LightIcon(light02));
+    LiSptr li03(new LightIcon(light03));
 
     dtLightIcons = {li01, li02, li03};
 
     // Setup lighting shader
-    auto lightingShader = Resources<Shader>::Get("Lighting", "Lighting");
+    auto lightingShader = ResourceManager<Shader>::Get("Lighting");
     lightingShader->setPreprocessor(GL_FRAGMENT_SHADER, "MAX_LIGHTS", MAX_LIGHTS);
 
     // Setup drawlists
     dtModels = DrawTargets(models.begin(), models.end());
     dl_illum = DrawListBuilder::CreateDrawList(dtModels, "Lighting");
-    dl_illum = DrawListBuilder::AddIllumination(std::move(dl_illum),
-                                                {"DirectionalLight", "PointLight", "SpotLight"});
+    dl_illum = DrawListBuilder::AddIllumination(std::move(dl_illum), lights);
 
     dl_trans = DrawListBuilder::CreateDrawList(dtLightIcons, "LightIconParticle");
     dl_trans = DrawListBuilder::AddTransparency(std::move(dl_trans));

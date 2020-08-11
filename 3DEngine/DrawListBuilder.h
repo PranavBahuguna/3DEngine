@@ -17,13 +17,11 @@ public:
   }
 
   // Sets the max number of lights and number of available lights for the shader
-  static DrawListUptr AddIllumination(DrawListUptr drawList,
-                                      const std::vector<std::string> &lightNames) {
-    const auto ilDrawList = new IlluminationDrawList(std::move(drawList));
-    ilDrawList->setLights(lightNames);
+  static DrawListUptr AddIllumination(DrawListUptr drawList, const std::vector<LightSptr> &lights) {
+    const auto ilDrawList = new IlluminationDrawList(std::move(drawList), lights);
 
     ShaderSptr _shader = ilDrawList->getShader();
-    _shader->setInt("nLights", static_cast<int>(lightNames.size()));
+    _shader->setInt("nLights", static_cast<int>(lights.size()));
 
     return DrawListUptr(ilDrawList);
   }

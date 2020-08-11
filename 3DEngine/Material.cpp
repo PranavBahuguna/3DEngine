@@ -1,9 +1,10 @@
 #include "Material.h"
 
 // Constructor
-Material::Material(const glm::vec3 &ambient, const glm::vec3 &diffuse, const glm::vec3 &specular,
-                   GLfloat shininess)
-    : m_ambient(ambient), m_diffuse(diffuse), m_specular(specular), m_shininess(shininess) {}
+Material::Material(const std::string &name, const glm::vec3 &ambient, const glm::vec3 &diffuse,
+                   const glm::vec3 &specular, GLfloat shininess)
+    : Resource{name}, m_ambient(ambient), m_diffuse(diffuse), m_specular(specular),
+      m_shininess(shininess) {}
 
 // Use this material
 void Material::use(const Shader &shader) const {

@@ -2,7 +2,7 @@
 
 #include "Drawable.h"
 #include "Light.h"
-#include "Resources.h"
+#include "ResourceManager.h"
 #include "Texture.h"
 
 #include <memory>
@@ -11,7 +11,7 @@
 
 class LightIcon : public Drawable {
 public:
-  LightIcon(const std::string &lightName);
+  LightIcon(LightSptr light);
 
   void draw(ERROR &errCode, const Shader &shader) const override;
 

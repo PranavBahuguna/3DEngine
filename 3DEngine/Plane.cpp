@@ -5,7 +5,7 @@
 
 // Constructor
 Plane::Plane(const std::string &name, const glm::uvec2 &nTiles, const glm::vec2 &tileDimensions,
-                 const glm::vec2 &tileTexMapping)
+             const glm::vec2 &tileTexMapping)
     : Model(name), m_nTiles(nTiles), m_tileDimensions(tileDimensions),
       m_tileTexMapping(tileTexMapping) {
 
@@ -15,7 +15,7 @@ Plane::Plane(const std::string &name, const glm::uvec2 &nTiles, const glm::vec2 
 // Creates the mesh and relevant materials
 void Plane::load(ERROR &errCode) {
   // Use existing mesh if available, otherwise generate the mesh
-  if (!Resources<Mesh>::Find(m_name, m_meshes[0]))
+  if (!ResourceManager<Mesh>::Find(m_name, m_meshes[0]))
     generateMesh();
 
   AssetLoader::loadMaterials(errCode, m_name, m_materials, m_textures);
@@ -67,5 +67,5 @@ void Plane::generateMesh() {
     }
   }
 
-  m_meshes[0] = Resources<Mesh>::Get(m_name, vertices, texCoords, normals, indices);
+  m_meshes[0] = ResourceManager<Mesh>::Get(m_name, vertices, texCoords, normals, indices);
 }

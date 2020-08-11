@@ -1,9 +1,10 @@
 #pragma once
 
 #include "Error.h"
+#include "ResourceManager.h"
 
-#include <unordered_map>
 #include <memory>
+#include <unordered_map>
 
 #include <GL/glew.h>
 #include <glm/glm.hpp>
@@ -13,7 +14,7 @@ using UniformMap = std::unordered_map<std::string, GLuint>;
 using PreprocessorMap = std::unordered_map<GLenum, std::unordered_map<std::string, std::string>>;
 using ShaderSptr = std::shared_ptr<Shader>;
 
-class Shader {
+class Shader : public Resource {
 public:
   Shader(const std::string &name);
   ~Shader();
@@ -57,7 +58,6 @@ private:
 
   static constexpr GLsizei MAX_PARAM_LENGTH = 256;
 
-  std::string m_name;
   UniformMap m_uniformMap;
   PreprocessorMap m_preprocessorMap;
 
