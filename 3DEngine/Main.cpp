@@ -7,6 +7,7 @@
 #include "Light.h"
 #include "LightIcon.h"
 #include "Plane.h"
+#include "Skybox.h"
 #include "Text.h"
 #include "Timer.h"
 #include "Window.h"
@@ -155,9 +156,15 @@ int main() {
 
     dtLightIcons = {li01, li02, li03};
 
-    // Setup lighting shader
+    // Setup skybox
+    Skybox skybox("Teide", ".jpg");
+
+    // Setup lighting and skybox shader
     auto lightingShader = ResourceManager<Shader>::Get("Lighting");
     lightingShader->setPreprocessor(GL_FRAGMENT_SHADER, "MAX_LIGHTS", MAX_LIGHTS);
+
+    auto skyboxShader = ResourceManager<Shader>::Get("Skybox");
+    skyboxShader->compile();
 
     // Setup drawlists
     dtModels = DrawTargets(models.begin(), models.end());
@@ -201,6 +208,9 @@ int main() {
       // Draw all models and light icons
       dl_illum->draw(errCode);
       dl_trans->draw(errCode);
+
+      // Draw the skybox
+      skybox.draw(errCode, *skyboxShader);
 
       // Draw HUD elements to screen
       if (displayHUD) {

@@ -157,6 +157,7 @@
   <ItemGroup>
     <ClCompile Include="AssetLoader.cpp" />
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="CubeMap.cpp" />
     <ClCompile Include="Drawable.cpp" />
     <ClCompile Include="DrawList.cpp" />
     <ClCompile Include="Font.cpp" />
@@ -170,6 +171,7 @@
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="Plane.cpp" />
+    <ClCompile Include="Skybox.cpp" />
     <ClCompile Include="Text.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="Main.cpp" />
@@ -180,6 +182,7 @@
   <ItemGroup>
     <ClInclude Include="AssetLoader.h" />
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="CubeMap.h" />
     <ClInclude Include="Drawable.h" />
     <ClInclude Include="DrawList.h" />
     <ClInclude Include="Error.h" />
@@ -197,6 +200,7 @@
     <ClInclude Include="Shader.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="Plane.h" />
+    <ClInclude Include="Skybox.h" />
     <ClInclude Include="Text.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="Timer.h" />
@@ -210,6 +214,8 @@
     <None Include="Scripts\Tetrahedron.lua" />
     <None Include="Shaders\LightIconParticle.frag" />
     <None Include="Shaders\LightIconParticle.vert" />
+    <None Include="Shaders\Skybox.frag" />
+    <None Include="Shaders\Skybox.vert" />
     <None Include="Shaders\Text.frag" />
     <None Include="Shaders\Text.vert" />
     <None Include="Shaders\Lighting.frag" />

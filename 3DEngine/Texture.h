@@ -7,6 +7,8 @@
 
 #include <GL/glew.h>
 
+#define ERROR_TEXTURE "Textures/error.jpg"
+
 class Texture;
 using TexSptr = std::shared_ptr<Texture>;
 
@@ -20,13 +22,12 @@ public:
   int getWidth() const { return m_width; };
   int getHeight() const { return m_height; };
 
+  static GLenum GetFormat(ERROR &errCode, int channels);
+
 private:
   ERROR load(const std::string &filepath);
-  void setFormat(ERROR &errCode, int channels);
 
   GLuint m_textureID;
-  GLenum m_format;
   int m_width;
   int m_height;
-  int m_bitDepth;
 };
