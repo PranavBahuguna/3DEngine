@@ -30,6 +30,7 @@ git clone --recurse-submodules https://github.com/PranavBahuguna/3DEngine
 - Real-time lighting (point, directional and cone lights).
 - 2D font and text rendering.
 - Game object scripting with Lua.
+- Cubemaps / skyboxes.
 
 # Controls
 - **A** - Left
