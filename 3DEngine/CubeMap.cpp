@@ -5,23 +5,15 @@
 
 #define CUBEMAP_DIR "Textures/Cubemaps/"
 
-// Constructor - loads all image files from folder name and extension only
-CubeMap::CubeMap(const std::string &folder, const std::string &extension)
-    : CubeMap(folder, {CUBEMAP_DIR + folder + "/posx" + extension,
-                       CUBEMAP_DIR + folder + "/negx" + extension,
-                       CUBEMAP_DIR + folder + "/posy" + extension,
-                       CUBEMAP_DIR + folder + "/negy" + extension,
-                       CUBEMAP_DIR + folder + "/posz" + extension,
-                       CUBEMAP_DIR + folder + "/negz" + extension}) {}
-
 // Constructor - supply a name for the collection and each image file individually
-CubeMap::CubeMap(const std::string &name, const std::vector<std::string> &files) : Resource{name} {
+CubeMap::CubeMap(const std::string &folder, const std::vector<std::string> &files)
+    : Resource{folder} {
   glGenTextures(1, &m_textureID);
   glBindTexture(GL_TEXTURE_CUBE_MAP, m_textureID);
 
   // Try loading each available image file
   for (GLuint i = 0; i < 6; i++) {
-    if (i >= files.size() || load(files[i], i) != ERROR_OK) {
+    if (i >= files.size() || load(CUBEMAP_DIR + folder + "/" + files[i], i) != ERROR_OK) {
       // Try loading the error texture instead
       if (load(ERROR_TEXTURE, i) != ERROR_OK)
         throw std::runtime_error("An error occurred while loading texture.");

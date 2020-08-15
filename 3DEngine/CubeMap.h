@@ -9,8 +9,7 @@ using CbmSptr = std::shared_ptr<CubeMap>;
 
 class CubeMap : public Resource {
 public:
-  CubeMap(const std::string &folder, const std::string &extension);
-  CubeMap(const std::string &name, const std::vector<std::string> &files);
+  CubeMap(const std::string &folder, const std::vector<std::string> &files);
   ~CubeMap();
 
   void use() const;

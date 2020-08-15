@@ -58,10 +58,12 @@ std::vector<LightSptr> lights;
 DrawTargets dtModels;
 DrawTargets dtTexts;
 DrawTargets dtLightIcons;
+DrawTargets dtSkybox;
 
-DrawListUptr dl_illum;
-DrawListUptr dl_trans;
-DrawListUptr dl_text;
+DrawListUptr dlIllum;
+DrawListUptr dlTrans;
+DrawListUptr dlText;
+DrawListUptr dlSkybox;
 
 // forward declarations
 static std::string toStringDp(float, size_t);
@@ -157,25 +159,26 @@ int main() {
     dtLightIcons = {li01, li02, li03};
 
     // Setup skybox
-    Skybox skybox("Teide", ".jpg");
+    Skybox skybox("Teide",
+                  {"posx.jpg", "negx.jpg", "posy.jpg", "negy.jpg", "posz.jpg", "negz.jpg"});
 
     // Setup lighting and skybox shader
     auto lightingShader = ResourceManager<Shader>::Get("Lighting");
     lightingShader->setPreprocessor(GL_FRAGMENT_SHADER, "MAX_LIGHTS", MAX_LIGHTS);
 
-    auto skyboxShader = ResourceManager<Shader>::Get("Skybox");
-    skyboxShader->compile();
-
     // Setup drawlists
     dtModels = DrawTargets(models.begin(), models.end());
-    dl_illum = DrawListBuilder::CreateDrawList(dtModels, "Lighting");
-    dl_illum = DrawListBuilder::AddIllumination(std::move(dl_illum), lights);
+    dlIllum = DrawListBuilder::CreateDrawList(dtModels, "Lighting");
+    dlIllum = DrawListBuilder::AddIllumination(std::move(dlIllum), lights);
 
-    dl_trans = DrawListBuilder::CreateDrawList(dtLightIcons, "LightIconParticle");
-    dl_trans = DrawListBuilder::AddTransparency(std::move(dl_trans));
+    dlTrans = DrawListBuilder::CreateDrawList(dtLightIcons, "LightIconParticle");
+    dlTrans = DrawListBuilder::AddTransparency(std::move(dlTrans));
 
-    dl_text = DrawListBuilder::CreateDrawList(dtTexts, "Text");
-    dl_text = DrawListBuilder::AddOrthoProjection(std::move(dl_text));
+    dlText = DrawListBuilder::CreateDrawList(dtTexts, "Text");
+    dlText = DrawListBuilder::AddOrthoProjection(std::move(dlText));
+
+    dtSkybox = DrawTargets({std::make_shared<Skybox>(skybox)});
+    dlSkybox = DrawListBuilder::CreateDrawList(dtSkybox, "Skybox");
 
     // Setup camera
     Camera::Init(glm::vec3(0.0f), {0.0f, 1.0f, 0.0f}, 90.0f, 0.0f, FOV, NEAR_PLANE, FAR_PLANE);
@@ -205,12 +208,14 @@ int main() {
       for (const auto &gameObject : gameObjects)
         gameObject->update(errCode);
 
-      // Draw all models and light icons
-      dl_illum->draw(errCode);
-      dl_trans->draw(errCode);
+      // Draw all models first
+      dlIllum->draw(errCode);
 
       // Draw the skybox
-      skybox.draw(errCode, *skyboxShader);
+      dlSkybox->draw(errCode);
+
+      // Draw all transparent objects next
+      dlTrans->draw(errCode);
 
       // Draw HUD elements to screen
       if (displayHUD) {
@@ -233,7 +238,7 @@ int main() {
         yawValue->setText(toStringDp(Camera::GetYaw(), 1));
         fovValue->setText(toStringDp(Camera::GetFOV(), 1));
 
-        dl_text->draw(errCode);
+        dlText->draw(errCode);
       }
 
       if (errCode != ERROR_OK)

@@ -2,6 +2,7 @@
 #include "Camera.h"
 #include "ResourceManager.h"
 
+// Skybox cube vertices
 static constexpr float vertices[] = {
     -1.0f, 1.0f,  -1.0f, -1.0f, -1.0f, -1.0f, 1.0f,  -1.0f, -1.0f, // T1
     1.0f,  -1.0f, -1.0f, 1.0f,  1.0f,  -1.0f, -1.0f, 1.0f,  -1.0f, // T2
@@ -17,9 +18,8 @@ static constexpr float vertices[] = {
     1.0f,  -1.0f, -1.0f, -1.0f, -1.0f, 1.0f,  1.0f,  -1.0f, 1.0f   // T12
 };
 
-Skybox::Skybox(const std::string &cubeMapFolder, const std::string &extension)
-    : Drawable{glm::vec3(0.0f)},
-      m_cubeMap(ResourceManager<CubeMap>::Get(cubeMapFolder, extension)) {
+Skybox::Skybox(const std::string &cubeMapFolder, const std::vector<std::string> &files)
+    : Drawable{glm::vec3(0.0f)}, m_cubeMap(ResourceManager<CubeMap>::Get(cubeMapFolder, files)) {
 
   // Configure VAO / VBO for skybox and bind buffer data
   glGenVertexArrays(1, &m_VAO);
@@ -43,7 +43,6 @@ void Skybox::draw(ERROR &errCode, const Shader &shader) const {
   glDepthFunc(GL_LEQUAL);
 
   // Set shader parameters and apply
-  shader.use();
   shader.setMat4("view", glm::mat4(glm::mat3(Camera::GetView()))); // remove translation
   shader.setMat4("projection", Camera::GetProjection());
 
