@@ -109,11 +109,14 @@ void Shader::linkPrograms(ERROR &errCode) {
 void Shader::bindUniforms() {
   GLint count;
   GLchar name[MAX_PARAM_LENGTH];
+  GLsizei length;
+  GLint size;
+  GLenum type;
 
   // Get uniforms
   glGetProgramiv(m_progId, GL_ACTIVE_UNIFORMS, &count);
   for (GLuint i = 0; i < (GLuint)count; ++i) {
-    glGetActiveUniform(m_progId, i, MAX_PARAM_LENGTH, NULL, NULL, NULL, name);
+    glGetActiveUniform(m_progId, i, MAX_PARAM_LENGTH, nullptr, nullptr, nullptr, name);
     m_uniformMap[name] = glGetUniformLocation(m_progId, name);
   }
 }
