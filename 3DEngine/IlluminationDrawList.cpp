@@ -3,7 +3,9 @@
 // Constructor
 IlluminationDrawList::IlluminationDrawList(DrawListUptr drawList,
                                            const std::vector<LightSptr> &lights)
-    : DrawListDecorator(std::move(drawList)), m_lights(lights) {}
+    : DrawListDecorator(std::move(drawList)), m_lights(lights) {
+  _drawList->getShader()->setInt("nLights", static_cast<int>(lights.size()));
+}
 
 void IlluminationDrawList::draw(ERROR &errCode) {
   ShaderSptr _shader = _drawList->getShader();

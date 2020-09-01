@@ -20,8 +20,8 @@ Shader::~Shader() {
 // Load all shader files and compiles them
 void Shader::compile(bool useShader) {
   // Get file paths
-  const std::string vertPath = "Shaders/" + name + ".vert";
-  const std::string fragPath = "Shaders/" + name + ".frag";
+  const std::string vertPath = "Shaders/" + _name + ".vert";
+  const std::string fragPath = "Shaders/" + _name + ".frag";
 
   // Load vertex and fragment shaders
   ERROR errCode = ERROR_OK;
@@ -116,7 +116,7 @@ void Shader::bindUniforms() {
   // Get uniforms
   glGetProgramiv(m_progId, GL_ACTIVE_UNIFORMS, &count);
   for (GLuint i = 0; i < (GLuint)count; ++i) {
-    glGetActiveUniform(m_progId, i, MAX_PARAM_LENGTH, nullptr, nullptr, nullptr, name);
+    glGetActiveUniform(m_progId, i, MAX_PARAM_LENGTH, &length, &size, &type, name);
     m_uniformMap[name] = glGetUniformLocation(m_progId, name);
   }
 }
@@ -134,7 +134,7 @@ void Shader::preprocess(ERROR &errCode, std::string &shaderSource, GLenum type) 
     size_t strStartPos = shaderSource.find(preprocessorStr);
 
     if (strStartPos == std::string::npos) {
-      errCode = printErrorMsg(ERROR_SHADER_PREPROCESSOR_NOT_FOUND, preproc.c_str(), name.c_str());
+      errCode = printErrorMsg(ERROR_SHADER_PREPROCESSOR_NOT_FOUND, preproc.c_str(), _name.c_str());
       break;
     } else {
       // Find the next newline char

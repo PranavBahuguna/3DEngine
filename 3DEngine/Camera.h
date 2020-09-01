@@ -27,6 +27,8 @@ public:
   static float GetPitch();
   static float GetYaw();
   static float GetFOV();
+  static float GetNear();
+  static float GetFar();
 
   Camera(); // prevent construction of this class
 

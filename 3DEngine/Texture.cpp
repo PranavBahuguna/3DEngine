@@ -5,7 +5,19 @@
 
 #include <stdexcept>
 
-// Constructor
+// Constructor - direct creation
+Texture::Texture(const std::string &name, GLsizei width, GLsizei height, const void *texData,
+                 GLenum format, GLenum internalFormat, GLenum type, bool generateMipmaps)
+    : Resource{name}, m_width(width), m_height(height) {
+  create(texData, format, internalFormat, type, generateMipmaps);
+}
+
+// Constructor - direct creation (format and internal format are same)
+Texture::Texture(const std::string &name, GLsizei width, GLsizei height, const void *texData,
+                 GLenum format, GLenum type, bool generateMipmaps)
+    : Texture(name, width, height, texData, format, format, type, generateMipmaps) {}
+
+// Constructor - load from file path
 Texture::Texture(const std::string &filename) : Resource{filename} {
   // Get file path and try loading texture
   const std::string path = "Textures/" + filename;
@@ -17,8 +29,44 @@ Texture::Texture(const std::string &filename) : Resource{filename} {
   }
 }
 
-// Destructor - clear texture bound to id
-Texture::~Texture() { glDeleteTextures(1, &m_textureID); }
+Texture::~Texture() { glDeleteTextures(1, &m_id); }
+
+// Create a new texture
+void Texture::create(const void *texData, GLenum format, GLenum internalFormat, GLenum type,
+                     bool generateMipmaps) {
+  // Generate and bind texture
+  glGenTextures(1, &m_id);
+  glBindTexture(GL_TEXTURE_2D, m_id);
+  glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, m_width, m_height, 0, format, type, texData);
+
+  if (generateMipmaps) {
+    glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
+    glGenerateMipmap(GL_TEXTURE_2D);
+  }
+}
+
+// Texture parameter setter methods - requires this texture to be bound first
+void Texture::setParameter(GLuint param, int value) {
+  glTexParameteri(GL_TEXTURE_2D, param, value);
+}
+
+void Texture::setParameter(GLuint param, float value) {
+  glTexParameterf(GL_TEXTURE_2D, param, value);
+}
+
+void Texture::setParameter(GLuint param, int *values) {
+  glTexParameteriv(GL_TEXTURE_2D, param, values);
+}
+
+void Texture::setParameter(GLuint param, float *values) {
+  glTexParameterfv(GL_TEXTURE_2D, param, values);
+}
+
+// Enable usage of this texture
+void Texture::use() const {
+  glActiveTexture(GL_TEXTURE0);
+  glBindTexture(GL_TEXTURE_2D, m_id);
+}
 
 // Loads texture from given file path
 ERROR Texture::load(const std::string &filepath) {
@@ -28,22 +76,20 @@ ERROR Texture::load(const std::string &filepath) {
   if (texData == nullptr)
     return printErrorMsg(ERROR_FILE_LOAD_FAILED, filepath.c_str());
 
-  // Set the texture format
+  // Get the texture format
   ERROR errCode = ERROR_OK;
   GLenum format = GetFormat(errCode, bitDepth);
 
-  if (errCode == ERROR_OK) {
-    // Bind the texture and set its properties
-    glGenTextures(1, &m_textureID);
-    glBindTexture(GL_TEXTURE_2D, m_textureID);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
-    glGenerateMipmap(GL_TEXTURE_2D);
-    glTexImage2D(GL_TEXTURE_2D, 0, format, m_width, m_height, 0, format, GL_UNSIGNED_BYTE, texData);
-  }
+  // Create the texture
+  if (errCode == ERROR_OK)
+    create(texData, format, format, GL_UNSIGNED_BYTE, true);
+
+  // Set parameters
+  setParameter(GL_TEXTURE_WRAP_S, GL_REPEAT);
+  setParameter(GL_TEXTURE_WRAP_T, GL_REPEAT);
+  setParameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  setParameter(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
   stbi_image_free(texData);
 
   return errCode;
@@ -67,10 +113,4 @@ GLenum Texture::GetFormat(ERROR &errCode, int channels) {
   }
 
   return format;
-}
-
-// Enable usage of this texture
-void Texture::use() const {
-  glActiveTexture(GL_TEXTURE0);
-  glBindTexture(GL_TEXTURE_2D, m_textureID);
 }

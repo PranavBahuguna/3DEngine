@@ -13,8 +13,8 @@ static CamPtr _instance = nullptr;
 
 // Constructor - zero all parameters
 Camera::Camera()
-    : m_position(0), m_up(0), m_yaw(0), m_pitch(0), m_right(0), m_front(0), m_worldUp(0),
-      m_fov(0), m_near(0), m_far(0), m_view(0), m_projection(0) {}
+    : m_position(0), m_up(0), m_yaw(0), m_pitch(0), m_right(0), m_front(0), m_worldUp(0), m_fov(0),
+      m_near(0), m_far(0), m_view(0), m_projection(0) {}
 
 // Initialise all camera properties
 void Camera::Init(const glm::vec3 &pos, const glm::vec3 &up, float yaw, float pitch, float fov,
@@ -47,6 +47,10 @@ float Camera::GetPitch() { return _instance->m_pitch; }
 float Camera::GetYaw() { return _instance->m_yaw; }
 
 float Camera::GetFOV() { return _instance->m_fov; }
+
+float Camera::GetNear() { return _instance->m_near; }
+
+float Camera::GetFar() { return _instance->m_far; }
 
 void Camera::KeyControl() { _instance->_keyControl(); };
 

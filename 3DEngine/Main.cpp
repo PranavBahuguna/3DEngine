@@ -3,10 +3,12 @@
 #include "Camera.h"
 #include "DrawListBuilder.h"
 #include "Drawable.h"
+#include "FrameBuffer.h"
 #include "GameObject.h"
 #include "Light.h"
 #include "LightIcon.h"
 #include "Plane.h"
+#include "RenderBuffer.h"
 #include "Skybox.h"
 #include "Text.h"
 #include "Timer.h"
@@ -38,6 +40,7 @@
 #define FPS_UPDATE_DELAY 0.5f
 #define FPS_BUFFER_SIZE 8
 #define MAX_LIGHTS 8
+#define DEPTH_VISUALISATION true
 
 using TextSptr = std::shared_ptr<Text>;
 using LiSptr = std::shared_ptr<LightIcon>;
@@ -55,18 +58,50 @@ std::vector<ModelSptr> models;
 std::vector<GObjSptr> gameObjects;
 std::vector<LightSptr> lights;
 
+TexSptr depthMap;
+constexpr GLuint SHADOW_WIDTH = 1024;
+constexpr GLuint SHADOW_HEIGHT = 1024;
+
 DrawTargets dtModels;
 DrawTargets dtTexts;
 DrawTargets dtLightIcons;
 DrawTargets dtSkybox;
 
 DrawListUptr dlIllum;
+DrawListUptr dlDepth;
+DrawListUptr dlShadowMapped;
 DrawListUptr dlTrans;
 DrawListUptr dlText;
 DrawListUptr dlSkybox;
 
+unsigned int quadVAO = 0;
+unsigned int quadVBO = 0;
+
 // forward declarations
 static std::string toStringDp(float, size_t);
+
+void renderQuad() {
+  if (quadVAO == 0) {
+    float quadVertices[] = {
+        // positions        // texture Coords
+        -1.0f, 1.0f, 0.0f, 0.0f, 1.0f, -1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
+        1.0f,  1.0f, 0.0f, 1.0f, 1.0f, 1.0f,  -1.0f, 0.0f, 1.0f, 0.0f,
+    };
+    // setup plane VAO
+    glGenVertexArrays(1, &quadVAO);
+    glGenBuffers(1, &quadVBO);
+    glBindVertexArray(quadVAO);
+    glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *)0);
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *)(3 * sizeof(float)));
+  }
+  glBindVertexArray(quadVAO);
+  glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+  glBindVertexArray(0);
+}
 
 int main() {
   try {
@@ -142,34 +177,44 @@ int main() {
 
     // Setup scene lights
     LightSptr light01(new Light(LightType::DIRECTIONAL_LIGHT, {1.0f, 1.0f, -1.0f}, glm::vec3(1.0f),
-                                0.25f, 1.0f, 1.0f));
+                                0.1f, 0.2f, 0.2f));
     LightSptr light02(new Light(LightType::POINT_LIGHT, {4.0f, 4.0f, -4.0f}, {1.0f, 0.0f, 0.0f},
-                                0.25f, 1.0f, 1.0f, 1.0f, 0.045f, 0.0075f));
-    LightSptr light03(new Light(LightType::SPOT_LIGHT, {-4.0f, 10.0f, 3.0f}, glm::vec3(1.0f), 0.25f,
-                                1.0f, 1.0f, 1.0f, 0.045f, 0.0075f, {0.0f, -1.0f, 0.0f}, 20.0f,
-                                25.0f));
+                                0.1f, 1.0f, 1.0f, false, 1.0f, 0.045f, 0.0075f));
+    LightSptr light03(new Light(LightType::SPOT_LIGHT, {-4.0f, 10.0f, 3.0f}, glm::vec3(1.0f), 0.1f,
+                                1.0f, 1.0f, true, 1.0f, 0.045f, 0.0075f, {0.0f, -1.0f, 0.0f}, 30.0f,
+                                35.0f));
 
     lights = {light01, light02, light03};
 
     // Setup light icons
-    LiSptr li01(new LightIcon(light01));
-    LiSptr li02(new LightIcon(light02));
     LiSptr li03(new LightIcon(light03));
 
-    dtLightIcons = {li01, li02, li03};
+    dtLightIcons = {li03};
 
     // Setup skybox
     Skybox skybox("Teide",
                   {"posx.jpg", "negx.jpg", "posy.jpg", "negy.jpg", "posz.jpg", "negz.jpg"});
 
-    // Setup lighting and skybox shader
-    auto lightingShader = ResourceManager<Shader>::Get("Lighting");
+    // Setup lighting and depth shader
+    auto lightingShader = ResourceManager<Shader>::Create("Lighting");
     lightingShader->setPreprocessor(GL_FRAGMENT_SHADER, "MAX_LIGHTS", MAX_LIGHTS);
+
+    auto depthShader = ResourceManager<Shader>::Create("Depth");
+    depthShader->compile();
+    depthShader->setInt("depthMap", 0);
+    depthShader->setFloat("nearPlane", 1.0f);
+    depthShader->setFloat("farPlane", 20.0f);
+    depthShader->setBool("isPerspective", true);
+
+    auto SMD_Shader = ResourceManager<Shader>::Create("ShadowMappingDepth");
+    SMD_Shader->compile();
 
     // Setup drawlists
     dtModels = DrawTargets(models.begin(), models.end());
     dlIllum = DrawListBuilder::CreateDrawList(dtModels, "Lighting");
     dlIllum = DrawListBuilder::AddIllumination(std::move(dlIllum), lights);
+
+    dlShadowMapped = DrawListBuilder::CreateDrawList(dtModels, "ShadowMappingDepth");
 
     dlTrans = DrawListBuilder::CreateDrawList(dtLightIcons, "LightIconParticle");
     dlTrans = DrawListBuilder::AddTransparency(std::move(dlTrans));
@@ -179,6 +224,31 @@ int main() {
 
     dtSkybox = DrawTargets({std::make_shared<Skybox>(skybox)});
     dlSkybox = DrawListBuilder::CreateDrawList(dtSkybox, "Skybox");
+
+    // Setup shadow map
+    depthMap = ResourceManager<Texture>::Create("depth-map", SHADOW_WIDTH, SHADOW_HEIGHT,
+                                                (void *)NULL, GL_DEPTH_COMPONENT, GL_FLOAT);
+    depthMap->setParameter(GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    depthMap->setParameter(GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    depthMap->setParameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    depthMap->setParameter(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    float borderColor[] = {1.0f, 1.0f, 1.0f, 1.0f}; // black border
+    depthMap->setParameter(GL_TEXTURE_BORDER_COLOR, borderColor);
+
+    // Setup FBO and attach shadow map to it
+    FrameBuffer depthMapFBO;
+    depthMapFBO.bind();
+    depthMapFBO.attachTexture(depthMap->getId(), FboAttachment::Depth);
+    glDrawBuffer(GL_NONE); // not drawing to any color buffer
+    glReadBuffer(GL_NONE);
+    if (depthMapFBO.isOk()) {
+      printf("Framebuffer OK!\n");
+    } else {
+      printf("Framebuffer not OK!\n");
+      return -1;
+    }
+
+    depthMapFBO.unbind();
 
     // Setup camera
     Camera::Init(glm::vec3(0.0f), {0.0f, 1.0f, 0.0f}, 90.0f, 0.0f, FOV, NEAR_PLANE, FAR_PLANE);
@@ -208,8 +278,25 @@ int main() {
       for (const auto &gameObject : gameObjects)
         gameObject->update(errCode);
 
+      // Render scene depth to texture from light's perspective
+      glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
+      depthMapFBO.bind();
+      glClear(GL_DEPTH_BUFFER_BIT);
+      dlShadowMapped->draw(errCode);
+      depthMapFBO.unbind();
+
+      // Reset viewport
+      glViewport(0, 0, Window::GetWidth(), Window::GetHeight());
+      glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
       // Draw all models first
       dlIllum->draw(errCode);
+      /*
+      if (DEPTH_VISUALISATION) {
+        depthShader->use();
+        depthMap->use();
+        renderQuad();
+      }*/
 
       // Draw the skybox
       dlSkybox->draw(errCode);

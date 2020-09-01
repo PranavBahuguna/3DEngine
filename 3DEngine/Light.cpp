@@ -2,13 +2,12 @@
 
 #include <sstream>
 
-// Constructor
 Light::Light(LightType type, const glm::vec3 &position, const glm::vec3 &color, float ambient,
-             float diffuse, float specular, float constant, float linear, float quadratic,
-             const glm::vec3 &coneDir, float innerConeAngle, float outerConeAngle)
+             float diffuse, float specular, bool isShadowCaster, float constant, float linear,
+             float quadratic, const glm::vec3 &coneDir, float innerConeAngle, float outerConeAngle)
     : m_type(type), m_color(color), m_ambient(ambient), m_diffuse(diffuse), m_specular(specular),
-      m_constant(constant), m_linear(linear), m_quadratic(quadratic), m_coneDir(coneDir),
-      m_innerConeAngle(0.0f), m_outerConeAngle(0.0f) {
+      m_isShadowCaster(isShadowCaster), m_constant(constant), m_linear(linear),
+      m_quadratic(quadratic), m_coneDir(coneDir), m_innerConeAngle(0.0f), m_outerConeAngle(0.0f) {
 
   // w-value of 0 indicates to shader that this is a direction, w-value of 1 indicates that this is
   // a position
@@ -34,6 +33,7 @@ void Light::use(const Shader &shader, size_t index) const {
   shader.setFloat(prefix + "ambientStrength", m_ambient);
   shader.setFloat(prefix + "diffuseStrength", m_diffuse);
   shader.setFloat(prefix + "specularStrength", m_specular);
+  shader.setBool(prefix + "isShadowCaster", m_isShadowCaster);
 
   if (m_type == LightType::POINT_LIGHT || m_type == LightType::SPOT_LIGHT) {
     shader.setFloat(prefix + "constant", m_constant);
