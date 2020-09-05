@@ -9,34 +9,24 @@
 #define LIGHT_ICON_SIZE 256.0f
 #define LIGHT_ICON_IMAGE "light-icons.png"
 
-// Constructor
-LightIcon::LightIcon(LightSptr light)
-    : m_light(light), m_texture(ResourceManager<Texture>::Get(LIGHT_ICON_IMAGE)) {
-  // Position for directional lights is in a fixed location (with offset for light direction).
-  // Position for other lights is at light location.
-  const auto &lightType = m_light->getType();
-  glm::vec3 lightPos = glm::vec3(m_light->getPosition());
+LightIcon::LightIcon(LightSptr light) {
+  glm::vec2 texIndices = {1, 1};
+  m_pos = glm::vec3(light->getPosition());
+  m_lightColor = glm::vec4(light->getColor(), 1.0f);
 
-  if (lightType == LightType::DIRECTIONAL_LIGHT)
-    m_pos = glm::normalize(lightPos) * DIRLIGHT_ICON_OFFSET_FACTOR +
+  if (dynamic_cast<DirectionalLight *>(light.get()) != nullptr) {
+    // Position for directional lights is in a fixed location (with offset for light direction),
+    // rather than at light location itself
+    m_pos = glm::normalize(m_pos) * DIRLIGHT_ICON_OFFSET_FACTOR +
             glm::vec3(0.0f, DIRLIGHT_ICON_POS_HEIGHT, 0.0f);
-  else
-    m_pos = lightPos;
-
-  // Get the appropriate icon from the sprite map
-  glm::vec2 texIndices = {0, 0};
-
-  switch (lightType) {
-  case LightType::DIRECTIONAL_LIGHT:
-    texIndices = {0, 0}; // sun
-    break;
-  case LightType::POINT_LIGHT:
-    texIndices = {0, 1}; // light bulb
-    break;
-  case LightType::SPOT_LIGHT:
-    texIndices = {1, 0}; // flashlight
-    break;
+    texIndices = {0, 0};
+  } else if (dynamic_cast<PointLight *>(light.get()) != nullptr) {
+    texIndices = {0, 1};
+  } else if (dynamic_cast<SpotLight *>(light.get()) != nullptr) {
+    texIndices = {1, 0};
   }
+
+  m_texture = ResourceManager<Texture>::Get(LIGHT_ICON_IMAGE);
 
   // Calculate icon texture coordinates and set them accordingly
   GLfloat texW = LIGHT_ICON_SIZE / m_texture->getWidth();
@@ -68,7 +58,7 @@ LightIcon::LightIcon(LightSptr light)
 // Draws a light icon onto the screen
 void LightIcon::draw(ERROR &errCode, const Shader &shader) const {
   // Pass shader parameters
-  shader.setVec4("color", glm::vec4(m_light->getColor(), 1.0f));
+  shader.setVec4("color", m_lightColor);
   shader.setMat4("model", glm::translate(glm::mat4(1.0f), m_pos));
 
   // Use texture and draw vertices

@@ -40,11 +40,12 @@
 #define FPS_UPDATE_DELAY 0.5f
 #define FPS_BUFFER_SIZE 8
 #define MAX_LIGHTS 8
-#define DEPTH_VISUALISATION true
+#define DEPTH_VISUALISATION false
 
 using TextSptr = std::shared_ptr<Text>;
 using LiSptr = std::shared_ptr<LightIcon>;
 using GObjSptr = std::shared_ptr<GameObject>;
+using MeshSptr = std::shared_ptr<Mesh>;
 
 ERROR errCode = ERROR_OK;
 
@@ -59,6 +60,7 @@ std::vector<GObjSptr> gameObjects;
 std::vector<LightSptr> lights;
 
 TexSptr depthMap;
+MeshSptr depthMesh;
 constexpr GLuint SHADOW_WIDTH = 1024;
 constexpr GLuint SHADOW_HEIGHT = 1024;
 
@@ -80,35 +82,12 @@ unsigned int quadVBO = 0;
 // forward declarations
 static std::string toStringDp(float, size_t);
 
-void renderQuad() {
-  if (quadVAO == 0) {
-    float quadVertices[] = {
-        // positions        // texture Coords
-        -1.0f, 1.0f, 0.0f, 0.0f, 1.0f, -1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
-        1.0f,  1.0f, 0.0f, 1.0f, 1.0f, 1.0f,  -1.0f, 0.0f, 1.0f, 0.0f,
-    };
-    // setup plane VAO
-    glGenVertexArrays(1, &quadVAO);
-    glGenBuffers(1, &quadVBO);
-    glBindVertexArray(quadVAO);
-    glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *)0);
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *)(3 * sizeof(float)));
-  }
-  glBindVertexArray(quadVAO);
-  glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-  glBindVertexArray(0);
-}
-
 int main() {
   try {
     // Determine the window mode to use and create a window
-    WindowMode wMode = (!USE_WINDOWED) ? WindowMode::FULLSCREEN
-                                       : (FULLSCREEN_WINDOWS) ? WindowMode::FULLSCREEN_WINDOWED
-                                                              : WindowMode::WINDOWED;
+    WindowMode wMode = (!USE_WINDOWED)        ? WindowMode::FULLSCREEN
+                       : (FULLSCREEN_WINDOWS) ? WindowMode::FULLSCREEN_WINDOWED
+                                              : WindowMode::WINDOWED;
 
     Window::Init("Test window", wMode, WINDOW_WIDTH, WINDOW_HEIGHT);
 
@@ -176,20 +155,20 @@ int main() {
                zPosValue, pitchLabel, pitchValue, yawLabel,  yawValue,  fovLabel,  fovValue};
 
     // Setup scene lights
-    LightSptr light01(new Light(LightType::DIRECTIONAL_LIGHT, {1.0f, 1.0f, -1.0f}, glm::vec3(1.0f),
-                                0.1f, 0.2f, 0.2f));
-    LightSptr light02(new Light(LightType::POINT_LIGHT, {4.0f, 4.0f, -4.0f}, {1.0f, 0.0f, 0.0f},
-                                0.1f, 1.0f, 1.0f, false, 1.0f, 0.045f, 0.0075f));
-    LightSptr light03(new Light(LightType::SPOT_LIGHT, {-4.0f, 10.0f, 3.0f}, glm::vec3(1.0f), 0.1f,
-                                1.0f, 1.0f, true, 1.0f, 0.045f, 0.0075f, {0.0f, -1.0f, 0.0f}, 30.0f,
-                                35.0f));
+    LightSptr light01(new DirectionalLight({1.0f, 1.0f, -1.0f}, glm::vec3(1.0f), 0.1f, 0.5f, 0.5f));
+    LightSptr light02(new PointLight({4.0f, 4.0f, -4.0f}, {1.0f, 0.0f, 0.0f}, 0.1f, 1.0f, 1.0f,
+                                     1.0f, 0.045f, 0.0075f));
+    LightSptr light03(new SpotLight({-4.0f, 10.0f, 3.0f}, glm::vec3(1.0f), 0.1f, 1.0f, 1.0f, 1.0f,
+                                    0.045f, 0.0075f, {0.0f, -1.0f, 0.0f}, 30.0f, 35.0f, true));
 
     lights = {light01, light02, light03};
 
     // Setup light icons
+    LiSptr li01(new LightIcon(light01));
+    LiSptr li02(new LightIcon(light02));
     LiSptr li03(new LightIcon(light03));
 
-    dtLightIcons = {li03};
+    dtLightIcons = {li01, li02, li03};
 
     // Setup skybox
     Skybox skybox("Teide",
@@ -234,6 +213,15 @@ int main() {
     depthMap->setParameter(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     float borderColor[] = {1.0f, 1.0f, 1.0f, 1.0f}; // black border
     depthMap->setParameter(GL_TEXTURE_BORDER_COLOR, borderColor);
+
+    // Setup shadow map debugger mesh
+    std::vector<float> dmVerts = {
+        -1.0f, 1.0f, 0.0f, -1.0f, -1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f, -1.0f, 0.0f,
+    };
+    std::vector<float> dmTexCoords = {0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f};
+    std::vector<GLuint> dmIndices = {0, 1, 2, 2, 1, 3};
+    depthMesh = ResourceManager<Mesh>::Create("depth-mesh", dmVerts, dmTexCoords,
+                                              std::vector<float>(), dmIndices);
 
     // Setup FBO and attach shadow map to it
     FrameBuffer depthMapFBO;
@@ -291,12 +279,12 @@ int main() {
 
       // Draw all models first
       dlIllum->draw(errCode);
-      /*
+
       if (DEPTH_VISUALISATION) {
         depthShader->use();
         depthMap->use();
-        renderQuad();
-      }*/
+        depthMesh->draw();
+      }
 
       // Draw the skybox
       dlSkybox->draw(errCode);

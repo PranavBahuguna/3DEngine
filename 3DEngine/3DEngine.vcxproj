@@ -164,6 +164,7 @@
     <ClCompile Include="AssetLoader.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="CubeMap.cpp" />
+    <ClCompile Include="DirectionalLight.cpp" />
     <ClCompile Include="Drawable.cpp" />
     <ClCompile Include="DrawList.cpp" />
     <ClCompile Include="Font.cpp" />
@@ -174,12 +175,14 @@
     <ClCompile Include="LightIcon.cpp" />
     <ClCompile Include="Material.cpp" />
     <ClCompile Include="Model.cpp" />
+    <ClCompile Include="PointLight.cpp" />
     <ClCompile Include="RenderBuffer.cpp" />
     <ClCompile Include="Script.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="Plane.cpp" />
     <ClCompile Include="Skybox.cpp" />
+    <ClCompile Include="SpotLight.cpp" />
     <ClCompile Include="Text.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="Main.cpp" />
@@ -191,6 +194,7 @@
     <ClInclude Include="AssetLoader.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="CubeMap.h" />
+    <ClInclude Include="DirectionalLight.h" />
     <ClInclude Include="Drawable.h" />
     <ClInclude Include="DrawList.h" />
     <ClInclude Include="Error.h" />
@@ -203,6 +207,7 @@
     <ClInclude Include="LightIcon.h" />
     <ClInclude Include="Material.h" />
     <ClInclude Include="Model.h" />
+    <ClInclude Include="PointLight.h" />
     <ClInclude Include="RenderBuffer.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="ResourceManager.h" />
@@ -211,6 +216,7 @@
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="Plane.h" />
     <ClInclude Include="Skybox.h" />
+    <ClInclude Include="SpotLight.h" />
     <ClInclude Include="Text.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="Timer.h" />

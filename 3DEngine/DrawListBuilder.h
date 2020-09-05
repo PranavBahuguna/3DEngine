@@ -18,6 +18,10 @@ public:
 
   // Sets the max number of lights and number of available lights for the shader
   static DrawListUptr AddIllumination(DrawListUptr drawList, const std::vector<LightSptr> &lights) {
+    ShaderSptr _shader = drawList->getShader();
+    _shader->setInt("thisTexture", 0);
+    _shader->setInt("shadowMap", 1);
+
     return DrawListUptr(new IlluminationDrawList(std::move(drawList), lights));
   }
 

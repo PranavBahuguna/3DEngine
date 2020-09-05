@@ -83,12 +83,12 @@ vec3 calcLight(Light light, Material mat, vec3 viewDir, vec3 norm, vec3 fragPos)
   vec3 ambient = light.ambientStrength * mat.ambient;
 
   // Diffuse component
-  float diffuseFactor = max(dot(norm, lightDir), 0.0f);
+  float diffuseFactor = max(dot(norm, lightDir), 0.0);
   vec3 diffuse = light.diffuseStrength * mat.diffuse * diffuseFactor;
 
   // Specular component
   vec3 reflectDir = reflect(-lightDir, norm);
-  float specularFactor = pow(max(dot(viewDir, reflectDir), 0.0f), mat.shininess);
+  float specularFactor = pow(max(dot(viewDir, reflectDir), 0.0), mat.shininess);
   vec3 specular = light.specularStrength * mat.specular * specularFactor;
 
   // Shadow component
@@ -108,5 +108,5 @@ void main() {
   for (int i = 0; i < min(nLights, MAX_LIGHTS); i++)
     resultColor += calcLight(lights[i], material, viewDir, norm, fs_in.FragPos);
 
-  FragColor = texture(thisTexture, fs_in.TexCoords) * vec4(resultColor, 1.0f);
+  FragColor = texture(thisTexture, fs_in.TexCoords) * vec4(resultColor, 1.0);
 }

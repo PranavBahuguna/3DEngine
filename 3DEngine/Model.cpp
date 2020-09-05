@@ -36,9 +36,6 @@ void Model::draw(ERROR &errCode, const Shader &shader) const {
   ////////////////////////////////////////////////////////////////////////////////////////////////
 
   if (shader._name == "Lighting") {
-    shader.setInt("thisTexture", 0);
-    shader.setInt("shadowMap", 1);
-
     glActiveTexture(GL_TEXTURE1);
     TexSptr depthTex;
     ResourceManager<Texture>::Find("depth-map", depthTex);

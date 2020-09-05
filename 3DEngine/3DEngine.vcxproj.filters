@@ -33,6 +33,12 @@
     <Filter Include="Source Files\Resources">
       <UniqueIdentifier>{e426cd22-5707-4975-831b-c33d2299a5b4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Lights">
+      <UniqueIdentifier>{b1919a0e-6d97-4050-aa17-ea73c5c055c4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Lights">
+      <UniqueIdentifier>{961cedc2-4777-4c03-aa18-dd5d9a1cff8a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Window.cpp">
@@ -51,9 +57,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="AssetLoader.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Light.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="LightIcon.cpp">
@@ -110,6 +113,18 @@
     <ClCompile Include="FrameBuffer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Light.cpp">
+      <Filter>Source Files\Lights</Filter>
+    </ClCompile>
+    <ClCompile Include="DirectionalLight.cpp">
+      <Filter>Source Files\Lights</Filter>
+    </ClCompile>
+    <ClCompile Include="SpotLight.cpp">
+      <Filter>Source Files\Lights</Filter>
+    </ClCompile>
+    <ClCompile Include="PointLight.cpp">
+      <Filter>Source Files\Lights</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Window.h">
@@ -125,9 +140,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Text.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Light.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="LightIcon.h">
@@ -195,6 +207,18 @@
     </ClInclude>
     <ClInclude Include="FrameBuffer.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Light.h">
+      <Filter>Header Files\Lights</Filter>
+    </ClInclude>
+    <ClInclude Include="DirectionalLight.h">
+      <Filter>Header Files\Lights</Filter>
+    </ClInclude>
+    <ClInclude Include="PointLight.h">
+      <Filter>Header Files\Lights</Filter>
+    </ClInclude>
+    <ClInclude Include="SpotLight.h">
+      <Filter>Header Files\Lights</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
