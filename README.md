@@ -2,7 +2,7 @@
 A custom 3D rendering engine, written in C++ with OpenGL. Will be steadily adding more features to
 this over time.
 
-# Example screenshot (as of 14/07/2020)
+# Example screenshot (as of 06/09/2020)
 ![](example.png)
 
 # Cloning the repo
@@ -28,6 +28,7 @@ git clone --recurse-submodules https://github.com/PranavBahuguna/3DEngine
 - Model loading system (using wavefront .obj format).
 - Model texturing and materials system.
 - Real-time lighting (point, directional and cone lights).
+- Shadow mapping.
 - 2D font and text rendering.
 - Game object scripting with Lua.
 - Cubemaps / skyboxes.
@@ -48,3 +49,4 @@ git clone --recurse-submodules https://github.com/PranavBahuguna/3DEngine
 - **M** - Toggle HUD
 - **O / Mouse Scroll Down** - Decrease FOV (zoom in)
 - **P / Mouse Scroll Up** - Increase FOV (zoom out)
+- **Enter** - Pause / unpause gameplay
