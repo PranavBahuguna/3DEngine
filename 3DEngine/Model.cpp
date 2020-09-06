@@ -2,8 +2,9 @@
 
 #include <glm/gtc/matrix_transform.hpp>
 
-// Constructor
-Model::Model(const std::string &name) : m_name(name), m_euler(0.0f), m_scale(1.0f) {}
+Model::Model(const std::string &name) : m_name(name), m_euler(0.0f), m_scale(1.0f) {
+  ResourceManager<Texture>::Find("depth-map", m_depthTexture);
+}
 
 // Loads model from the given file path
 void Model::load(ERROR &errCode) {
@@ -21,25 +22,9 @@ void Model::draw(ERROR &errCode, const Shader &shader) const {
   // Set shader parameters and apply
   shader.setMat4("model", getMatrix());
 
-  ////////////////////////////////////////////////////////////////////////////////////////////////
-  float near_plane = 1.0f, far_plane = 20.0f;
-  // glm::mat4 lightSpaceProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane,
-  // far_plane);
-  glm::mat4 lightSpaceProjection =
-      glm::perspective(glm::radians(60.0f), 1.0f, near_plane, far_plane);
-  glm::vec3 pos = {-4.0f, 10.0f, 3.0f};
-  glm::vec3 tgt = {-4.0f, 0.0f, 3.0f};
-  glm::vec3 up = {0.0f, 0.0f, 1.0f};
-  glm::mat4 lightSpaceView = glm::lookAt(pos, tgt, up);
-  glm::mat4 lightSpaceMatrix = lightSpaceProjection * lightSpaceView;
-  shader.setMat4("lightSpaceMatrix", lightSpaceMatrix);
-  ////////////////////////////////////////////////////////////////////////////////////////////////
-
   if (shader._name == "Lighting") {
-    glActiveTexture(GL_TEXTURE1);
-    TexSptr depthTex;
-    ResourceManager<Texture>::Find("depth-map", depthTex);
-    glBindTexture(GL_TEXTURE_2D, depthTex->getId());
+    // Apply depth texture
+    m_depthTexture->use(GL_TEXTURE1);
 
     // Iterate over each stored mesh/texture/material and draw
     for (size_t i = 0; i < m_meshes.size(); i++) {
@@ -51,9 +36,8 @@ void Model::draw(ERROR &errCode, const Shader &shader) const {
     }
   }
 
-  for (size_t i = 0; i < m_meshes.size(); i++) {
-    m_meshes[i]->draw();
-  }
+  for (const auto &mesh : m_meshes)
+    mesh->draw();
 }
 
 // Gets the model matrix

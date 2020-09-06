@@ -27,7 +27,7 @@ public:
   void setParameter(GLuint param, float value);
   void setParameter(GLuint param, int *values);
   void setParameter(GLuint param, float *values);
-  void use() const;
+  void use(GLuint slot = GL_TEXTURE0) const;
 
   int getWidth() const { return m_width; };
   int getHeight() const { return m_height; };

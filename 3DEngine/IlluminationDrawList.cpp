@@ -1,6 +1,5 @@
 #include "IlluminationDrawList.h"
 
-// Constructor
 IlluminationDrawList::IlluminationDrawList(DrawListUptr drawList,
                                            const std::vector<LightSptr> &lights)
     : DrawListDecorator(std::move(drawList)), m_lights(lights) {
@@ -12,8 +11,13 @@ void IlluminationDrawList::draw(ERROR &errCode) {
   _shader->use();
 
   // Apply all lights to the shader
-  for (size_t i = 0; i < m_lights.size(); i++)
+  for (size_t i = 0; i < m_lights.size(); i++) {
     m_lights[i]->use(*_shader, i);
+
+    // Apply light space matrix if this is a shadow-casting light
+    if (m_lights[i]->isShadowCaster())
+      m_lights[i]->setLightSpaceMatrix(*_shader);
+  }
 
   _shader->setMat4("projection", Camera::GetProjection());
   _shader->setMat4("view", Camera::GetView());

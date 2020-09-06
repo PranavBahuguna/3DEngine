@@ -7,6 +7,9 @@ public:
   DirectionalLight(const glm::vec3 &position, const glm::vec3 &color, float ambient, float diffuse,
                    float specular, bool isShadowCaster = false);
 
+  void setLightSpaceMatrix(const Shader &shader) const override;
+  void update(ERROR &errCode) override;
+
 private:
   virtual void use(const Shader &shader, const std::string &prefix) const override;
 };

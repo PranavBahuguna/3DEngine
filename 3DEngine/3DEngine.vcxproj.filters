@@ -125,6 +125,9 @@
     <ClCompile Include="PointLight.cpp">
       <Filter>Source Files\Lights</Filter>
     </ClCompile>
+    <ClCompile Include="ShadowMappingDrawList.cpp">
+      <Filter>Source Files\DrawLists</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Window.h">
@@ -219,6 +222,9 @@
     </ClInclude>
     <ClInclude Include="SpotLight.h">
       <Filter>Header Files\Lights</Filter>
+    </ClInclude>
+    <ClInclude Include="ShadowMappingDrawList.h">
+      <Filter>Header Files\DrawLists</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

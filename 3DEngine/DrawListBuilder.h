@@ -1,6 +1,7 @@
 #pragma once
 
 #include "IlluminationDrawList.h"
+#include "ShadowMappingDrawList.h"
 #include "TransparencyDrawList.h"
 
 #include <glm/gtc/matrix_transform.hpp>
@@ -23,6 +24,12 @@ public:
     _shader->setInt("shadowMap", 1);
 
     return DrawListUptr(new IlluminationDrawList(std::move(drawList), lights));
+  }
+
+  // Apply shadow mapping
+  static DrawListUptr AddShadowMapping(DrawListUptr drawList,
+                                       const std::vector<LightSptr> &lights) {
+    return DrawListUptr(new ShadowMappingDrawList(std::move(drawList), lights));
   }
 
   // Allows sorting of targets by distance from camera enabled for the drawlist

@@ -63,8 +63,8 @@ void Texture::setParameter(GLuint param, float *values) {
 }
 
 // Enable usage of this texture
-void Texture::use() const {
-  glActiveTexture(GL_TEXTURE0);
+void Texture::use(GLuint slot) const {
+  glActiveTexture(slot);
   glBindTexture(GL_TEXTURE_2D, m_id);
 }
 

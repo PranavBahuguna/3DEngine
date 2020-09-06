@@ -54,6 +54,7 @@ size_t fpsBufferIdx = 0;
 float fpsUpdateTime = FPS_UPDATE_DELAY;
 
 bool displayHUD = false;
+bool updateScene = true;
 
 std::vector<ModelSptr> models;
 std::vector<GObjSptr> gameObjects;
@@ -61,8 +62,8 @@ std::vector<LightSptr> lights;
 
 TexSptr depthMap;
 MeshSptr depthMesh;
-constexpr GLuint SHADOW_WIDTH = 1024;
-constexpr GLuint SHADOW_HEIGHT = 1024;
+constexpr GLuint SHADOW_WIDTH = 4096;
+constexpr GLuint SHADOW_HEIGHT = 4096;
 
 DrawTargets dtModels;
 DrawTargets dtTexts;
@@ -75,9 +76,6 @@ DrawListUptr dlShadowMapped;
 DrawListUptr dlTrans;
 DrawListUptr dlText;
 DrawListUptr dlSkybox;
-
-unsigned int quadVAO = 0;
-unsigned int quadVBO = 0;
 
 // forward declarations
 static std::string toStringDp(float, size_t);
@@ -101,6 +99,25 @@ int main() {
     // Enable blending
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    // Setup shadow map
+    depthMap = ResourceManager<Texture>::Create("depth-map", SHADOW_WIDTH, SHADOW_HEIGHT,
+                                                (void *)NULL, GL_DEPTH_COMPONENT, GL_FLOAT);
+    depthMap->setParameter(GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    depthMap->setParameter(GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    depthMap->setParameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    depthMap->setParameter(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    float borderColor[] = {1.0f, 1.0f, 1.0f, 1.0f}; // black border
+    depthMap->setParameter(GL_TEXTURE_BORDER_COLOR, borderColor);
+
+    // Setup shadow map debugger mesh
+    std::vector<float> dmVerts = {
+        -1.0f, 1.0f, 0.0f, -1.0f, -1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f, -1.0f, 0.0f,
+    };
+    std::vector<float> dmTexCoords = {0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f};
+    std::vector<GLuint> dmIndices = {0, 1, 2, 2, 1, 3};
+    depthMesh = ResourceManager<Mesh>::Create("depth-mesh", dmVerts, dmTexCoords,
+                                              std::vector<float>(), dmIndices);
 
     // Setup scene objects
     ModelSptr tetrahedron(new Model("Tetrahedron"));
@@ -159,7 +176,7 @@ int main() {
     LightSptr light02(new PointLight({4.0f, 4.0f, -4.0f}, {1.0f, 0.0f, 0.0f}, 0.1f, 1.0f, 1.0f,
                                      1.0f, 0.045f, 0.0075f));
     LightSptr light03(new SpotLight({-4.0f, 10.0f, 3.0f}, glm::vec3(1.0f), 0.1f, 1.0f, 1.0f, 1.0f,
-                                    0.045f, 0.0075f, {0.0f, -1.0f, 0.0f}, 30.0f, 35.0f, true));
+                                    0.045f, 0.0075f, {0.0f, -0.99f, 0.0f}, 30.0f, 35.0f, true));
 
     lights = {light01, light02, light03};
 
@@ -194,6 +211,7 @@ int main() {
     dlIllum = DrawListBuilder::AddIllumination(std::move(dlIllum), lights);
 
     dlShadowMapped = DrawListBuilder::CreateDrawList(dtModels, "ShadowMappingDepth");
+    dlShadowMapped = DrawListBuilder::AddShadowMapping(std::move(dlShadowMapped), lights);
 
     dlTrans = DrawListBuilder::CreateDrawList(dtLightIcons, "LightIconParticle");
     dlTrans = DrawListBuilder::AddTransparency(std::move(dlTrans));
@@ -203,25 +221,6 @@ int main() {
 
     dtSkybox = DrawTargets({std::make_shared<Skybox>(skybox)});
     dlSkybox = DrawListBuilder::CreateDrawList(dtSkybox, "Skybox");
-
-    // Setup shadow map
-    depthMap = ResourceManager<Texture>::Create("depth-map", SHADOW_WIDTH, SHADOW_HEIGHT,
-                                                (void *)NULL, GL_DEPTH_COMPONENT, GL_FLOAT);
-    depthMap->setParameter(GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    depthMap->setParameter(GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    depthMap->setParameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    depthMap->setParameter(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    float borderColor[] = {1.0f, 1.0f, 1.0f, 1.0f}; // black border
-    depthMap->setParameter(GL_TEXTURE_BORDER_COLOR, borderColor);
-
-    // Setup shadow map debugger mesh
-    std::vector<float> dmVerts = {
-        -1.0f, 1.0f, 0.0f, -1.0f, -1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f, -1.0f, 0.0f,
-    };
-    std::vector<float> dmTexCoords = {0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f};
-    std::vector<GLuint> dmIndices = {0, 1, 2, 2, 1, 3};
-    depthMesh = ResourceManager<Mesh>::Create("depth-mesh", dmVerts, dmTexCoords,
-                                              std::vector<float>(), dmIndices);
 
     // Setup FBO and attach shadow map to it
     FrameBuffer depthMapFBO;
@@ -257,14 +256,21 @@ int main() {
 
       if (Window::GetToggleKey(errCode, GLFW_KEY_M))
         displayHUD = !displayHUD;
+      if (Window::GetToggleKey(errCode, GLFW_KEY_ENTER))
+        updateScene = !updateScene;
 
       // Clear window
       glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-      // Update all gameobjects
-      for (const auto &gameObject : gameObjects)
-        gameObject->update(errCode);
+      if (updateScene) {
+        // Update all gameobjects and lights
+        for (const auto &gameObject : gameObjects)
+          gameObject->update(errCode);
+
+        for (const auto &light : lights)
+          light->update(errCode);
+      }
 
       // Render scene depth to texture from light's perspective
       glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);

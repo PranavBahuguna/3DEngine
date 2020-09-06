@@ -35,4 +35,6 @@ protected:
   AssetPtrs<Mesh> m_meshes;
   AssetPtrs<Texture> m_textures;
   AssetPtrs<Material> m_materials;
+
+  TexSptr m_depthTexture;
 };
