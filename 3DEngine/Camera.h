@@ -6,6 +6,7 @@
 #include <memory>
 
 #include <glm/glm.hpp>
+#include <glm/gtx/quaternion.hpp>
 
 class Camera;
 typedef std::unique_ptr<Camera> CamPtr;
@@ -20,6 +21,7 @@ public:
   static void KeyControl();
   static void MouseControl();
   static void MouseScrollControl();
+  static void Update();
 
   static glm::mat4 GetView();
   static glm::mat4 GetProjection();
@@ -35,6 +37,7 @@ public:
 private:
   void updateDirection();
   void updateProjection();
+  void restrictAngle(float &angle);
 
   void _keyControl();
   void _mouseControl();
@@ -48,11 +51,14 @@ private:
 
   float m_yaw;
   float m_pitch;
-
   float m_fov;
   float m_near;
   float m_far;
 
+  glm::quat m_orientation;
   glm::mat4 m_view;
   glm::mat4 m_projection;
+
+  bool m_recalcView;
+  bool m_recalcProjection;
 };

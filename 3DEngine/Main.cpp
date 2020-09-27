@@ -238,7 +238,7 @@ int main() {
     depthMapFBO.unbind();
 
     // Setup camera
-    Camera::Init(glm::vec3(0.0f), {0.0f, 1.0f, 0.0f}, 90.0f, 0.0f, FOV, NEAR_PLANE, FAR_PLANE);
+    Camera::Init(glm::vec3(0.0f), {0.0f, 1.0f, 0.0f}, 180.0f, 0.0f, FOV, NEAR_PLANE, FAR_PLANE);
 
     // Main program loop
     while (!Window::GetShouldClose()) {
@@ -253,6 +253,7 @@ int main() {
       Camera::KeyControl();
       Camera::MouseControl();
       Camera::MouseScrollControl();
+      Camera::Update();
 
       if (Window::GetToggleKey(errCode, GLFW_KEY_M))
         displayHUD = !displayHUD;
