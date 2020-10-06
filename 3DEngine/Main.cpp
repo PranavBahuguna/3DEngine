@@ -5,8 +5,10 @@
 #include "Drawable.h"
 #include "FrameBuffer.h"
 #include "GameObject.h"
+#include "Keyboard.h"
 #include "Light.h"
 #include "LightIcon.h"
+#include "Mouse.h"
 #include "Plane.h"
 #include "RenderBuffer.h"
 #include "Skybox.h"
@@ -49,11 +51,13 @@ using MeshSptr = std::shared_ptr<Mesh>;
 
 ERROR errCode = ERROR_OK;
 
+std::shared_ptr<Camera> camera;
+
 std::vector<float> fpsBuffer(FPS_BUFFER_SIZE);
 size_t fpsBufferIdx = 0;
 float fpsUpdateTime = FPS_UPDATE_DELAY;
 
-bool displayHUD = false;
+bool displayHUD = true;
 bool updateScene = true;
 
 std::vector<ModelSptr> models;
@@ -99,6 +103,14 @@ int main() {
     // Enable blending
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    // Setup camera
+    camera = ResourceManager<Camera>::Create("main", glm::vec3(0), glm::vec3(0, 1, 0), 180.0f, 0.0f,
+                                             FOV, NEAR_PLANE, FAR_PLANE);
+
+    // Setup keyboard and mouse
+    Keyboard::Init();
+    Mouse::Init();
 
     // Setup shadow map
     depthMap = ResourceManager<Texture>::Create("depth-map", SHADOW_WIDTH, SHADOW_HEIGHT,
@@ -237,9 +249,6 @@ int main() {
 
     depthMapFBO.unbind();
 
-    // Setup camera
-    Camera::Init(glm::vec3(0.0f), {0.0f, 1.0f, 0.0f}, 180.0f, 0.0f, FOV, NEAR_PLANE, FAR_PLANE);
-
     // Main program loop
     while (!Window::GetShouldClose()) {
       // Update the timer
@@ -250,15 +259,16 @@ int main() {
 
       // Handle user input events
       glfwPollEvents();
-      Camera::KeyControl();
-      Camera::MouseControl();
-      Camera::MouseScrollControl();
-      Camera::Update();
+      Keyboard::KeyControl();
+      Mouse::MouseControl();
+      Mouse::MouseScrollControl();
+      camera->update();
 
+      /*
       if (Window::GetToggleKey(errCode, GLFW_KEY_M))
         displayHUD = !displayHUD;
       if (Window::GetToggleKey(errCode, GLFW_KEY_ENTER))
-        updateScene = !updateScene;
+        updateScene = !updateScene;*/
 
       // Clear window
       glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -313,12 +323,12 @@ int main() {
           fpsUpdateTime += Timer::GetDeltaTime();
         }
 
-        xPosValue->setText(toStringDp(Camera::GetPosition().x, 3));
-        yPosValue->setText(toStringDp(Camera::GetPosition().y, 3));
-        zPosValue->setText(toStringDp(Camera::GetPosition().z, 3));
-        pitchValue->setText(toStringDp(Camera::GetPitch(), 1));
-        yawValue->setText(toStringDp(Camera::GetYaw(), 1));
-        fovValue->setText(toStringDp(Camera::GetFOV(), 1));
+        xPosValue->setText(toStringDp(camera->getPosition().x, 3));
+        yPosValue->setText(toStringDp(camera->getPosition().y, 3));
+        zPosValue->setText(toStringDp(camera->getPosition().z, 3));
+        pitchValue->setText(toStringDp(camera->getPitch(), 1));
+        yawValue->setText(toStringDp(camera->getYaw(), 1));
+        fovValue->setText(toStringDp(camera->getFOV(), 1));
 
         dlText->draw(errCode);
       }

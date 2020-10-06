@@ -7,4 +7,7 @@ public:
   TransparencyDrawList(DrawListUptr drawList);
 
   void draw(ERROR &errCode) override;
+
+private:
+  std::shared_ptr<Camera> m_camera;
 };

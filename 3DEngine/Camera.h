@@ -1,59 +1,54 @@
 #pragma once
 
 #include "Error.h"
+#include "ResourceManager.h"
 #include "Window.h"
-
-#include <memory>
 
 #include <glm/glm.hpp>
 #include <glm/gtx/quaternion.hpp>
 
-class Camera;
-typedef std::unique_ptr<Camera> CamPtr;
+enum class CameraAction {
+  MoveFront,
+  MoveRight,
+  MoveUp,
+  TurnRight,
+  TurnUp,
+  Zoom
+};
 
-class Camera {
+class Camera : public Resource {
 public:
-  ~Camera() {}
+  Camera(const std::string &name, const glm::vec3 &pos, const glm::vec3 &up, float yaw, float pitch,
+         float fov, float near, float far);
 
-  static void Init(const glm::vec3 &pos, const glm::vec3 &up, float yaw, float pitch, float fov,
-                   float near, float far);
+  void update();
 
-  static void KeyControl();
-  static void MouseControl();
-  static void MouseScrollControl();
-  static void Update();
+  glm::mat4 getView();
+  glm::mat4 getProjection();
+  glm::vec3 getPosition();
+  float getPitch();
+  float getYaw();
+  float getFOV();
+  float getNearPlane();
+  float getFarPlane();
 
-  static glm::mat4 GetView();
-  static glm::mat4 GetProjection();
-  static glm::vec3 GetPosition();
-  static float GetPitch();
-  static float GetYaw();
-  static float GetFOV();
-  static float GetNear();
-  static float GetFar();
-
-  Camera(); // prevent construction of this class
+  void performAction(CameraAction action, float amount);
 
 private:
   void updateDirection();
   void updateProjection();
   void restrictAngle(float &angle);
 
-  void _keyControl();
-  void _mouseControl();
-  void _mouseScrollControl();
-
   glm::vec3 m_position;
   glm::vec3 m_front;
   glm::vec3 m_up;
   glm::vec3 m_right;
-  glm::vec3 m_worldUp;
 
   float m_yaw;
   float m_pitch;
-  float m_fov;
-  float m_near;
-  float m_far;
+  float m_fovy;
+  float m_zNear;
+  float m_zFar;
 
   glm::quat m_orientation;
   glm::mat4 m_view;

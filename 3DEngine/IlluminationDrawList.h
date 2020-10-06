@@ -11,4 +11,5 @@ public:
 
 private:
   std::vector<LightSptr> m_lights;
+  std::shared_ptr<Camera> m_camera;
 };

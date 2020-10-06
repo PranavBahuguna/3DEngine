@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Error.h"
 #include "Resource.h"
 
 #include <memory>
@@ -22,6 +23,9 @@
  *
  *     std::shared_ptr<Texture> texture;
  *     bool success = ResourceManager<Texture>::Find("img01.png", texture);
+ *
+ * A variant of this method (FindOrError) works similarly to Find, but will instead return an error
+ * code determining whether the resource location attempt was successful.
  *
  * The Create method can be used to create new resources. As with Find, a name parameter is passed
  * along with a variadic set of parameters that are forwarded to the object's constructor. If a name
@@ -53,6 +57,12 @@ public:
       item = foundItem.lock();
 
     return !foundItem.expired();
+  }
+
+  // Finds resource by name, returns appropriate error code if successful or not.
+  static ERROR FindOrError(const std::string &name, std::shared_ptr<T> &item) {
+    ERROR errCode = Find(name, item) ? ERROR_OK : ERROR_RESOURCE_NOT_FOUND;
+    return printErrorMsg(errCode, name.c_str());
   }
 
   // Create a new resource and add to the map.

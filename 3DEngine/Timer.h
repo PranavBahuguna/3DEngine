@@ -2,8 +2,6 @@
 
 #include <GLFW/glfw3.h>
 
-
-
 class Timer {
 public:
   static void Update();

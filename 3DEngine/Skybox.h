@@ -2,6 +2,7 @@
 
 #include "CubeMap.h"
 #include "Drawable.h"
+#include "Camera.h"
 
 class Skybox : public Drawable {
 public:
@@ -11,6 +12,7 @@ public:
 
 private:
   CbmSptr m_cubeMap;
+  std::shared_ptr<Camera> m_camera;
 
   GLuint m_VAO;
   GLuint m_VBO;

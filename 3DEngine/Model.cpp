@@ -1,9 +1,12 @@
 #include "Model.h"
 
+#include <stdexcept>
+
 #include <glm/gtc/matrix_transform.hpp>
 
 Model::Model(const std::string &name) : m_name(name), m_euler(0.0f), m_scale(1.0f) {
-  ResourceManager<Texture>::Find("depth-map", m_depthTexture);
+  if (ResourceManager<Texture>::FindOrError("depth-map", m_depthTexture))
+    throw std::runtime_error("An error occurred while initializing Model.");
 }
 
 // Loads model from the given file path

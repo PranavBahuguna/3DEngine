@@ -27,6 +27,7 @@ typedef uint32_t ERROR;
 #define ERROR_FONT_CHARACTER_OUT_OF_RANGE       16
 #define ERROR_INPUT_KEY_OUT_OF_RANGE            17
 #define ERROR_LUA_ERROR                         18
+#define ERROR_RESOURCE_NOT_FOUND                19
 // clang-format on
 
 // If error reference is not required for a function, this macro may be used as a placeholder
@@ -37,6 +38,10 @@ inline ERROR &placeholder(ERROR &&e) { return e; }
 } // namespace details
 
 static ERROR printErrorMsg(ERROR errCode, ...) {
+  // ERROR_OK has no associated message to print
+  if (errCode == ERROR_OK)
+    return errCode;
+
   std::string errHeader = "Error " + std::to_string(errCode) + " - ";
   std::string errBody;
 
@@ -95,6 +100,9 @@ static ERROR printErrorMsg(ERROR errCode, ...) {
     break;
   case ERROR_LUA_ERROR:
     errBody = "Lua error: %s";
+    break;
+  case ERROR_RESOURCE_NOT_FOUND:
+    errBody = "Resource (%s) was not found.";
     break;
   default:
     errBody = "Unknown error";

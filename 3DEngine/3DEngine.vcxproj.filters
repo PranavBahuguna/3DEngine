@@ -39,6 +39,12 @@
     <Filter Include="Source Files\Lights">
       <UniqueIdentifier>{961cedc2-4777-4c03-aa18-dd5d9a1cff8a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\StaticInput">
+      <UniqueIdentifier>{900333fe-e564-4ff1-b029-b0f196711da0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\StaticInput">
+      <UniqueIdentifier>{50f8b5d2-0cb8-4ed5-b617-2de559aff407}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Window.cpp">
@@ -127,6 +133,12 @@
     </ClCompile>
     <ClCompile Include="ShadowMappingDrawList.cpp">
       <Filter>Source Files\DrawLists</Filter>
+    </ClCompile>
+    <ClCompile Include="Keyboard.cpp">
+      <Filter>Source Files\StaticInput</Filter>
+    </ClCompile>
+    <ClCompile Include="Mouse.cpp">
+      <Filter>Source Files\StaticInput</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -225,6 +237,15 @@
     </ClInclude>
     <ClInclude Include="ShadowMappingDrawList.h">
       <Filter>Header Files\DrawLists</Filter>
+    </ClInclude>
+    <ClInclude Include="Keyboard.h">
+      <Filter>Header Files\StaticInput</Filter>
+    </ClInclude>
+    <ClInclude Include="Mouse.h">
+      <Filter>Header Files\StaticInput</Filter>
+    </ClInclude>
+    <ClInclude Include="Game.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
