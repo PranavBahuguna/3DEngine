@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Game.h"
 #include "IlluminationDrawList.h"
 #include "ShadowMappingDrawList.h"
 #include "TransparencyDrawList.h"
@@ -40,8 +41,8 @@ public:
   // Applies orthographic projection for all drawlist targets
   static DrawListUptr AddOrthoProjection(DrawListUptr drawList) {
     ShaderSptr _shader = drawList->getShader();
-    _shader->setMat4("projection", glm::ortho(0.0f, (float)Window::GetWidth(), 0.0f,
-                                              (float)Window::GetHeight(), 0.0f, 1.0f));
+    _shader->setMat4("projection", glm::ortho(0.0f, (float)Game::GetWindow().getWidth(), 0.0f,
+                                              (float)Game::GetWindow().getHeight(), 0.0f, 1.0f));
     return drawList;
   }
 

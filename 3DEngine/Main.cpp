@@ -4,6 +4,7 @@
 #include "DrawListBuilder.h"
 #include "Drawable.h"
 #include "FrameBuffer.h"
+#include "Game.h"
 #include "GameObject.h"
 #include "Keyboard.h"
 #include "Light.h"
@@ -20,17 +21,6 @@
 #include <iomanip>
 #include <numeric>
 
-#define WINDOW_WIDTH 1600
-#define WINDOW_HEIGHT 1200
-#ifdef _DEBUG
-#define USE_WINDOWED true
-#else
-#define USE_WINDOWED false
-#endif
-#define FULLSCREEN_WINDOWS false
-#define FOV 45.0f
-#define NEAR_PLANE 0.1f
-#define FAR_PLANE 100.0f
 #define HUD_FONT "Unreal"
 #define COLOR_SEAWEED glm::vec4(0.0392f, 0.4941f, 0.549f, 1.0f)
 #define COLOR_RED glm::vec4(0.651f, 0.1725f, 0.1686f, 1.0f)
@@ -50,8 +40,6 @@ using GObjSptr = std::shared_ptr<GameObject>;
 using MeshSptr = std::shared_ptr<Mesh>;
 
 ERROR errCode = ERROR_OK;
-
-std::shared_ptr<Camera> camera;
 
 std::vector<float> fpsBuffer(FPS_BUFFER_SIZE);
 size_t fpsBufferIdx = 0;
@@ -86,31 +74,10 @@ static std::string toStringDp(float, size_t);
 
 int main() {
   try {
-    // Determine the window mode to use and create a window
-    WindowMode wMode = (!USE_WINDOWED)        ? WindowMode::FULLSCREEN
-                       : (FULLSCREEN_WINDOWS) ? WindowMode::FULLSCREEN_WINDOWED
-                                              : WindowMode::WINDOWED;
-
-    Window::Init("Test window", wMode, WINDOW_WIDTH, WINDOW_HEIGHT);
-
-    // Allow objects to obscure other objects behind them
-    glEnable(GL_DEPTH_TEST);
-
-    // Enable backface culling
-    glEnable(GL_CULL_FACE);
-    glCullFace(GL_BACK);
-
-    // Enable blending
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-    // Setup camera
-    camera = ResourceManager<Camera>::Create("main", glm::vec3(0), glm::vec3(0, 1, 0), 180.0f, 0.0f,
-                                             FOV, NEAR_PLANE, FAR_PLANE);
-
-    // Setup keyboard and mouse
-    Keyboard::Init();
-    Mouse::Init();
+    // Setup game
+    Game::Init();
+    Camera &camera = Game::GetCamera();
+    const Window &window = Game::GetWindow();
 
     // Setup shadow map
     depthMap = ResourceManager<Texture>::Create("depth-map", SHADOW_WIDTH, SHADOW_HEIGHT,
@@ -153,32 +120,32 @@ int main() {
 
     // Setup HUD elements
     TextSptr fpsLabel(
-        new Text(HUD_FONT, Window::RelToWinPos({0.7f, 0.95f}), 1.0f, COLOR_SEAWEED, "FPS:"));
-    TextSptr fpsValue(new Text(HUD_FONT, Window::RelToWinPos({0.8f, 0.95f}), 1.0f, COLOR_SEAWEED));
+        new Text(HUD_FONT, window.relToWinPos({0.7f, 0.95f}), 1.0f, COLOR_SEAWEED, "FPS:"));
+    TextSptr fpsValue(new Text(HUD_FONT, window.relToWinPos({0.8f, 0.95f}), 1.0f, COLOR_SEAWEED));
 
     TextSptr xPosLabel(
-        new Text(HUD_FONT, Window::RelToWinPos({0.7f, 0.85f}), 1.0f, COLOR_RED, "X:"));
-    TextSptr xPosValue(new Text(HUD_FONT, Window::RelToWinPos({0.8f, 0.85f}), 1.0f, COLOR_RED));
+        new Text(HUD_FONT, window.relToWinPos({0.7f, 0.85f}), 1.0f, COLOR_RED, "X:"));
+    TextSptr xPosValue(new Text(HUD_FONT, window.relToWinPos({0.8f, 0.85f}), 1.0f, COLOR_RED));
 
     TextSptr yPosLabel(
-        new Text(HUD_FONT, Window::RelToWinPos({0.7f, 0.8f}), 1.0f, COLOR_GREEN, "Y:"));
-    TextSptr yPosValue(new Text(HUD_FONT, Window::RelToWinPos({0.8f, 0.8f}), 1.0f, COLOR_GREEN));
+        new Text(HUD_FONT, window.relToWinPos({0.7f, 0.8f}), 1.0f, COLOR_GREEN, "Y:"));
+    TextSptr yPosValue(new Text(HUD_FONT, window.relToWinPos({0.8f, 0.8f}), 1.0f, COLOR_GREEN));
 
     TextSptr zPosLabel(
-        new Text(HUD_FONT, Window::RelToWinPos({0.7f, 0.75f}), 1.0f, COLOR_BLUE, "Z:"));
-    TextSptr zPosValue(new Text(HUD_FONT, Window::RelToWinPos({0.8f, 0.75f}), 1.0f, COLOR_BLUE));
+        new Text(HUD_FONT, window.relToWinPos({0.7f, 0.75f}), 1.0f, COLOR_BLUE, "Z:"));
+    TextSptr zPosValue(new Text(HUD_FONT, window.relToWinPos({0.8f, 0.75f}), 1.0f, COLOR_BLUE));
 
     TextSptr pitchLabel(
-        new Text(HUD_FONT, Window::RelToWinPos({0.7f, 0.65f}), 1.0f, COLOR_YELLOW, "Pitch:"));
-    TextSptr pitchValue(new Text(HUD_FONT, Window::RelToWinPos({0.8f, 0.65f}), 1.0f, COLOR_YELLOW));
+        new Text(HUD_FONT, window.relToWinPos({0.7f, 0.65f}), 1.0f, COLOR_YELLOW, "Pitch:"));
+    TextSptr pitchValue(new Text(HUD_FONT, window.relToWinPos({0.8f, 0.65f}), 1.0f, COLOR_YELLOW));
 
     TextSptr yawLabel(
-        new Text(HUD_FONT, Window::RelToWinPos({0.7f, 0.6f}), 1.0f, COLOR_VIOLET, "Yaw:"));
-    TextSptr yawValue(new Text(HUD_FONT, Window::RelToWinPos({0.8f, 0.6f}), 1.0f, COLOR_VIOLET));
+        new Text(HUD_FONT, window.relToWinPos({0.7f, 0.6f}), 1.0f, COLOR_VIOLET, "Yaw:"));
+    TextSptr yawValue(new Text(HUD_FONT, window.relToWinPos({0.8f, 0.6f}), 1.0f, COLOR_VIOLET));
 
     TextSptr fovLabel(
-        new Text(HUD_FONT, Window::RelToWinPos({0.7f, 0.5f}), 1.0f, COLOR_GREY, "FOV:"));
-    TextSptr fovValue(new Text(HUD_FONT, Window::RelToWinPos({0.8f, 0.5f}), 1.0f, COLOR_GREY));
+        new Text(HUD_FONT, window.relToWinPos({0.7f, 0.5f}), 1.0f, COLOR_GREY, "FOV:"));
+    TextSptr fovValue(new Text(HUD_FONT, window.relToWinPos({0.8f, 0.5f}), 1.0f, COLOR_GREY));
 
     dtTexts = {fpsLabel,  fpsValue,   xPosLabel,  xPosValue, yPosLabel, yPosValue, zPosLabel,
                zPosValue, pitchLabel, pitchValue, yawLabel,  yawValue,  fovLabel,  fovValue};
@@ -250,7 +217,7 @@ int main() {
     depthMapFBO.unbind();
 
     // Main program loop
-    while (!Window::GetShouldClose()) {
+    while (!window.getShouldClose()) {
       // Update the timer
       Timer::Update();
 
@@ -262,7 +229,7 @@ int main() {
       Keyboard::KeyControl();
       Mouse::MouseControl();
       Mouse::MouseScrollControl();
-      camera->update();
+      camera.update();
 
       /*
       if (Window::GetToggleKey(errCode, GLFW_KEY_M))
@@ -291,7 +258,7 @@ int main() {
       depthMapFBO.unbind();
 
       // Reset viewport
-      glViewport(0, 0, Window::GetWidth(), Window::GetHeight());
+      glViewport(0, 0, window.getWidth(), window.getHeight());
       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
       // Draw all models first
@@ -323,12 +290,12 @@ int main() {
           fpsUpdateTime += Timer::GetDeltaTime();
         }
 
-        xPosValue->setText(toStringDp(camera->getPosition().x, 3));
-        yPosValue->setText(toStringDp(camera->getPosition().y, 3));
-        zPosValue->setText(toStringDp(camera->getPosition().z, 3));
-        pitchValue->setText(toStringDp(camera->getPitch(), 1));
-        yawValue->setText(toStringDp(camera->getYaw(), 1));
-        fovValue->setText(toStringDp(camera->getFOV(), 1));
+        xPosValue->setText(toStringDp(camera.getPosition().x, 3));
+        yPosValue->setText(toStringDp(camera.getPosition().y, 3));
+        zPosValue->setText(toStringDp(camera.getPosition().z, 3));
+        pitchValue->setText(toStringDp(camera.getPitch(), 1));
+        yawValue->setText(toStringDp(camera.getYaw(), 1));
+        fovValue->setText(toStringDp(camera.getFOV(), 1));
 
         dlText->draw(errCode);
       }
@@ -336,7 +303,7 @@ int main() {
       if (errCode != ERROR_OK)
         throw std::runtime_error("An error occurred while runnning this level.");
 
-      Window::SwapBuffers();
+      window.swapBuffers();
     }
 
   } catch (std::exception &e) {

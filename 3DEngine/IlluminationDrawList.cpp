@@ -1,4 +1,5 @@
 #include "IlluminationDrawList.h"
+#include "Game.h"
 
 #include <stdexcept>
 
@@ -7,9 +8,6 @@ IlluminationDrawList::IlluminationDrawList(DrawListUptr drawList,
     : DrawListDecorator(std::move(drawList)), m_lights(lights) {
 
   _drawList->getShader()->setInt("nLights", static_cast<int>(lights.size()));
-
-  if (ResourceManager<Camera>::FindOrError("main", m_camera) != ERROR_OK)
-    throw std::runtime_error("An error occurred while constructing IlluminationDrawList.");
 }
 
 void IlluminationDrawList::draw(ERROR &errCode) {
@@ -25,9 +23,9 @@ void IlluminationDrawList::draw(ERROR &errCode) {
       m_lights[i]->setLightSpaceMatrix(*_shader);
   }
 
-  _shader->setMat4("projection", m_camera->getProjection());
-  _shader->setMat4("view", m_camera->getView());
-  _shader->setVec3("viewPos", m_camera->getPosition());
+  _shader->setMat4("projection", Game::GetCamera().getProjection());
+  _shader->setMat4("view", Game::GetCamera().getView());
+  _shader->setVec3("viewPos", Game::GetCamera().getPosition());
 
   DrawListDecorator::draw(errCode);
 }
