@@ -169,6 +169,7 @@
     <ClCompile Include="DrawList.cpp" />
     <ClCompile Include="Font.cpp" />
     <ClCompile Include="FrameBuffer.cpp" />
+    <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="IlluminationDrawList.cpp" />
     <ClCompile Include="Keyboard.cpp" />

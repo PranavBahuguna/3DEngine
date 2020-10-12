@@ -1,86 +1,55 @@
 #include "Mouse.h"
 #include "Game.h"
-#include "ResourceManager.h"
 #include "Timer.h"
 
-#include <stdexcept>
-
-static std::unique_ptr<Mouse> _instance = nullptr;
-
-Mouse::Mouse()
-    : m_lastX(0.0f), m_lastY(0.0f), m_deltaX(0.0f), m_deltaY(0.0f), m_offsetX(0.0f),
-      m_offsetY(0.0f), m_mouseFirstMoved(false) {}
-
-void Mouse::Init() {
-  if (_instance == nullptr)
-    _instance = std::unique_ptr<Mouse>(new Mouse());
-
-  _instance->m_lastX = 0.0f;
-  _instance->m_lastY = 0.0f;
-  _instance->m_deltaX = 0.0f;
-  _instance->m_deltaY = 0.0f;
-  _instance->m_offsetX = 0.0f;
-  _instance->m_offsetY = 0.0f;
-  _instance->m_mouseFirstMoved = true;
-
-  if (ResourceManager<Camera>::FindOrError("main", _instance->m_mainCamera) != ERROR_OK)
-    throw std::runtime_error("An error occurred while initializing Mouse.");
-}
+float Mouse::_lastX = 0.0f;
+float Mouse::_lastY = 0.0f;
+float Mouse::_deltaX = 0.0f;
+float Mouse::_deltaY = 0.0f;
+float Mouse::_offsetX = 0.0f;
+float Mouse::_offsetY = 0.0f;
+bool Mouse::_mouseFirstMoved = true;
 
 // Handles mouse movement input
 void Mouse::MouseHandler(GLFWwindow *window, double xPos, double yPos) {
   float fxPos = static_cast<float>(xPos);
   float fyPos = static_cast<float>(yPos);
 
-  if (_instance->m_mouseFirstMoved) {
-    _instance->m_lastX = fxPos;
-    _instance->m_lastY = fyPos;
-    _instance->m_mouseFirstMoved = false;
+  if (_mouseFirstMoved) {
+    _lastX = fxPos;
+    _lastY = fyPos;
+    _mouseFirstMoved = false;
   }
 
-  _instance->m_deltaX = fxPos - _instance->m_lastX;
-  _instance->m_deltaY = _instance->m_lastY - fyPos;
+  _deltaX = fxPos - _lastX;
+  _deltaY = _lastY - fyPos;
 
-  _instance->m_lastX = fxPos;
-  _instance->m_lastY = fyPos;
+  _lastX = fxPos;
+  _lastY = fyPos;
 }
 
 // Handles mouse scroll input
 void Mouse::MouseScrollHandler(GLFWwindow *window, double xOffset, double yOffset) {
-  _instance->m_offsetX = static_cast<float>(xOffset);
-  _instance->m_offsetY = static_cast<float>(yOffset);
+  _offsetX = static_cast<float>(xOffset);
+  _offsetY = static_cast<float>(yOffset);
 }
 
 void Mouse::MouseControl() {
-  float deltaYaw = GetDeltaX() * CAMERA_TURN_SPEED * Timer::GetDeltaTime();
-  float deltaPitch = GetDeltaY() * CAMERA_TURN_SPEED * Timer::GetDeltaTime();
+  float deltaYaw = _deltaX * CAMERA_TURN_SPEED * Timer::GetDeltaTime();
+  float deltaPitch = _deltaY * CAMERA_TURN_SPEED * Timer::GetDeltaTime();
 
   // Update yaw and pitch
-  _instance->m_mainCamera->performAction(CameraAction::TurnRight, deltaYaw);
-  _instance->m_mainCamera->performAction(CameraAction::TurnUp, deltaPitch);
+  Game::GetCamera().performAction(CameraAction::TurnRight, deltaYaw);
+  Game::GetCamera().performAction(CameraAction::TurnUp, deltaPitch);
+
+  // Reset changes in x/y-position
+  _deltaX = 0.0f;
+  _deltaY = 0.0f;
 }
 
 void Mouse::MouseScrollControl() {
-  float yScrollAmount = GetOffsetY() * CAMERA_ZOOM_SPEED * Timer::GetDeltaTime();
+  float yScrollAmount = _offsetY * CAMERA_ZOOM_SPEED * Timer::GetDeltaTime();
 
   // Update fov
-  _instance->m_mainCamera->performAction(CameraAction::Zoom, yScrollAmount);
+  Game::GetCamera().performAction(CameraAction::Zoom, yScrollAmount);
 }
-
-// Obtains and resets change in x-position
-float Mouse::GetDeltaX() {
-  float deltaX = _instance->m_deltaX;
-  _instance->m_deltaX = 0.0f;
-  return deltaX;
-}
-
-// Obtains and resets change in y-position
-float Mouse::GetDeltaY() {
-  float deltaY = _instance->m_deltaY;
-  _instance->m_deltaY = 0.0f;
-  return deltaY;
-}
-
-float Mouse::GetOffsetX() { return _instance->m_offsetX; }
-
-float Mouse::GetOffsetY() { return _instance->m_offsetY; }

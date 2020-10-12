@@ -11,29 +11,26 @@
 #include <memory>
 #include <string>
 
-class Window;
-typedef std::unique_ptr<Window> WndPtr;
-
 enum class WindowMode { WINDOWED, FULLSCREEN_WINDOWED, FULLSCREEN };
 
 class Window {
 public:
+  Window(const std::string &name, WindowMode wMode);
+  Window(const std::string &name, WindowMode wMode, int width, int height);
+  Window(const Window &) = delete;
+  Window &operator=(const Window &) = delete;
   ~Window();
 
-  static void Init(const std::string &name, WindowMode wMode);
-  static void Init(const std::string &name, WindowMode wMode, int width, int height);
+  int getWidth() const;
+  int getHeight() const;
+  float getAspectRatio() const;
+  glm::vec2 relToWinPos(const glm::vec2 &pos) const;
+  bool getShouldClose() const;
 
-  static int GetWidth();
-  static int GetHeight();
-  static float GetAspectRatio();
-  static glm::vec2 RelToWinPos(const glm::vec2 &pos);
-
-  static bool GetShouldClose();
-  static void SwapBuffers();
+  void swapBuffers();
+  void close();
 
 private:
-  Window(); // prevent construction of this class
-
   GLFWwindow *m_mainWindow;
 
   int m_width;

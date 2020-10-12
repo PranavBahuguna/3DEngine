@@ -4,32 +4,30 @@
 
 #include <glm/gtc/matrix_transform.hpp>
 
-Camera::Camera(const std::string &name, const glm::vec3 &pos, const glm::vec3 &up, float yaw,
-               float pitch, float fovy, float zNear, float zFar)
-    : Resource{name}, m_position(pos), m_up(up), m_yaw(glm::radians(yaw)),
-      m_pitch(glm::radians(pitch)), m_fovy(glm::radians(fovy)), m_zNear(zNear), m_zFar(zFar),
-      m_recalcView(true), m_recalcProjection(true) {
+Camera::Camera(const glm::vec3 &pos, const glm::vec3 &up, float yaw, float pitch, float fovy,
+               float zNear, float zFar)
+    : m_position(pos), m_up(up), m_yaw(yaw), m_pitch(pitch), m_fovy(fovy), m_zNear(zNear),
+      m_zFar(zFar), m_recalcView(true), m_recalcProjection(true) {
 
   updateDirection();
   updateProjection();
 }
 
-// Static handler utility methods
-glm::mat4 Camera::getView() { return m_view; }
+glm::mat4 Camera::getView() const { return m_view; }
 
-glm::mat4 Camera::getProjection() { return m_projection; }
+glm::mat4 Camera::getProjection() const { return m_projection; }
 
-glm::vec3 Camera::getPosition() { return m_position; }
+glm::vec3 Camera::getPosition() const { return m_position; }
 
-float Camera::getPitch() { return glm::degrees(m_pitch); }
+float Camera::getPitch() const { return m_pitch; }
 
-float Camera::getYaw() { return glm::degrees(m_yaw); }
+float Camera::getYaw() const { return m_yaw; }
 
-float Camera::getFOV() { return glm::degrees(m_fovy); }
+float Camera::getFOV() const { return m_fovy; }
 
-float Camera::getNearPlane() { return m_zNear; }
+float Camera::getZNear() const { return m_zNear; }
 
-float Camera::getFarPlane() { return m_zFar; }
+float Camera::getZFar() const { return m_zFar; }
 
 void Camera::performAction(CameraAction action, float amount) {
   // Decide whether the action will require recalculation of the view or projection matrices
@@ -110,12 +108,12 @@ void Camera::updateProjection() {
   if (m_fovy > CAMERA_MAX_FOV)
     m_fovy = CAMERA_MAX_FOV;
 
-  m_projection = glm::perspective(m_fovy, Window::GetAspectRatio(), m_zNear, m_zFar);
+  m_projection = glm::perspective(m_fovy, Game::GetWindow().getAspectRatio(), m_zNear, m_zFar);
   m_recalcProjection = false;
 }
 
 // Restricts an angle between min and max angle, looping if either bound exceeded
-void Camera::restrictAngle(float &angle) {
+void Camera::restrictAngle(float &angle) const {
   if (angle > CAMERA_MAX_ANGLE)
     angle -= TWO_PI_RADIANS;
   if (angle < CAMERA_MIN_ANGLE)

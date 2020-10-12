@@ -4,21 +4,11 @@
 
 #include <stdexcept>
 
-static WndPtr _instance = nullptr;
-
-// Constructor - zero all parameters
-Window::Window()
-    : m_width(0), m_height(0), m_mainWindow(nullptr) {}
-
 // Defaults width / height to 800/600 (applicable only if in windowed mode)
-void Window::Init(const std::string &name, WindowMode wMode) {
-  Window::Init(name, wMode, 800, 600);
-}
+Window::Window(const std::string &name, WindowMode wMode) : Window(name, wMode, 800, 600) {}
 
-// Initialise all window properties
-void Window::Init(const std::string &name, WindowMode wMode, int width, int height) {
-  if (_instance == nullptr)
-    _instance = WndPtr(new Window());
+Window::Window(const std::string &name, WindowMode wMode, int width, int height)
+    : m_width(width), m_height(height), m_mainWindow(nullptr) {
 
   // Initialise GLFW
   ERROR errCode = ERROR_OK;
@@ -39,25 +29,21 @@ void Window::Init(const std::string &name, WindowMode wMode, int width, int heig
     if (wMode == WindowMode::FULLSCREEN || wMode == WindowMode::FULLSCREEN_WINDOWED) {
       auto primaryMonitor = glfwGetPrimaryMonitor();
       const GLFWvidmode *mode = glfwGetVideoMode(primaryMonitor);
-      _instance->m_width = mode->width;
-      _instance->m_height = mode->height;
+      m_width = mode->width;
+      m_height = mode->height;
 
       // Use the primary monitor only if we want fullscreen without window
       if (wMode == WindowMode::FULLSCREEN)
         monitor = primaryMonitor;
-    } else {
-      _instance->m_height = height;
-      _instance->m_width = width;
     }
 
     // Initialiase window with given dimension
-    _instance->m_mainWindow =
-        glfwCreateWindow(_instance->m_width, _instance->m_height, name.c_str(), monitor, NULL);
-    if (_instance->m_mainWindow == nullptr) {
+    m_mainWindow = glfwCreateWindow(m_width, m_height, name.c_str(), monitor, NULL);
+    if (m_mainWindow == nullptr) {
       errCode = printErrorMsg(ERROR_GLFW_WINDOW_CREATE_FAILED);
     } else {
       // Set context for GLEW to use
-      glfwMakeContextCurrent(_instance->m_mainWindow);
+      glfwMakeContextCurrent(m_mainWindow);
 
       // Allow modern extension features
       glewExperimental = GL_TRUE;
@@ -67,13 +53,13 @@ void Window::Init(const std::string &name, WindowMode wMode, int width, int heig
         errCode = printErrorMsg(ERROR_GLEW_INIT_FAILED);
       } else {
         // Setup viewport size
-        glViewport(0, 0, _instance->m_width, _instance->m_height);
+        glViewport(0, 0, m_width, m_height);
         // Setup keyboard and mouse handlers
-        glfwSetKeyCallback(_instance->m_mainWindow, Keyboard::KeyHandler);
-        glfwSetCursorPosCallback(_instance->m_mainWindow, Mouse::MouseHandler);
-        glfwSetScrollCallback(_instance->m_mainWindow, Mouse::MouseScrollHandler);
+        glfwSetKeyCallback(m_mainWindow, Keyboard::KeyHandler);
+        glfwSetCursorPosCallback(m_mainWindow, Mouse::MouseHandler);
+        glfwSetScrollCallback(m_mainWindow, Mouse::MouseScrollHandler);
         // Remove cursor from screen
-        glfwSetInputMode(_instance->m_mainWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+        glfwSetInputMode(m_mainWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
       }
     }
   }
@@ -84,42 +70,22 @@ void Window::Init(const std::string &name, WindowMode wMode, int width, int heig
 
 // Destructor - destroy window and terminate
 Window::~Window() {
-  glfwDestroyWindow(_instance->m_mainWindow);
+  glfwDestroyWindow(m_mainWindow);
   glfwTerminate();
 }
 
-int Window::GetWidth() { return _instance->m_width; }
+int Window::getWidth() const { return m_width; }
 
-int Window::GetHeight() { return _instance->m_height; }
+int Window::getHeight() const { return m_height; }
 
-float Window::GetAspectRatio() { return (float)GetWidth() / (float)GetHeight(); }
+float Window::getAspectRatio() const { return (float)m_width / (float)m_height; }
 
-glm::vec2 Window::RelToWinPos(const glm::vec2 &pos) {
-  return {pos.x * GetWidth(), pos.y * GetHeight()};
+glm::vec2 Window::relToWinPos(const glm::vec2 &pos) const {
+  return {pos.x * m_width, pos.y * m_height};
 }
 
-/*
-// A toggle key can be queried during the rendering loop. It will return true the first time it is
-// called if the corresponding key is pressed, but will return false on subsequent calls until the
-// key is released and pressed again.
-bool Window::GetToggleKey(ERROR &errCode, int key) {
-  if (key < 0 || key >= NUM_KEYS) {
-    errCode = printErrorMsg(ERROR_INPUT_KEY_OUT_OF_RANGE, key);
-    return false;
-  }
+bool Window::getShouldClose() const { return glfwWindowShouldClose(m_mainWindow); }
 
-  if (_instance->m_keys[key]) {
-    if (_instance->m_toggleKeys[key]) {
-      _instance->m_toggleKeys[key] = false;
-      return true;
-    }
-  } else {
-    _instance->m_toggleKeys[key] = true;
-  }
+void Window::swapBuffers() { glfwSwapBuffers(m_mainWindow); }
 
-  return false;
-}*/
-
-bool Window::GetShouldClose() { return glfwWindowShouldClose(_instance->m_mainWindow); }
-
-void Window::SwapBuffers() { glfwSwapBuffers(_instance->m_mainWindow); }
+void Window::close() { glfwSetWindowShouldClose(m_mainWindow, GLFW_TRUE); }
