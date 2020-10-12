@@ -26,8 +26,8 @@ public:
   float getAspectRatio() const;
   glm::vec2 relToWinPos(const glm::vec2 &pos) const;
   bool getShouldClose() const;
-  void swapBuffers() const;
 
+  void swapBuffers();
   void close();
 
 private:

@@ -1,5 +1,4 @@
 #include "Window.h"
-#include "Game.h"
 #include "Keyboard.h"
 #include "Mouse.h"
 
@@ -87,6 +86,6 @@ glm::vec2 Window::relToWinPos(const glm::vec2 &pos) const {
 
 bool Window::getShouldClose() const { return glfwWindowShouldClose(m_mainWindow); }
 
-void Window::swapBuffers() const { glfwSwapBuffers(m_mainWindow); }
+void Window::swapBuffers() { glfwSwapBuffers(m_mainWindow); }
 
 void Window::close() { glfwSetWindowShouldClose(m_mainWindow, GLFW_TRUE); }

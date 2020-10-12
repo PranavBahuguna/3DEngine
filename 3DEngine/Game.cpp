@@ -1,7 +1,7 @@
 #include "Game.h"
 
-std::unique_ptr<Camera> Game::CameraPtr = nullptr;
-std::unique_ptr<Window> Game::WindowPtr = nullptr;
+std::unique_ptr<Camera> Game::_camera = nullptr;
+std::unique_ptr<Window> Game::_window = nullptr;
 
 // Initialise all basic components required to run the game
 void Game::Init() {
@@ -9,12 +9,12 @@ void Game::Init() {
   WindowMode wMode = (!USE_WINDOWED)        ? WindowMode::FULLSCREEN
                      : (FULLSCREEN_WINDOWS) ? WindowMode::FULLSCREEN_WINDOWED
                                             : WindowMode::WINDOWED;
-  WindowPtr =
-      std::unique_ptr<Window>(new Window("Test window", wMode, WINDOW_WIDTH, WINDOW_HEIGHT));
+  _window = std::unique_ptr<Window>(new Window("Test window", wMode, WINDOW_WIDTH, WINDOW_HEIGHT));
 
   // Setup camera
-  CameraPtr = std::unique_ptr<Camera>(new Camera(glm::vec3(0), glm::vec3(0, 1, 0), 180.0f, 0.0f,
-                                                 45.0f, CAMERA_NEAR_PLANE, CAMERA_FAR_PLANE));
+  _camera = std::unique_ptr<Camera>(
+      new Camera(CAMERA_SETUP_POS, glm::vec3(0, 1, 0), CAMERA_SETUP_YAW, CAMERA_SETUP_PITCH,
+                 CAMERA_SETUP_FOV, CAMERA_NEAR_PLANE, CAMERA_FAR_PLANE));
 
   // Allow objects to obscure other objects behind them
   glEnable(GL_DEPTH_TEST);
@@ -29,8 +29,8 @@ void Game::Init() {
 }
 
 // Handles closing of game session and window
-void Game::Exit() { WindowPtr->close(); }
+void Game::Exit() { _window->close(); }
 
-Camera &Game::GetCamera() { return *CameraPtr; }
+Camera &Game::GetCamera() { return *_camera; }
 
-Window &Game::GetWindow() { return *WindowPtr; }
+Window &Game::GetWindow() { return *_window; }

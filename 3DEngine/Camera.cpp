@@ -6,9 +6,8 @@
 
 Camera::Camera(const glm::vec3 &pos, const glm::vec3 &up, float yaw, float pitch, float fovy,
                float zNear, float zFar)
-    : m_position(pos), m_up(up), m_yaw(glm::radians(yaw)), m_pitch(glm::radians(pitch)),
-      m_fovy(glm::radians(fovy)), m_zNear(zNear), m_zFar(zFar), m_recalcView(true),
-      m_recalcProjection(true) {
+    : m_position(pos), m_up(up), m_yaw(yaw), m_pitch(pitch), m_fovy(fovy), m_zNear(zNear),
+      m_zFar(zFar), m_recalcView(true), m_recalcProjection(true) {
 
   updateDirection();
   updateProjection();
@@ -20,11 +19,11 @@ glm::mat4 Camera::getProjection() const { return m_projection; }
 
 glm::vec3 Camera::getPosition() const { return m_position; }
 
-float Camera::getPitch() const { return glm::degrees(m_pitch); }
+float Camera::getPitch() const { return m_pitch; }
 
-float Camera::getYaw() const { return glm::degrees(m_yaw); }
+float Camera::getYaw() const { return m_yaw; }
 
-float Camera::getFOV() const { return glm::degrees(m_fovy); }
+float Camera::getFOV() const { return m_fovy; }
 
 float Camera::getZNear() const { return m_zNear; }
 

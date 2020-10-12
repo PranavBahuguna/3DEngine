@@ -1,6 +1,5 @@
 #define TINYOBJLOADER_IMPLEMENTATION
 
-#include "Camera.h"
 #include "DrawListBuilder.h"
 #include "Drawable.h"
 #include "FrameBuffer.h"
@@ -15,24 +14,10 @@
 #include "Skybox.h"
 #include "Text.h"
 #include "Timer.h"
-#include "Window.h"
 
 #include <algorithm>
 #include <iomanip>
 #include <numeric>
-
-#define HUD_FONT "Unreal"
-#define COLOR_SEAWEED glm::vec4(0.0392f, 0.4941f, 0.549f, 1.0f)
-#define COLOR_RED glm::vec4(0.651f, 0.1725f, 0.1686f, 1.0f)
-#define COLOR_GREEN glm::vec4(0.1608f, 0.4314f, 0.0039f, 1.0f)
-#define COLOR_BLUE glm::vec4(0.1961f, 0.3216f, 0.4824f, 1.0f)
-#define COLOR_YELLOW glm::vec4(0.9922f, 0.80f, 0.051f, 1.0f)
-#define COLOR_VIOLET glm::vec4(0.3569f, 0.0392f, 0.5686f, 1.0f)
-#define COLOR_GREY glm::vec4(0.6667f, 0.6627f, 0.6784f, 1.0f)
-#define FPS_UPDATE_DELAY 0.5f
-#define FPS_BUFFER_SIZE 8
-#define MAX_LIGHTS 8
-#define DEPTH_VISUALISATION false
 
 using TextSptr = std::shared_ptr<Text>;
 using LiSptr = std::shared_ptr<LightIcon>;
@@ -77,7 +62,7 @@ int main() {
     // Setup game
     Game::Init();
     Camera &camera = Game::GetCamera();
-    const Window &window = Game::GetWindow();
+    Window &window = Game::GetWindow();
 
     // Setup shadow map
     depthMap = ResourceManager<Texture>::Create("depth-map", SHADOW_WIDTH, SHADOW_HEIGHT,
@@ -264,7 +249,7 @@ int main() {
       // Draw all models first
       dlIllum->draw(errCode);
 
-      if (DEPTH_VISUALISATION) {
+      if (USE_DEPTH_VISUALISATION) {
         depthShader->use();
         depthMap->use();
         depthMesh->draw();
@@ -293,9 +278,9 @@ int main() {
         xPosValue->setText(toStringDp(camera.getPosition().x, 3));
         yPosValue->setText(toStringDp(camera.getPosition().y, 3));
         zPosValue->setText(toStringDp(camera.getPosition().z, 3));
-        pitchValue->setText(toStringDp(camera.getPitch(), 1));
-        yawValue->setText(toStringDp(camera.getYaw(), 1));
-        fovValue->setText(toStringDp(camera.getFOV(), 1));
+        pitchValue->setText(toStringDp(glm::degrees(camera.getPitch()), 1));
+        yawValue->setText(toStringDp(glm::degrees(camera.getYaw()), 1));
+        fovValue->setText(toStringDp(glm::degrees(camera.getFOV()), 1));
 
         dlText->draw(errCode);
       }
