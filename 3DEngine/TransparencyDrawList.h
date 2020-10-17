@@ -1,6 +1,6 @@
 #pragma once
 
-#include "DrawList.h"
+#include "DrawListDecorator.h"
 
 class TransparencyDrawList : public DrawListDecorator {
 public:

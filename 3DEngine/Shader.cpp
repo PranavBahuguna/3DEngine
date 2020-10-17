@@ -4,11 +4,9 @@
 
 #include <glm/gtc/type_ptr.hpp>
 
-// Constructor
 Shader::Shader(const std::string &name)
     : Resource{name}, m_progId(0), m_vertId(0), m_fragId(0), m_isCompiled(false) {}
 
-// Destructor
 Shader::~Shader() {
   glDetachShader(m_progId, m_vertId);
   glDetachShader(m_progId, m_fragId);
@@ -34,6 +32,7 @@ void Shader::compile(bool useShader) {
 
   bindUniforms();
   m_isCompiled = true;
+
   if (useShader)
     use(); // switch current program to this shader
 }
@@ -239,7 +238,7 @@ void Shader::setPreprocessor(GLenum type, const std::string &name, float value) 
 char *Shader::getShaderErrorLog(GLuint id) const {
   GLint errorLength = 0;
   glGetShaderiv(id, GL_INFO_LOG_LENGTH, &errorLength);
-  std::vector<GLchar> errorLog(errorLength);
+  std::vector<char> errorLog(errorLength);
   glGetShaderInfoLog(id, errorLength, &errorLength, errorLog.data());
 
   // Copy errLog to output
@@ -254,7 +253,7 @@ char *Shader::getShaderErrorLog(GLuint id) const {
 char *Shader::getProgramErrorLog(GLuint id) const {
   GLint errorLength = 0;
   glGetShaderiv(id, GL_INFO_LOG_LENGTH, &errorLength);
-  std::vector<GLchar> errorLog(errorLength);
+  std::vector<char> errorLog(errorLength);
   glGetProgramInfoLog(id, errorLength, &errorLength, errorLog.data());
 
   // Copy errLog to output

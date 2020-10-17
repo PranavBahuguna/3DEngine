@@ -1,5 +1,7 @@
 #pragma once
 
+#include "BasicDrawList.h"
+#include "DrawListDecorator.h"
 #include "Game.h"
 #include "IlluminationDrawList.h"
 #include "ShadowMappingDrawList.h"
@@ -10,9 +12,8 @@
 class DrawListBuilder {
 public:
   // Basic draw list sets targets and shader
-  static DrawListUptr CreateDrawList(DrawTargets targets, const std::string &shader) {
+  static DrawListUptr CreateDrawList(ShaderSptr shader) {
     DrawListUptr basicDrawList = DrawListUptr(new BasicDrawList());
-    basicDrawList->setTargets(std::move(targets));
     basicDrawList->setShader(shader);
 
     return basicDrawList;
@@ -20,9 +21,12 @@ public:
 
   // Sets the max number of lights and number of available lights for the shader
   static DrawListUptr AddIllumination(DrawListUptr drawList, const std::vector<LightSptr> &lights) {
-    ShaderSptr _shader = drawList->getShader();
-    _shader->setInt("thisTexture", 0);
-    _shader->setInt("shadowMap", 1);
+    ShaderSptr shader = drawList->getShader();
+    shader->use();
+
+    shader->setInt("nLights", static_cast<int>(lights.size()));
+    shader->setInt("thisTexture", 0);
+    shader->setInt("shadowMap", 1);
 
     return DrawListUptr(new IlluminationDrawList(std::move(drawList), lights));
   }
@@ -40,9 +44,11 @@ public:
 
   // Applies orthographic projection for all drawlist targets
   static DrawListUptr AddOrthoProjection(DrawListUptr drawList) {
-    ShaderSptr _shader = drawList->getShader();
-    _shader->setMat4("projection", glm::ortho(0.0f, (float)Game::GetWindow().getWidth(), 0.0f,
-                                              (float)Game::GetWindow().getHeight(), 0.0f, 1.0f));
+    ShaderSptr shader = drawList->getShader();
+    shader->use();
+
+    shader->setMat4("projection", glm::ortho(0.0f, (float)Game::GetWindow().getWidth(), 0.0f,
+                                             (float)Game::GetWindow().getHeight(), 0.0f, 1.0f));
     return drawList;
   }
 

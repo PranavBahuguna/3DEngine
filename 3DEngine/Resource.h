@@ -3,5 +3,5 @@
 #include <string>
 
 struct Resource {
-  const std::string _name;
+  std::string _name;
 };

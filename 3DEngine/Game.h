@@ -30,7 +30,7 @@ static constexpr int WINDOW_HEIGHT = 1200;
 #ifdef _DEBUG
 static constexpr bool USE_WINDOWED = true;
 #else
-static constexpr bool USE_WINDOWED = true;
+static constexpr bool USE_WINDOWED = false;
 #endif
 static constexpr bool FULLSCREEN_WINDOWS = false;
 

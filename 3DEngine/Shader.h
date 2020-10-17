@@ -10,9 +10,10 @@
 #include <glm/glm.hpp>
 
 class Shader;
+
+using ShaderSptr = std::shared_ptr<Shader>;
 using UniformMap = std::unordered_map<std::string, GLuint>;
 using PreprocessorMap = std::unordered_map<GLenum, std::unordered_map<std::string, std::string>>;
-using ShaderSptr = std::shared_ptr<Shader>;
 
 class Shader : public Resource {
 public:
@@ -45,7 +46,7 @@ public:
   void setPreprocessor(GLenum type, const std::string &name, int value);
   void setPreprocessor(GLenum type, const std::string &name, float value);
 
-  bool isCompiled() { return m_isCompiled; }
+  bool isCompiled() const { return m_isCompiled; }
 
 private:
   void load(ERROR &errCode, const std::string &filename, GLenum type, GLuint &shaderId);
@@ -56,7 +57,7 @@ private:
   char *getShaderErrorLog(GLuint id) const;
   char *getProgramErrorLog(GLuint id) const;
 
-  static constexpr GLsizei MAX_PARAM_LENGTH = 256;
+  static constexpr int MAX_PARAM_LENGTH = 256;
 
   UniformMap m_uniformMap;
   PreprocessorMap m_preprocessorMap;

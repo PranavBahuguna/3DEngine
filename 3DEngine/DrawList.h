@@ -1,8 +1,7 @@
 #pragma once
 
-#include "Camera.h"
 #include "Drawable.h"
-#include "ResourceManager.h"
+#include "Shader.h"
 
 class DrawList;
 
@@ -12,33 +11,11 @@ using DrawListUptr = std::unique_ptr<DrawList>;
 
 class DrawList {
 public:
+  virtual ShaderSptr getShader() = 0;
+  virtual DrawTargets &getTargets() = 0;
+
   virtual void draw(ERROR &errCode) = 0;
-
-  void setShader(const std::string &name);
-  void setTargets(DrawTargets targets);
-
-  virtual ShaderSptr getShader() const { return m_shader; }
-  virtual DrawTargets &getTargets() { return m_drawTargets; }
-
-private:
-  ShaderSptr m_shader;
-  DrawTargets m_drawTargets;
-};
-
-class BasicDrawList : public DrawList {
-public:
-  void draw(ERROR &errCode) override;
-};
-
-class DrawListDecorator : public DrawList {
-public:
-  DrawListDecorator(DrawListUptr drawList);
-
-  void draw(ERROR &errCode) override { _drawList->draw(errCode); }
-
-  ShaderSptr getShader() const override { return _drawList->getShader(); }
-  DrawTargets &getTargets() override { return _drawList->getTargets(); }
-
-protected:
-  DrawListUptr _drawList;
+  virtual void addTarget(const DrawSptr &target) = 0;
+  virtual void addTargets(const DrawTargets &targets) = 0;
+  virtual void setShader(ShaderSptr shader) = 0;
 };

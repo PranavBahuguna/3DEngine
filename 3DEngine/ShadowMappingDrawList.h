@@ -1,6 +1,6 @@
 #pragma once
 
-#include "DrawList.h"
+#include "DrawListDecorator.h"
 #include "Light.h"
 
 class ShadowMappingDrawList : public DrawListDecorator {

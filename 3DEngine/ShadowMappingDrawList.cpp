@@ -5,13 +5,13 @@ ShadowMappingDrawList::ShadowMappingDrawList(DrawListUptr drawList,
     : DrawListDecorator(std::move(drawList)), m_lights(lights) {}
 
 void ShadowMappingDrawList::draw(ERROR &errCode) {
-  ShaderSptr _shader = _drawList->getShader();
-  _shader->use();
+  ShaderSptr shader = getShader();
+  shader->use();
 
   // Apply the light space matrix for all shadow-casting lights
   for (auto &light : m_lights) {
     if (light->isShadowCaster())
-      light->setLightSpaceMatrix(*_shader);
+      light->setLightSpaceMatrix(*shader);
   }
 
   DrawListDecorator::draw(errCode);

@@ -2,7 +2,7 @@
 
 #include "Shader.h"
 
-static unsigned int id = 0;
+static GLuint id = 0;
 
 class Drawable {
 public:

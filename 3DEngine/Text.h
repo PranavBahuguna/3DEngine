@@ -5,7 +5,7 @@
 
 class Text : public Drawable {
 public:
-  Text(const std::string &font, const glm::vec2 &pos, const GLfloat scale, const glm::vec4 &color,
+  Text(const std::string &font, const glm::vec2 &pos, const float scale, const glm::vec4 &color,
        const std::string &text = "");
 
   void draw(ERROR &errCode, const Shader &shader) const override;
@@ -14,7 +14,7 @@ public:
 private:
   std::string m_text;
   FontSptr m_font;
-  GLfloat m_scale;
+  float m_scale;
   glm::vec4 m_color;
 
   GLuint m_VAO;

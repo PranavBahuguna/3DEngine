@@ -42,11 +42,6 @@ MeshSptr depthMesh;
 constexpr GLuint SHADOW_WIDTH = 4096;
 constexpr GLuint SHADOW_HEIGHT = 4096;
 
-DrawTargets dtModels;
-DrawTargets dtTexts;
-DrawTargets dtLightIcons;
-DrawTargets dtSkybox;
-
 DrawListUptr dlIllum;
 DrawListUptr dlDepth;
 DrawListUptr dlShadowMapped;
@@ -63,6 +58,54 @@ int main() {
     Game::Init();
     Camera &camera = Game::GetCamera();
     Window &window = Game::GetWindow();
+
+    // Setup shaders
+    ShaderSptr lightingShader = ResourceManager<Shader>::Create("Lighting");
+    lightingShader->setPreprocessor(GL_FRAGMENT_SHADER, "MAX_LIGHTS", MAX_LIGHTS);
+    lightingShader->compile();
+
+    ShaderSptr depthShader = ResourceManager<Shader>::Create("Depth");
+    depthShader->compile();
+    depthShader->setInt("depthMap", 0);
+    depthShader->setFloat("nearPlane", 1.0f);
+    depthShader->setFloat("farPlane", 20.0f);
+    depthShader->setBool("isPerspective", true);
+
+    ShaderSptr smdShader = ResourceManager<Shader>::Create("ShadowMappingDepth");
+    smdShader->compile();
+
+    ShaderSptr liParticleShader = ResourceManager<Shader>::Create("LightIconParticle");
+    liParticleShader->compile();
+
+    ShaderSptr textShader = ResourceManager<Shader>::Create("Text");
+    textShader->compile();
+
+    ShaderSptr skyboxShader = ResourceManager<Shader>::Create("Skybox");
+    skyboxShader->compile();
+
+    // Setup scene lights
+    LightSptr light01(new DirectionalLight({1.0f, 1.0f, -1.0f}, glm::vec3(1.0f), 0.1f, 0.5f, 0.5f));
+    LightSptr light02(new PointLight({4.0f, 4.0f, -4.0f}, {1.0f, 0.0f, 0.0f}, 0.1f, 1.0f, 1.0f,
+                                     1.0f, 0.045f, 0.0075f));
+    LightSptr light03(new SpotLight({-4.0f, 10.0f, 3.0f}, glm::vec3(1.0f), 0.1f, 1.0f, 1.0f, 1.0f,
+                                    0.045f, 0.0075f, {0.0f, -0.99f, 0.0f}, 30.0f, 35.0f, true));
+
+    lights = {light01, light02, light03};
+
+    // Setup drawlists
+    dlIllum = DrawListBuilder::CreateDrawList(lightingShader);
+    dlIllum = DrawListBuilder::AddIllumination(std::move(dlIllum), lights);
+
+    dlShadowMapped = DrawListBuilder::CreateDrawList(smdShader);
+    dlShadowMapped = DrawListBuilder::AddShadowMapping(std::move(dlShadowMapped), lights);
+
+    dlTrans = DrawListBuilder::CreateDrawList(liParticleShader);
+    dlTrans = DrawListBuilder::AddTransparency(std::move(dlTrans));
+
+    dlText = DrawListBuilder::CreateDrawList(textShader);
+    dlText = DrawListBuilder::AddOrthoProjection(std::move(dlText));
+
+    dlSkybox = DrawListBuilder::CreateDrawList(skyboxShader);
 
     // Setup shadow map
     depthMap = ResourceManager<Texture>::Create("depth-map", SHADOW_WIDTH, SHADOW_HEIGHT,
@@ -88,11 +131,13 @@ int main() {
     ModelSptr cube(new Model("Cube"));
     ModelSptr earth(new Model("Sphere"));
     ModelSptr starfighter(new Model("Arc170"));
-
     ModelSptr floor(new Plane("Grass", {5, 5}, {10.0f, 10.0f}));
     floor->setPos(glm::vec3(0.0f, -3.0f, 0.0f));
     floor->setEuler(glm::vec3(1.0f));
     floor->load(errCode);
+
+    dlIllum->addTargets({tetrahedron, cube, earth, starfighter, floor});
+    dlShadowMapped->addTargets({tetrahedron, cube, earth, starfighter});
 
     GObjSptr earthObj(new GameObject(earth, "Earth"));
     GObjSptr tetrahedronObj(new GameObject(tetrahedron, "Tetrahedron"));
@@ -101,7 +146,6 @@ int main() {
     GObjSptr floorObj(new GameObject(floor));
 
     gameObjects = {earthObj, tetrahedronObj, cubeObj, starfighterObj, floorObj};
-    models = {tetrahedron, cube, earth, starfighter, floor};
 
     // Setup HUD elements
     TextSptr fpsLabel(
@@ -132,59 +176,21 @@ int main() {
         new Text(HUD_FONT, window.relToWinPos({0.7f, 0.5f}), 1.0f, COLOR_GREY, "FOV:"));
     TextSptr fovValue(new Text(HUD_FONT, window.relToWinPos({0.8f, 0.5f}), 1.0f, COLOR_GREY));
 
-    dtTexts = {fpsLabel,  fpsValue,   xPosLabel,  xPosValue, yPosLabel, yPosValue, zPosLabel,
-               zPosValue, pitchLabel, pitchValue, yawLabel,  yawValue,  fovLabel,  fovValue};
-
-    // Setup scene lights
-    LightSptr light01(new DirectionalLight({1.0f, 1.0f, -1.0f}, glm::vec3(1.0f), 0.1f, 0.5f, 0.5f));
-    LightSptr light02(new PointLight({4.0f, 4.0f, -4.0f}, {1.0f, 0.0f, 0.0f}, 0.1f, 1.0f, 1.0f,
-                                     1.0f, 0.045f, 0.0075f));
-    LightSptr light03(new SpotLight({-4.0f, 10.0f, 3.0f}, glm::vec3(1.0f), 0.1f, 1.0f, 1.0f, 1.0f,
-                                    0.045f, 0.0075f, {0.0f, -0.99f, 0.0f}, 30.0f, 35.0f, true));
-
-    lights = {light01, light02, light03};
+    dlText->addTargets({fpsLabel, fpsValue, xPosLabel, xPosValue, yPosLabel, yPosValue, zPosLabel,
+                        zPosValue, pitchLabel, pitchValue, yawLabel, yawValue, fovLabel, fovValue});
 
     // Setup light icons
     LiSptr li01(new LightIcon(light01));
     LiSptr li02(new LightIcon(light02));
     LiSptr li03(new LightIcon(light03));
 
-    dtLightIcons = {li01, li02, li03};
+    dlTrans->addTargets({li01, li02, li03});
 
     // Setup skybox
     Skybox skybox("Teide",
                   {"posx.jpg", "negx.jpg", "posy.jpg", "negy.jpg", "posz.jpg", "negz.jpg"});
 
-    // Setup lighting and depth shader
-    auto lightingShader = ResourceManager<Shader>::Create("Lighting");
-    lightingShader->setPreprocessor(GL_FRAGMENT_SHADER, "MAX_LIGHTS", MAX_LIGHTS);
-
-    auto depthShader = ResourceManager<Shader>::Create("Depth");
-    depthShader->compile();
-    depthShader->setInt("depthMap", 0);
-    depthShader->setFloat("nearPlane", 1.0f);
-    depthShader->setFloat("farPlane", 20.0f);
-    depthShader->setBool("isPerspective", true);
-
-    auto SMD_Shader = ResourceManager<Shader>::Create("ShadowMappingDepth");
-    SMD_Shader->compile();
-
-    // Setup drawlists
-    dtModels = DrawTargets(models.begin(), models.end());
-    dlIllum = DrawListBuilder::CreateDrawList(dtModels, "Lighting");
-    dlIllum = DrawListBuilder::AddIllumination(std::move(dlIllum), lights);
-
-    dlShadowMapped = DrawListBuilder::CreateDrawList(dtModels, "ShadowMappingDepth");
-    dlShadowMapped = DrawListBuilder::AddShadowMapping(std::move(dlShadowMapped), lights);
-
-    dlTrans = DrawListBuilder::CreateDrawList(dtLightIcons, "LightIconParticle");
-    dlTrans = DrawListBuilder::AddTransparency(std::move(dlTrans));
-
-    dlText = DrawListBuilder::CreateDrawList(dtTexts, "Text");
-    dlText = DrawListBuilder::AddOrthoProjection(std::move(dlText));
-
-    dtSkybox = DrawTargets({std::make_shared<Skybox>(skybox)});
-    dlSkybox = DrawListBuilder::CreateDrawList(dtSkybox, "Skybox");
+    dlSkybox->addTarget(std::make_shared<Skybox>(skybox));
 
     // Setup FBO and attach shadow map to it
     FrameBuffer depthMapFBO;

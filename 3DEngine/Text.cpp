@@ -2,8 +2,8 @@
 #include "ResourceManager.h"
 
 // Constructor
-Text::Text(const std::string &font, const glm::vec2 &pos, const GLfloat scale,
-           const glm::vec4 &color, const std::string &text)
+Text::Text(const std::string &font, const glm::vec2 &pos, const float scale, const glm::vec4 &color,
+           const std::string &text)
     : Drawable({pos.x, pos.y, 0.0f}), m_font(ResourceManager<Font>::Get(font)), m_scale(scale),
       m_color(color), m_text(text) {
 
@@ -27,7 +27,7 @@ void Text::draw(ERROR &errCode, const Shader &shader) const {
   glActiveTexture(GL_TEXTURE0);
   glBindVertexArray(m_VAO);
 
-  GLfloat xStart = m_pos.x; // starting x-position current character in text string
+  float xStart = m_pos.x; // starting x-position current character in text string
 
   // Iterate and draw each character
   for (const char &c : m_text) {
@@ -36,13 +36,13 @@ void Text::draw(ERROR &errCode, const Shader &shader) const {
       break;
 
     // Calculate position and size for the given character
-    GLfloat xPos = xStart + ch->bearing.x * m_scale;
-    GLfloat yPos = m_pos.y - (ch->size.y - ch->bearing.y) * m_scale;
-    GLfloat w = ch->size.x * m_scale;
-    GLfloat h = ch->size.y * m_scale;
+    float xPos = xStart + ch->bearing.x * m_scale;
+    float yPos = m_pos.y - (ch->size.y - ch->bearing.y) * m_scale;
+    float w = ch->size.x * m_scale;
+    float h = ch->size.y * m_scale;
 
     // Construct vertices and bind data to VBO
-    GLfloat vertices[4][4] = {
+    float vertices[4][4] = {
         {xPos, yPos, 0.0f, 1.0f},
         {xPos + w, yPos, 1.0f, 1.0f},
         {xPos, yPos + h, 0.0f, 0.0f},
