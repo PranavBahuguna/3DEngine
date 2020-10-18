@@ -1,6 +1,10 @@
 #include "Game.h"
 
+#include <iomanip>
+#include <sstream>
+
 std::unique_ptr<Camera> Game::_camera = nullptr;
+std::unique_ptr<UiOverlay> Game::_uiOverlay = nullptr;
 std::unique_ptr<Window> Game::_window = nullptr;
 
 // Initialise all basic components required to run the game
@@ -15,6 +19,9 @@ void Game::Init() {
   _camera = std::unique_ptr<Camera>(
       new Camera(CAMERA_SETUP_POS, glm::vec3(0, 1, 0), CAMERA_SETUP_YAW, CAMERA_SETUP_PITCH,
                  CAMERA_SETUP_FOV, CAMERA_NEAR_PLANE, CAMERA_FAR_PLANE));
+
+  // Setup UI
+  _uiOverlay = std::unique_ptr<UiOverlay>(new UiOverlay());
 
   // Allow objects to obscure other objects behind them
   glEnable(GL_DEPTH_TEST);
@@ -34,3 +41,12 @@ void Game::Exit() { _window->close(); }
 Camera &Game::GetCamera() { return *_camera; }
 
 Window &Game::GetWindow() { return *_window; }
+
+UiOverlay &Game::GetUiOverlay() { return *_uiOverlay; }
+
+// Converts a float to string with a number of decimal places
+std::string Game::toStringDp(float f, size_t dp) {
+  std::stringstream ss;
+  ss << std::fixed << std::setprecision(dp) << f;
+  return ss.str();
+}

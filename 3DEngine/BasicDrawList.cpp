@@ -20,7 +20,11 @@ void BasicDrawList::draw(ERROR &errCode) {
   ShaderSptr shader = getShader();
   shader->use();
 
-  const auto &targets = getTargets();
-  for (auto it = targets.begin(); it != targets.end() && errCode == ERROR_OK; ++it)
-    (*it)->draw(errCode, *shader);
+  for (auto &target : getTargets()) {
+    if (errCode != ERROR_OK)
+      break;
+
+    if (target->isActive())
+      target->draw(errCode, *shader);
+  }
 }

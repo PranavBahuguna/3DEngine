@@ -19,18 +19,12 @@
 #include <iomanip>
 #include <numeric>
 
-using TextSptr = std::shared_ptr<Text>;
 using LiSptr = std::shared_ptr<LightIcon>;
 using GObjSptr = std::shared_ptr<GameObject>;
 using MeshSptr = std::shared_ptr<Mesh>;
 
 ERROR errCode = ERROR_OK;
 
-std::vector<float> fpsBuffer(FPS_BUFFER_SIZE);
-size_t fpsBufferIdx = 0;
-float fpsUpdateTime = FPS_UPDATE_DELAY;
-
-bool displayHUD = true;
 bool updateScene = true;
 
 std::vector<ModelSptr> models;
@@ -48,9 +42,6 @@ DrawListUptr dlShadowMapped;
 DrawListUptr dlTrans;
 DrawListUptr dlText;
 DrawListUptr dlSkybox;
-
-// forward declarations
-static std::string toStringDp(float, size_t);
 
 int main() {
   try {
@@ -147,38 +138,6 @@ int main() {
 
     gameObjects = {earthObj, tetrahedronObj, cubeObj, starfighterObj, floorObj};
 
-    // Setup HUD elements
-    TextSptr fpsLabel(
-        new Text(HUD_FONT, window.relToWinPos({0.7f, 0.95f}), 1.0f, COLOR_SEAWEED, "FPS:"));
-    TextSptr fpsValue(new Text(HUD_FONT, window.relToWinPos({0.8f, 0.95f}), 1.0f, COLOR_SEAWEED));
-
-    TextSptr xPosLabel(
-        new Text(HUD_FONT, window.relToWinPos({0.7f, 0.85f}), 1.0f, COLOR_RED, "X:"));
-    TextSptr xPosValue(new Text(HUD_FONT, window.relToWinPos({0.8f, 0.85f}), 1.0f, COLOR_RED));
-
-    TextSptr yPosLabel(
-        new Text(HUD_FONT, window.relToWinPos({0.7f, 0.8f}), 1.0f, COLOR_GREEN, "Y:"));
-    TextSptr yPosValue(new Text(HUD_FONT, window.relToWinPos({0.8f, 0.8f}), 1.0f, COLOR_GREEN));
-
-    TextSptr zPosLabel(
-        new Text(HUD_FONT, window.relToWinPos({0.7f, 0.75f}), 1.0f, COLOR_BLUE, "Z:"));
-    TextSptr zPosValue(new Text(HUD_FONT, window.relToWinPos({0.8f, 0.75f}), 1.0f, COLOR_BLUE));
-
-    TextSptr pitchLabel(
-        new Text(HUD_FONT, window.relToWinPos({0.7f, 0.65f}), 1.0f, COLOR_YELLOW, "Pitch:"));
-    TextSptr pitchValue(new Text(HUD_FONT, window.relToWinPos({0.8f, 0.65f}), 1.0f, COLOR_YELLOW));
-
-    TextSptr yawLabel(
-        new Text(HUD_FONT, window.relToWinPos({0.7f, 0.6f}), 1.0f, COLOR_VIOLET, "Yaw:"));
-    TextSptr yawValue(new Text(HUD_FONT, window.relToWinPos({0.8f, 0.6f}), 1.0f, COLOR_VIOLET));
-
-    TextSptr fovLabel(
-        new Text(HUD_FONT, window.relToWinPos({0.7f, 0.5f}), 1.0f, COLOR_GREY, "FOV:"));
-    TextSptr fovValue(new Text(HUD_FONT, window.relToWinPos({0.8f, 0.5f}), 1.0f, COLOR_GREY));
-
-    dlText->addTargets({fpsLabel, fpsValue, xPosLabel, xPosValue, yPosLabel, yPosValue, zPosLabel,
-                        zPosValue, pitchLabel, pitchValue, yawLabel, yawValue, fovLabel, fovValue});
-
     // Setup light icons
     LiSptr li01(new LightIcon(light01));
     LiSptr li02(new LightIcon(light02));
@@ -209,11 +168,7 @@ int main() {
 
     // Main program loop
     while (!window.getShouldClose()) {
-      // Update the timer
       Timer::Update();
-
-      if (fpsBufferIdx < FPS_BUFFER_SIZE)
-        fpsBuffer[fpsBufferIdx++] = 1.0f / Timer::GetDeltaTime();
 
       // Handle user input events
       glfwPollEvents();
@@ -222,11 +177,8 @@ int main() {
       Mouse::MouseScrollControl();
       camera.update();
 
-      /*
-      if (Window::GetToggleKey(errCode, GLFW_KEY_M))
-        displayHUD = !displayHUD;
-      if (Window::GetToggleKey(errCode, GLFW_KEY_ENTER))
-        updateScene = !updateScene;*/
+      // if (Window::GetToggleKey(errCode, GLFW_KEY_ENTER))
+      //  updateScene = !updateScene;*/
 
       // Clear window
       glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -267,29 +219,8 @@ int main() {
       // Draw all transparent objects next
       dlTrans->draw(errCode);
 
-      // Draw HUD elements to screen
-      if (displayHUD) {
-        if (fpsUpdateTime >= FPS_UPDATE_DELAY) {
-          // Calculate average fps from buffer
-          float avgFps =
-              std::accumulate(fpsBuffer.begin(), fpsBuffer.begin() + fpsBufferIdx, 0.0f) /
-              std::max(fpsBufferIdx, (size_t)1);
-          fpsValue->setText(toStringDp(avgFps, 1));
-          fpsUpdateTime -= FPS_UPDATE_DELAY;
-          fpsBufferIdx = 0;
-        } else {
-          fpsUpdateTime += Timer::GetDeltaTime();
-        }
-
-        xPosValue->setText(toStringDp(camera.getPosition().x, 3));
-        yPosValue->setText(toStringDp(camera.getPosition().y, 3));
-        zPosValue->setText(toStringDp(camera.getPosition().z, 3));
-        pitchValue->setText(toStringDp(glm::degrees(camera.getPitch()), 1));
-        yawValue->setText(toStringDp(glm::degrees(camera.getYaw()), 1));
-        fovValue->setText(toStringDp(glm::degrees(camera.getFOV()), 1));
-
-        dlText->draw(errCode);
-      }
+      // Update the HUD overlay
+      Game::GetUiOverlay().update(errCode);
 
       if (errCode != ERROR_OK)
         throw std::runtime_error("An error occurred while runnning this level.");
@@ -303,11 +234,4 @@ int main() {
   }
 
   return EXIT_SUCCESS;
-}
-
-// Converts a float to string with a number of decimal places
-static std::string toStringDp(float f, size_t dp) {
-  std::stringstream ss;
-  ss << std::fixed << std::setprecision(dp) << f;
-  return ss.str();
 }

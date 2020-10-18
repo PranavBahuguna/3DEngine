@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Camera.h"
+#include "UiOverlay.h"
 #include "Window.h"
 
 #include <memory>
@@ -60,10 +61,14 @@ public:
 
   static Camera &GetCamera();
   static Window &GetWindow();
+  static UiOverlay &GetUiOverlay();
+
+  static std::string toStringDp(float f, size_t dp);
 
 private:
   Game() {} // prevent construction of this class
 
   static std::unique_ptr<Camera> _camera;
+  static std::unique_ptr<UiOverlay> _uiOverlay;
   static std::unique_ptr<Window> _window;
 };

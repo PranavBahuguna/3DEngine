@@ -3,6 +3,9 @@
 #include "Drawable.h"
 #include "Font.h"
 
+class Text;
+using TextSptr = std::shared_ptr<Text>;
+
 class Text : public Drawable {
 public:
   Text(const std::string &font, const glm::vec2 &pos, const float scale, const glm::vec4 &color,
