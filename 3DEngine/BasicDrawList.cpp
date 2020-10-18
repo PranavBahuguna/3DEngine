@@ -2,7 +2,10 @@
 
 #include <algorithm>
 
-ShaderSptr BasicDrawList::getShader() { return m_shader; }
+ShaderSptr BasicDrawList::getShader() {
+  m_shader->use();
+  return m_shader;
+}
 
 DrawTargets &BasicDrawList::getTargets() { return m_drawTargets; }
 
@@ -18,7 +21,6 @@ void BasicDrawList::setShader(ShaderSptr shader) { m_shader = shader; }
 // each target
 void BasicDrawList::draw(ERROR &errCode) {
   ShaderSptr shader = getShader();
-  shader->use();
 
   for (auto &target : getTargets()) {
     if (errCode != ERROR_OK)

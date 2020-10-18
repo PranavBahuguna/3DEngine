@@ -22,7 +22,6 @@ void TransparencyDrawList::draw(ERROR &errCode) {
   });
 
   ShaderSptr shader = getShader();
-  shader->use();
   shader->setMat4("view", Game::GetCamera().getView());
   shader->setMat4("projection", Game::GetCamera().getProjection());
 

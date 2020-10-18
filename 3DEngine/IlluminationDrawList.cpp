@@ -9,7 +9,6 @@ IlluminationDrawList::IlluminationDrawList(DrawListUptr drawList,
 
 void IlluminationDrawList::draw(ERROR &errCode) {
   ShaderSptr shader = getShader();
-  shader->use();
 
   // Apply all lights to the shader
   for (size_t i = 0; i < m_lights.size(); i++) {

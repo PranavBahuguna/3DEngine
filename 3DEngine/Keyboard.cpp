@@ -61,6 +61,9 @@ void Keyboard::KeyControl() {
   if (_keys[GLFW_KEY_M].isToggled())
     Game::GetUiOverlay().toggle();
 
+  if (_keys[GLFW_KEY_ENTER].isToggled())
+    Game::ToggleSceneUpdateStatus();
+
   if (_keys[GLFW_KEY_ESCAPE].isToggled())
     Game::Exit();
 }

@@ -1,4 +1,7 @@
 #include "Game.h"
+#include "Keyboard.h"
+#include "Mouse.h"
+#include "Timer.h"
 
 #include <iomanip>
 #include <sstream>
@@ -6,6 +9,7 @@
 std::unique_ptr<Camera> Game::_camera = nullptr;
 std::unique_ptr<UiOverlay> Game::_uiOverlay = nullptr;
 std::unique_ptr<Window> Game::_window = nullptr;
+bool Game::_updateScene = true;
 
 // Initialise all basic components required to run the game
 void Game::Init() {
@@ -38,11 +42,32 @@ void Game::Init() {
 // Handles closing of game session and window
 void Game::Exit() { _window->close(); }
 
+// Toggle the scene update status
+void Game::ToggleSceneUpdateStatus() { _updateScene = !_updateScene; }
+
+void Game::Update() {
+  Timer::Update();
+
+  // Handle user input events
+  glfwPollEvents();
+  Keyboard::KeyControl();
+  Mouse::MouseControl();
+  Mouse::MouseScrollControl();
+
+  _camera->update();
+
+  // Clear window
+  glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+}
+
 Camera &Game::GetCamera() { return *_camera; }
 
 Window &Game::GetWindow() { return *_window; }
 
 UiOverlay &Game::GetUiOverlay() { return *_uiOverlay; }
+
+bool Game::ShouldUpdateScene() { return _updateScene; }
 
 // Converts a float to string with a number of decimal places
 std::string Game::toStringDp(float f, size_t dp) {

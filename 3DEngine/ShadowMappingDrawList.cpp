@@ -6,7 +6,6 @@ ShadowMappingDrawList::ShadowMappingDrawList(DrawListUptr drawList,
 
 void ShadowMappingDrawList::draw(ERROR &errCode) {
   ShaderSptr shader = getShader();
-  shader->use();
 
   // Apply the light space matrix for all shadow-casting lights
   for (auto &light : m_lights) {

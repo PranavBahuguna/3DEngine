@@ -1,23 +1,16 @@
 #define TINYOBJLOADER_IMPLEMENTATION
 
 #include "DrawListBuilder.h"
-#include "Drawable.h"
 #include "FrameBuffer.h"
 #include "Game.h"
 #include "GameObject.h"
-#include "Keyboard.h"
 #include "Light.h"
 #include "LightIcon.h"
-#include "Mouse.h"
 #include "Plane.h"
-#include "RenderBuffer.h"
 #include "Skybox.h"
-#include "Text.h"
 #include "Timer.h"
 
-#include <algorithm>
 #include <iomanip>
-#include <numeric>
 
 using LiSptr = std::shared_ptr<LightIcon>;
 using GObjSptr = std::shared_ptr<GameObject>;
@@ -25,16 +18,12 @@ using MeshSptr = std::shared_ptr<Mesh>;
 
 ERROR errCode = ERROR_OK;
 
-bool updateScene = true;
-
 std::vector<ModelSptr> models;
 std::vector<GObjSptr> gameObjects;
 std::vector<LightSptr> lights;
 
 TexSptr depthMap;
 MeshSptr depthMesh;
-constexpr GLuint SHADOW_WIDTH = 4096;
-constexpr GLuint SHADOW_HEIGHT = 4096;
 
 DrawListUptr dlIllum;
 DrawListUptr dlDepth;
@@ -168,24 +157,10 @@ int main() {
 
     // Main program loop
     while (!window.getShouldClose()) {
-      Timer::Update();
+      Game::Update();
 
-      // Handle user input events
-      glfwPollEvents();
-      Keyboard::KeyControl();
-      Mouse::MouseControl();
-      Mouse::MouseScrollControl();
-      camera.update();
-
-      // if (Window::GetToggleKey(errCode, GLFW_KEY_ENTER))
-      //  updateScene = !updateScene;*/
-
-      // Clear window
-      glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-      glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-      if (updateScene) {
-        // Update all gameobjects and lights
+      // Update all gameobjects and lights
+      if (Game::ShouldUpdateScene()) {
         for (const auto &gameObject : gameObjects)
           gameObject->update(errCode);
 
