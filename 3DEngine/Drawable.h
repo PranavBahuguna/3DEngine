@@ -2,7 +2,7 @@
 
 #include "Shader.h"
 
-static unsigned int id = 0;
+static GLuint id = 0;
 
 class Drawable {
 public:
@@ -13,8 +13,12 @@ public:
 
   virtual void draw(ERROR &errCode, const Shader &shader) const = 0;
 
-  glm::vec3 getPos() const { return m_pos; }
+  void setActive(bool value);
+
+  bool isActive() const;
+  glm::vec3 getPos() const;
 
 protected:
+  bool m_isActive;
   glm::vec3 m_pos;
 };

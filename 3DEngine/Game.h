@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Camera.h"
+#include "UiOverlay.h"
 #include "Window.h"
 
 #include <memory>
@@ -30,7 +31,7 @@ static constexpr int WINDOW_HEIGHT = 1200;
 #ifdef _DEBUG
 static constexpr bool USE_WINDOWED = true;
 #else
-static constexpr bool USE_WINDOWED = true;
+static constexpr bool USE_WINDOWED = false;
 #endif
 static constexpr bool FULLSCREEN_WINDOWS = false;
 
@@ -39,6 +40,8 @@ static constexpr float FPS_UPDATE_DELAY = 0.5f;
 static constexpr size_t FPS_BUFFER_SIZE = 8;
 static constexpr int MAX_LIGHTS = 8;
 static constexpr bool USE_DEPTH_VISUALISATION = false;
+static constexpr GLuint SHADOW_WIDTH = 4096;
+static constexpr GLuint SHADOW_HEIGHT = 4096;
 
 // Text options
 static constexpr auto HUD_FONT = "Unreal";
@@ -57,13 +60,22 @@ class Game {
 public:
   static void Init();
   static void Exit();
+  static void ToggleSceneUpdateStatus();
+  static void Update();
 
   static Camera &GetCamera();
   static Window &GetWindow();
+  static UiOverlay &GetUiOverlay();
+  static bool ShouldUpdateScene();
+
+  static std::string toStringDp(float f, size_t dp);
 
 private:
   Game() {} // prevent construction of this class
 
   static std::unique_ptr<Camera> _camera;
+  static std::unique_ptr<UiOverlay> _uiOverlay;
   static std::unique_ptr<Window> _window;
+
+  static bool _updateScene;
 };

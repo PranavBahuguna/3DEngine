@@ -14,14 +14,11 @@
 
 class LightIcon : public Drawable {
 public:
-  //LightIcon(Light &light);
   LightIcon(LightSptr light);
 
   void draw(ERROR &errCode, const Shader &shader) const override;
 
 private:
-  void init(Light *light, const glm::vec2 &texIndices);
-
   TexSptr m_texture;
   glm::vec4 m_lightColor;
 

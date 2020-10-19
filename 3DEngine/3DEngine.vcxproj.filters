@@ -71,9 +71,6 @@
     <ClCompile Include="Drawable.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="DrawList.cpp">
-      <Filter>Source Files\DrawLists</Filter>
-    </ClCompile>
     <ClCompile Include="IlluminationDrawList.cpp">
       <Filter>Source Files\DrawLists</Filter>
     </ClCompile>
@@ -142,6 +139,15 @@
     </ClCompile>
     <ClCompile Include="Game.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="UiOverlay.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BasicDrawList.cpp">
+      <Filter>Source Files\DrawLists</Filter>
+    </ClCompile>
+    <ClCompile Include="DrawListDecorator.cpp">
+      <Filter>Source Files\DrawLists</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -249,6 +255,15 @@
     </ClInclude>
     <ClInclude Include="Game.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UiOverlay.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BasicDrawList.h">
+      <Filter>Header Files\DrawLists</Filter>
+    </ClInclude>
+    <ClInclude Include="DrawListDecorator.h">
+      <Filter>Header Files\DrawLists</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
