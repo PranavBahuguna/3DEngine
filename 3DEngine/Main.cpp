@@ -29,7 +29,6 @@ DrawListUptr dlIllum;
 DrawListUptr dlDepth;
 DrawListUptr dlShadowMapped;
 DrawListUptr dlTrans;
-DrawListUptr dlText;
 DrawListUptr dlSkybox;
 
 int main() {
@@ -40,28 +39,19 @@ int main() {
     Window &window = Game::GetWindow();
 
     // Setup shaders
-    ShaderSptr lightingShader = ResourceManager<Shader>::Create("Lighting");
-    lightingShader->setPreprocessor(GL_FRAGMENT_SHADER, "MAX_LIGHTS", MAX_LIGHTS);
-    lightingShader->compile();
+    PreprocessorList lightingShaderPreprocessors = {{GL_FRAGMENT_SHADER, "MAX_LIGHTS", MAX_LIGHTS}};
+    auto lightingShader = ResourceManager<Shader>::Create("Lighting", lightingShaderPreprocessors);
 
-    ShaderSptr depthShader = ResourceManager<Shader>::Create("Depth");
-    depthShader->compile();
+    auto depthShader = ResourceManager<Shader>::Create("Depth");
+    depthShader->use();
     depthShader->setInt("depthMap", 0);
     depthShader->setFloat("nearPlane", 1.0f);
     depthShader->setFloat("farPlane", 20.0f);
     depthShader->setBool("isPerspective", true);
 
-    ShaderSptr smdShader = ResourceManager<Shader>::Create("ShadowMappingDepth");
-    smdShader->compile();
-
-    ShaderSptr liParticleShader = ResourceManager<Shader>::Create("LightIconParticle");
-    liParticleShader->compile();
-
-    ShaderSptr textShader = ResourceManager<Shader>::Create("Text");
-    textShader->compile();
-
-    ShaderSptr skyboxShader = ResourceManager<Shader>::Create("Skybox");
-    skyboxShader->compile();
+    auto smdShader = ResourceManager<Shader>::Create("ShadowMappingDepth");
+    auto liParticleShader = ResourceManager<Shader>::Create("LightIconParticle");
+    auto skyboxShader = ResourceManager<Shader>::Create("Skybox");
 
     // Setup scene lights
     LightSptr light01(new DirectionalLight({1.0f, 1.0f, -1.0f}, glm::vec3(1.0f), 0.1f, 0.5f, 0.5f));
@@ -81,9 +71,6 @@ int main() {
 
     dlTrans = DrawListBuilder::CreateDrawList(liParticleShader);
     dlTrans = DrawListBuilder::AddTransparency(std::move(dlTrans));
-
-    dlText = DrawListBuilder::CreateDrawList(textShader);
-    dlText = DrawListBuilder::AddOrthoProjection(std::move(dlText));
 
     dlSkybox = DrawListBuilder::CreateDrawList(skyboxShader);
 

@@ -5,22 +5,49 @@
 
 #include <memory>
 #include <unordered_map>
+#include <variant>
 
 #include <GL/glew.h>
 #include <glm/glm.hpp>
 
 class Shader;
+struct Preprocessor;
 
 using ShaderSptr = std::shared_ptr<Shader>;
 using UniformMap = std::unordered_map<std::string, GLuint>;
-using PreprocessorMap = std::unordered_map<GLenum, std::unordered_map<std::string, std::string>>;
+using PreprocessorData = std::variant<std::string, bool, int, float>;
+using PreprocessorMap = std::unordered_map<GLuint, std::unordered_map<std::string, std::string>>;
+using PreprocessorList = std::vector<Preprocessor>;
+
+struct Preprocessor {
+  Preprocessor(GLuint _type, const std::string &_name, PreprocessorData rawData) {
+    type = _type;
+    name = _name;
+
+    // Try retrieving data from each preprocessor type
+    if (const auto strPtr(std::get_if<std::string>(&rawData)); strPtr != nullptr)
+      data = *strPtr;
+    else if (const auto boolPtr(std::get_if<bool>(&rawData)); boolPtr != nullptr)
+      data = std::to_string(*boolPtr);
+    else if (const auto intPtr(std::get_if<int>(&rawData)); intPtr != nullptr)
+      data = std::to_string(*intPtr);
+    else if (const auto floatPtr(std::get_if<float>(&rawData)); floatPtr != nullptr)
+      data = std::to_string(*floatPtr);
+  }
+
+  GLuint type;
+  std::string name;
+  std::string data;
+};
 
 class Shader : public Resource {
 public:
-  Shader(const std::string &name);
+  Shader(const std::string &name, const PreprocessorList &preprocessors = {},
+         bool compileNow = true);
+  Shader(const std::string &name, bool compileNow);
   ~Shader();
 
-  void compile(bool useShader = true);
+  void compile();
 
   void use() const;
   GLint getUniformId(const std::string &param) const;
@@ -40,14 +67,6 @@ public:
   void setMat3(const std::string &name, const glm::mat3 &value) const;
   void setMat4(const std::string &name, const glm::mat4 &value) const;
 
-  // Preprocessor setter utility functions
-  void setPreprocessor(GLenum type, const std::string &name, const std::string &value);
-  void setPreprocessor(GLenum type, const std::string &name, bool value);
-  void setPreprocessor(GLenum type, const std::string &name, int value);
-  void setPreprocessor(GLenum type, const std::string &name, float value);
-
-  bool isCompiled() const { return m_isCompiled; }
-
 private:
   void load(ERROR &errCode, const std::string &filename, GLenum type, GLuint &shaderId);
   void linkPrograms(ERROR &errCode);
@@ -61,8 +80,6 @@ private:
 
   UniformMap m_uniformMap;
   PreprocessorMap m_preprocessorMap;
-
-  bool m_isCompiled;
 
   // Program ids
   GLuint m_progId;

@@ -4,8 +4,17 @@
 
 #include <glm/gtc/type_ptr.hpp>
 
-Shader::Shader(const std::string &name)
-    : Resource{name}, m_progId(0), m_vertId(0), m_fragId(0), m_isCompiled(false) {}
+Shader::Shader(const std::string &name, const PreprocessorList &preprocessors, bool compileNow)
+    : Resource{name}, m_progId(0), m_vertId(0), m_fragId(0) {
+  // Generate preprocessor map
+  for (const auto &preproc : preprocessors)
+    m_preprocessorMap[preproc.type][preproc.name] = preproc.data;
+
+  if (compileNow)
+    compile();
+}
+
+Shader::Shader(const std::string &name, bool compileNow) : Shader(name, {}, compileNow) {}
 
 Shader::~Shader() {
   glDetachShader(m_progId, m_vertId);
@@ -16,7 +25,7 @@ Shader::~Shader() {
 }
 
 // Load all shader files and compiles them
-void Shader::compile(bool useShader) {
+void Shader::compile() {
   // Get file paths
   const std::string vertPath = "Shaders/" + _name + ".vert";
   const std::string fragPath = "Shaders/" + _name + ".frag";
@@ -31,10 +40,6 @@ void Shader::compile(bool useShader) {
     throw std::runtime_error("An error occurred during shader program compilation.");
 
   bindUniforms();
-  m_isCompiled = true;
-
-  if (useShader)
-    use(); // switch current program to this shader
 }
 
 // Loads shader from file
@@ -213,25 +218,6 @@ void Shader::setMat3(const std::string &name, const glm::mat3 &value) const {
 
 void Shader::setMat4(const std::string &name, const glm::mat4 &value) const {
   glUniformMatrix4fv(getUniformId(name), 1, GL_FALSE, glm::value_ptr(value));
-}
-
-// Adds an entry to the preprocessor values map to use when compiling the shader.
-// NOTE: Unlike the uniform setter functions, preprocessor values are applied before shader
-// compilation, so this method will have no effect if this shader is already compiled!
-void Shader::setPreprocessor(GLenum type, const std::string &name, const std::string &value) {
-  m_preprocessorMap[type][name] = value;
-}
-
-void Shader::setPreprocessor(GLenum type, const std::string &name, bool value) {
-  m_preprocessorMap[type][name] = std::to_string(value);
-}
-
-void Shader::setPreprocessor(GLenum type, const std::string &name, int value) {
-  m_preprocessorMap[type][name] = std::to_string(value);
-}
-
-void Shader::setPreprocessor(GLenum type, const std::string &name, float value) {
-  m_preprocessorMap[type][name] = std::to_string(value);
 }
 
 // Prints the error log of a shader
