@@ -51,6 +51,7 @@ public:
 
   void use() const;
   GLint getUniformId(const std::string &param) const;
+  bool isCompiled() const { return m_isCompiled; }
 
   // Uniform setter utility functions
   void setBool(const std::string &name, bool value) const;
@@ -80,6 +81,8 @@ private:
 
   UniformMap m_uniformMap;
   PreprocessorMap m_preprocessorMap;
+
+  bool m_isCompiled;
 
   // Program ids
   GLuint m_progId;

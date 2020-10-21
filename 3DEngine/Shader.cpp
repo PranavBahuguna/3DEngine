@@ -5,7 +5,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 Shader::Shader(const std::string &name, const PreprocessorList &preprocessors, bool compileNow)
-    : Resource{name}, m_progId(0), m_vertId(0), m_fragId(0) {
+    : Resource{name}, m_isCompiled(false), m_progId(0), m_vertId(0), m_fragId(0) {
   // Generate preprocessor map
   for (const auto &preproc : preprocessors)
     m_preprocessorMap[preproc.type][preproc.name] = preproc.data;
@@ -40,6 +40,7 @@ void Shader::compile() {
     throw std::runtime_error("An error occurred during shader program compilation.");
 
   bindUniforms();
+  m_isCompiled = true;
 }
 
 // Loads shader from file
