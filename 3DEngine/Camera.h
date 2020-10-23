@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Error.h"
+#include "Transform.h"
 #include "Window.h"
 
 #include <glm/glm.hpp>
@@ -10,13 +11,13 @@ enum class CameraAction { MoveFront, MoveRight, MoveUp, TurnRight, TurnUp, Zoom 
 
 class Camera {
 public:
-  Camera(const glm::vec3 &pos, const glm::vec3 &up, float yaw, float pitch, float fov, float near,
-         float far);
+  Camera(const Transform &transform, float fov, float near, float far);
   Camera(const Camera &) = delete;
   Camera &operator=(const Camera &) = delete;
 
   void update();
 
+  Transform getTransform() const;
   glm::mat4 getView() const;
   glm::mat4 getProjection() const;
   glm::vec3 getPosition() const;
@@ -31,15 +32,13 @@ public:
 private:
   void updateDirection();
   void updateProjection();
-  void restrictAngle(float &angle) const;
 
+  Transform m_transform;
   glm::vec3 m_position;
   glm::vec3 m_front;
   glm::vec3 m_up;
   glm::vec3 m_right;
 
-  float m_yaw;
-  float m_pitch;
   float m_fovy;
   float m_zNear;
   float m_zFar;

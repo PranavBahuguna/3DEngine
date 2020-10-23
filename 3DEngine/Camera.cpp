@@ -4,24 +4,25 @@
 
 #include <glm/gtc/matrix_transform.hpp>
 
-Camera::Camera(const glm::vec3 &pos, const glm::vec3 &up, float yaw, float pitch, float fovy,
-               float zNear, float zFar)
-    : m_position(pos), m_up(up), m_yaw(yaw), m_pitch(pitch), m_fovy(fovy), m_zNear(zNear),
-      m_zFar(zFar), m_recalcView(true), m_recalcProjection(true) {
+Camera::Camera(const Transform &transform, float fovy, float zNear, float zFar)
+    : m_transform(transform), m_fovy(fovy), m_zNear(zNear), m_zFar(zFar), m_recalcView(true),
+      m_recalcProjection(true) {
 
   updateDirection();
   updateProjection();
 }
 
+Transform Camera::getTransform() const { return m_transform; }
+
 glm::mat4 Camera::getView() const { return m_view; }
 
 glm::mat4 Camera::getProjection() const { return m_projection; }
 
-glm::vec3 Camera::getPosition() const { return m_position; }
+glm::vec3 Camera::getPosition() const { return m_transform.getPosition(); }
 
-float Camera::getPitch() const { return m_pitch; }
+float Camera::getPitch() const { return m_transform.getRotation().x; }
 
-float Camera::getYaw() const { return m_yaw; }
+float Camera::getYaw() const { return m_transform.getRotation().y; }
 
 float Camera::getFOV() const { return m_fovy; }
 
@@ -46,19 +47,19 @@ void Camera::performAction(CameraAction action, float amount) {
 
   switch (action) {
   case CameraAction::MoveFront:
-    m_position += m_front * amount;
+    m_transform.translate(m_front * amount);
     break;
   case CameraAction::MoveRight:
-    m_position += m_right * amount;
+    m_transform.translate(m_right * amount);
     break;
   case CameraAction::MoveUp:
-    m_position += m_up * amount;
+    m_transform.translate(m_up * amount);
     break;
   case CameraAction::TurnRight:
-    m_yaw += amount;
+    m_transform.rotate(glm::vec3(0.0f, amount, 0.0f));
     break;
   case CameraAction::TurnUp:
-    m_pitch += amount;
+    m_transform.rotate(glm::vec3(amount, 0.0f, 0.0f));
     break;
   case CameraAction::Zoom:
     m_fovy += amount;
@@ -76,17 +77,16 @@ void Camera::updateDirection() {
   if (!m_recalcView)
     return;
 
-  restrictAngle(m_yaw);
-  restrictAngle(m_pitch);
+  m_transform.limitRotation();
 
   // Calculate orientation from pitch and yaw
-  glm::quat qPitch = glm::angleAxis(-m_pitch, glm::vec3(1, 0, 0));
-  glm::quat qYaw = glm::angleAxis(m_yaw, glm::vec3(0, 1, 0));
+  glm::quat qPitch = glm::angleAxis(-m_transform.getRotation().x, glm::vec3(1, 0, 0));
+  glm::quat qYaw = glm::angleAxis(m_transform.getRotation().y, glm::vec3(0, 1, 0));
   m_orientation = qPitch * qYaw;
 
   // Calculate view matrix
-  m_view = glm::mat4_cast(m_orientation);       // rotation
-  m_view = glm::translate(m_view, -m_position); // translation
+  m_view = glm::mat4_cast(m_orientation);                      // rotation
+  m_view = glm::translate(m_view, -m_transform.getPosition()); // translation
 
   // Calculate the front, right and up vectors
   glm::quat invOrientation = glm::conjugate(m_orientation);
@@ -110,12 +110,4 @@ void Camera::updateProjection() {
 
   m_projection = glm::perspective(m_fovy, Game::GetWindow().getAspectRatio(), m_zNear, m_zFar);
   m_recalcProjection = false;
-}
-
-// Restricts an angle between min and max angle, looping if either bound exceeded
-void Camera::restrictAngle(float &angle) const {
-  if (angle > CAMERA_MAX_ANGLE)
-    angle -= TWO_PI_RADIANS;
-  if (angle < CAMERA_MIN_ANGLE)
-    angle += TWO_PI_RADIANS;
 }

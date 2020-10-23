@@ -4,7 +4,8 @@
 
 class Transform {
 public:
-  Transform(const glm::vec3 &position, const glm::vec3 &rotation, const glm::vec3 &scale);
+  Transform(const glm::vec3 &position = glm::vec3(), const glm::vec3 &rotation = glm::vec3(),
+            const glm::vec3 &scale = glm::vec3(1.0f, 1.0f, 1.0f));
 
   // All mutator methods return the current transform to allow for method chaining
   Transform &setPosition(const glm::vec3 &position);
@@ -17,6 +18,9 @@ public:
   const glm::vec3 &getPosition() const;
   const glm::vec3 &getRotation() const;
   const glm::vec3 &getScale() const;
+  glm::mat4 getModel() const;
+
+  void limitRotation();
 
 private:
   glm::vec3 m_position;
