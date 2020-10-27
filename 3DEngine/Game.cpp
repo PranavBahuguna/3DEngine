@@ -21,8 +21,9 @@ void Game::Init() {
 
   // Setup camera
   View cameraView(Transform(CAMERA_SETUP_POS, CAMERA_SETUP_ROTATION));
-  _camera = std::unique_ptr<Camera>(
-      new Camera(cameraView, CAMERA_SETUP_FOV, CAMERA_NEAR_PLANE, CAMERA_FAR_PLANE));
+  Projection cameraProjection(CAMERA_SETUP_FOV, _window->getAspectRatio(), CAMERA_NEAR_PLANE,
+                              CAMERA_FAR_PLANE);
+  _camera = std::unique_ptr<Camera>(new Camera(cameraView, cameraProjection));
 
   // Setup UI
   _uiOverlay = std::unique_ptr<UiOverlay>(new UiOverlay());
@@ -53,8 +54,6 @@ void Game::Update() {
   Keyboard::KeyControl();
   Mouse::MouseControl();
   Mouse::MouseScrollControl();
-
-  _camera->update();
 
   // Clear window
   glClearColor(0.0f, 0.0f, 0.0f, 1.0f);

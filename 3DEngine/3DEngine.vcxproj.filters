@@ -45,6 +45,12 @@
     <Filter Include="Source Files\StaticInput">
       <UniqueIdentifier>{50f8b5d2-0cb8-4ed5-b617-2de559aff407}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\MVP">
+      <UniqueIdentifier>{1d1d46ef-ac73-47ba-abcf-64a8f4cac650}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\MVP">
+      <UniqueIdentifier>{7608928e-7eec-467c-9856-510c899e1c11}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Window.cpp">
@@ -54,9 +60,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Model.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Text.cpp">
@@ -149,11 +152,17 @@
     <ClCompile Include="DrawListDecorator.cpp">
       <Filter>Source Files\DrawLists</Filter>
     </ClCompile>
-    <ClCompile Include="Transform.cpp">
+    <ClCompile Include="View.cpp">
+      <Filter>Source Files\MVP</Filter>
+    </ClCompile>
+    <ClCompile Include="Projection.cpp">
+      <Filter>Source Files\MVP</Filter>
+    </ClCompile>
+    <ClCompile Include="Model.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="View.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="Transform.cpp">
+      <Filter>Source Files\MVP</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -164,9 +173,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Camera.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Model.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Text.h">
@@ -271,10 +277,16 @@
     <ClInclude Include="DrawListDecorator.h">
       <Filter>Header Files\DrawLists</Filter>
     </ClInclude>
-    <ClInclude Include="Transform.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="View.h">
+      <Filter>Header Files\MVP</Filter>
+    </ClInclude>
+    <ClInclude Include="Projection.h">
+      <Filter>Header Files\MVP</Filter>
+    </ClInclude>
+    <ClInclude Include="Transform.h">
+      <Filter>Header Files\MVP</Filter>
+    </ClInclude>
+    <ClInclude Include="Model.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

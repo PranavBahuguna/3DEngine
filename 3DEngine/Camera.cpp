@@ -4,15 +4,12 @@
 
 #include <glm/gtc/matrix_transform.hpp>
 
-Camera::Camera(const View &view, float fovy, float zNear, float zFar)
-    : m_view(view), m_fovy(fovy), m_zNear(zNear), m_zFar(zFar), m_recalcProjection(true) {
-
-  updateProjection();
-}
+Camera::Camera(const View &view, const Projection &projection)
+    : m_view(view), m_projection(projection) {}
 
 glm::mat4 Camera::getView() const { return m_view.getView(); }
 
-glm::mat4 Camera::getProjection() const { return m_projection; }
+glm::mat4 Camera::getProjection() const { return m_projection.getProjection(); }
 
 glm::vec3 Camera::getPosition() const { return m_view.getPosition(); }
 
@@ -20,11 +17,11 @@ float Camera::getPitch() const { return m_view.getRotation().x; }
 
 float Camera::getYaw() const { return m_view.getRotation().y; }
 
-float Camera::getFOV() const { return m_fovy; }
+float Camera::getFOV() const { return m_projection.getFOV(); }
 
-float Camera::getZNear() const { return m_zNear; }
+float Camera::getZNear() const { return m_projection.getNearPlane(); }
 
-float Camera::getZFar() const { return m_zFar; }
+float Camera::getZFar() const { return m_projection.getFarPlane(); }
 
 void Camera::performAction(CameraAction action, float amount) {
   switch (action) {
@@ -44,24 +41,13 @@ void Camera::performAction(CameraAction action, float amount) {
     m_view.rotate(glm::vec3(amount, 0.0f, 0.0f));
     break;
   case CameraAction::Zoom:
-    m_fovy += amount;
+    float newFov = m_projection.zoom(amount).getFOV();
+
+    // Clamp FOV between min and max values
+    if (newFov < CAMERA_MIN_FOV)
+      m_projection.setFOV(CAMERA_MIN_FOV);
+    if (newFov > CAMERA_MAX_FOV)
+      m_projection.setFOV(CAMERA_MAX_FOV);
     break;
   }
-}
-
-void Camera::update() { updateProjection(); }
-
-// Update the camera's projection
-void Camera::updateProjection() {
-  if (!m_recalcProjection)
-    return;
-
-  // Clamp FOV between min and max values
-  if (m_fovy < CAMERA_MIN_FOV)
-    m_fovy = CAMERA_MIN_FOV;
-  if (m_fovy > CAMERA_MAX_FOV)
-    m_fovy = CAMERA_MAX_FOV;
-
-  m_projection = glm::perspective(m_fovy, Game::GetWindow().getAspectRatio(), m_zNear, m_zFar);
-  m_recalcProjection = false;
 }

@@ -180,6 +180,7 @@
     <ClCompile Include="Model.cpp" />
     <ClCompile Include="Mouse.cpp" />
     <ClCompile Include="PointLight.cpp" />
+    <ClCompile Include="Projection.cpp" />
     <ClCompile Include="RenderBuffer.cpp" />
     <ClCompile Include="Script.cpp" />
     <ClCompile Include="Shader.cpp" />
@@ -221,6 +222,7 @@
     <ClInclude Include="Model.h" />
     <ClInclude Include="Mouse.h" />
     <ClInclude Include="PointLight.h" />
+    <ClInclude Include="Projection.h" />
     <ClInclude Include="RenderBuffer.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="ResourceManager.h" />
