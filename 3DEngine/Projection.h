@@ -13,20 +13,20 @@ public:
   Projection &setNearPlane(float zNear);
   Projection &setFarPlane(float zFar);
 
-  float getFOV();
-  float getAspectRatio();
-  float getNearPlane();
-  float getFarPlane();
-  const glm::mat4 &getProjection();
+  float getFOV() const;
+  float getAspectRatio() const;
+  float getNearPlane() const;
+  float getFarPlane() const;
+  const glm::mat4 &getProjection() const;
 
 private:
-  void updateProjectionMatrix();
+  void updateProjection() const;
 
   float m_fovy;
   float m_aspectRatio;
   float m_zNear;
   float m_zFar;
-  glm::mat4 m_projection;
 
-  bool m_projectionMatrixUpdated;
+  mutable glm::mat4 m_projection;
+  mutable bool m_projectionUpdated;
 };

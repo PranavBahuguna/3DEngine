@@ -29,5 +29,5 @@ public:
 
 private:
   Transform m_transform;
-  mutable Projection m_projection;
+  Projection m_projection;
 };
