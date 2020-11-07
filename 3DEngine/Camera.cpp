@@ -4,18 +4,18 @@
 
 #include <glm/gtc/matrix_transform.hpp>
 
-Camera::Camera(const View &view, const Projection &projection)
-    : m_view(view), m_projection(projection) {}
+Camera::Camera(const Transform &transform, const Projection &projection)
+    : m_transform(transform), m_projection(projection) {}
 
-glm::mat4 Camera::getView() const { return m_view.getView(); }
+glm::mat4 Camera::getView() const { return m_transform.getView(); }
 
 glm::mat4 Camera::getProjection() const { return m_projection.getProjection(); }
 
-glm::vec3 Camera::getPosition() const { return m_view.getPosition(); }
+glm::vec3 Camera::getPosition() const { return m_transform.getPosition(); }
 
-float Camera::getPitch() const { return m_view.getRotation().x; }
+float Camera::getPitch() const { return m_transform.getRotation().x; }
 
-float Camera::getYaw() const { return m_view.getRotation().y; }
+float Camera::getYaw() const { return m_transform.getRotation().y; }
 
 float Camera::getFOV() const { return m_projection.getFOV(); }
 
@@ -26,19 +26,19 @@ float Camera::getZFar() const { return m_projection.getFarPlane(); }
 void Camera::performAction(CameraAction action, float amount) {
   switch (action) {
   case CameraAction::MoveFront:
-    m_view.translate(m_view.getFront() * amount);
+    m_transform.translate(m_transform.getFront() * amount);
     break;
   case CameraAction::MoveRight:
-    m_view.translate(m_view.getRight() * amount);
+    m_transform.translate(m_transform.getRight() * amount);
     break;
   case CameraAction::MoveUp:
-    m_view.translate(m_view.getUp() * amount);
+    m_transform.translate(m_transform.getUp() * amount);
     break;
   case CameraAction::TurnRight:
-    m_view.rotate(glm::vec3(0.0f, amount, 0.0f));
+    m_transform.rotate(glm::vec3(0.0f, amount, 0.0f));
     break;
   case CameraAction::TurnUp:
-    m_view.rotate(glm::vec3(amount, 0.0f, 0.0f));
+    m_transform.rotate(glm::vec3(amount, 0.0f, 0.0f));
     break;
   case CameraAction::Zoom:
     float newFov = m_projection.zoom(amount).getFOV();

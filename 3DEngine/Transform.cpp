@@ -4,76 +4,85 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 Transform::Transform(const glm::vec3 &position, const glm::vec3 &rotation, const glm::vec3 &scale)
-    : m_position(position), m_rotation(rotation), m_scale(scale), m_model(glm::mat4()),
-      m_positionUpdated(true), m_rotationUpdated(true), m_scaleUpdated(true) {}
+    : m_position(position), m_rotation(rotation), m_scale(scale), m_orientation(glm::mat4()),
+      m_model(glm::mat4()), m_view(glm::mat4()), m_orientationUpdated(true), m_modelUpdated(true),
+      m_viewUpdated(true) {}
 
 Transform &Transform::setPosition(const glm::vec3 &position) {
   if (m_position != position) {
     m_position = position;
-    m_positionUpdated = true;
+    m_modelUpdated = true;
+    m_viewUpdated = true;
   }
   return *this;
 }
 
 Transform &Transform::translate(const glm::vec3 &translation) {
-  if (translation != glm::vec3()) {
-    m_position += translation;
-    m_positionUpdated = true;
-  }
-  return *this;
+  return setPosition(m_position + translation);
 }
 
+// Rotate transform to a direction given by pitch, yaw and roll
 Transform &Transform::setRotation(const glm::vec3 &rotation) {
+  limitRotation(const_cast<glm::vec3 &>(rotation));
   if (m_rotation != rotation) {
     m_rotation = rotation;
-    m_rotationUpdated = true;
+    m_orientationUpdated = true;
+    m_modelUpdated = true;
+    m_viewUpdated = true;
   }
   return *this;
 }
 
 Transform &Transform::rotate(const glm::vec3 &rotation) {
-  if (rotation != glm::vec3()) {
-    m_rotation += rotation;
-    m_rotationUpdated = true;
-  }
-  return *this;
+  return setRotation(m_rotation + rotation);
 }
 
 Transform &Transform::setScale(const glm::vec3 &scale) {
-  if (m_scale != scale) {
-    m_scale = scale;
-    m_scaleUpdated = true;
-  }
+  m_scale = scale;
+  m_modelUpdated = true;
   return *this;
 }
 
-Transform &Transform::reScale(const glm::vec3 &scale) {
-  if (scale != glm::vec3()) {
-    m_scale += scale;
-    m_scaleUpdated = true;
-  }
-  return *this;
+Transform &Transform::reScale(const glm::vec3 &scale) { return setScale(m_scale + scale); }
+
+const glm::vec3 &Transform::getPosition() const { return m_position; }
+
+const glm::vec3 &Transform::getRotation() const { return m_rotation; }
+
+const glm::vec3 &Transform::getScale() const { return m_scale; }
+
+const glm::quat &Transform::getOrientation() const {
+  updateOrientation();
+  return m_orientation;
 }
 
-const glm::vec3 &Transform::getPosition() { return m_position; }
-
-const glm::vec3 &Transform::getRotation() {
-  limitRotation();
-  return m_rotation;
-}
-
-const glm::vec3 &Transform::getScale() { return m_scale; }
-
-const glm::mat4 &Transform::getModel() {
+const glm::mat4 &Transform::getModel() const {
   updateModel();
   return m_model;
 }
 
-// Resets rotation angle to an equivalent value between +/- pi radians
-void Transform::limitRotation() {
-  if (!m_rotationUpdated)
-    return;
+const glm::mat4 &Transform::getView() const {
+  updateView();
+  return m_view;
+}
 
+glm::vec3 Transform::getFront() const {
+  updateOrientation();
+  return glm::rotate(glm::conjugate(m_orientation), glm::vec3(0.0f, 0.0f, -1.0f));
+}
+
+glm::vec3 Transform::getRight() const {
+  updateOrientation();
+  return glm::rotate(glm::conjugate(m_orientation), glm::vec3(1.0f, 0.0f, 0.0f));
+}
+
+glm::vec3 Transform::getUp() const {
+  updateOrientation();
+  return glm::rotate(glm::conjugate(m_orientation), glm::vec3(0.0f, 1.0f, 0.0f));
+}
+
+// Produces a rotation vector with all angles limited between +/- pi radians
+void Transform::limitRotation(glm::vec3 &rotation) const {
   constexpr auto limitAngle = [](float &angle) {
     constexpr float pi = glm::pi<float>();
 
@@ -83,23 +92,51 @@ void Transform::limitRotation() {
     }
   };
 
-  limitAngle(m_rotation.x);
-  limitAngle(m_rotation.y);
-  limitAngle(m_rotation.z);
+  limitAngle(rotation.x);
+  limitAngle(rotation.y);
+  limitAngle(rotation.z);
 }
 
-void Transform::updateModel() {
-  if (!m_positionUpdated && !m_rotationUpdated && !m_scaleUpdated)
+// Recalculates orientation quaternion if it has been updated
+void Transform::updateOrientation() const {
+  if (!m_orientationUpdated)
     return;
 
+  // Calculate orientation from rotation pitch, yaw and roll
+  glm::quat qPitch = glm::angleAxis(-m_rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
+  glm::quat qYaw = glm::angleAxis(m_rotation.y, glm::vec3(0.0f, 1.0f, 0.0f));
+  glm::quat qRoll = glm::angleAxis(m_rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
+  m_orientation = qPitch * qYaw * qRoll;
+
+  // Reset orientation update flag
+  m_orientationUpdated = false;
+}
+
+// Recalculates the model matrix if it has been updated
+void Transform::updateModel() const {
+  if (!m_modelUpdated)
+    return;
+
+  updateOrientation();
+
+  // Calculate model from position, orientation and scale
   m_model = glm::translate(m_model, m_position);
-  m_model = glm::rotate(m_model, m_rotation.x, {1.0f, 0.0f, 0.0f});
-  m_model = glm::rotate(m_model, m_rotation.y, {0.0f, 1.0f, 0.0f});
-  m_model = glm::rotate(m_model, m_rotation.z, {0.0f, 0.0f, 1.0f});
+  m_model *= glm::mat4_cast(m_orientation);
   m_model = glm::scale(m_model, m_scale);
 
-  // Reset transform update flags
-  m_positionUpdated = false;
-  m_rotationUpdated = false;
-  m_scaleUpdated = false;
+  // Reset model update flag
+  m_modelUpdated = false;
+}
+
+// Recalculates the view matrix if it has been updated
+void Transform::updateView() const {
+  if (!m_viewUpdated)
+    return;
+
+  updateOrientation();
+  m_view = glm::mat4_cast(m_orientation);       // rotation
+  m_view = glm::translate(m_view, -m_position); // translation
+
+  // Reset view update flag
+  m_viewUpdated = false;
 }

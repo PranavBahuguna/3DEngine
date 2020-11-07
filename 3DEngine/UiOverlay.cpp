@@ -9,7 +9,6 @@
 UiOverlay::UiOverlay() : m_toggleOn(true) {
   // Setup shader and draw list
   auto textShader = ResourceManager<Shader>::Get("Text");
-
   m_dlText = DrawListBuilder::CreateDrawList(textShader);
   m_dlText = DrawListBuilder::AddOrthoProjection(std::move(m_dlText));
 

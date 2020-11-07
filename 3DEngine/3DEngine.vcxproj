@@ -196,7 +196,6 @@
     <ClCompile Include="Transform.cpp" />
     <ClCompile Include="TransparencyDrawList.cpp" />
     <ClCompile Include="UiOverlay.cpp" />
-    <ClCompile Include="View.cpp" />
     <ClCompile Include="Window.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -239,7 +238,6 @@
     <ClInclude Include="Transform.h" />
     <ClInclude Include="TransparencyDrawList.h" />
     <ClInclude Include="UiOverlay.h" />
-    <ClInclude Include="View.h" />
     <ClInclude Include="Window.h" />
   </ItemGroup>
   <ItemGroup>

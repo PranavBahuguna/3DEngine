@@ -152,9 +152,6 @@
     <ClCompile Include="DrawListDecorator.cpp">
       <Filter>Source Files\DrawLists</Filter>
     </ClCompile>
-    <ClCompile Include="View.cpp">
-      <Filter>Source Files\MVP</Filter>
-    </ClCompile>
     <ClCompile Include="Projection.cpp">
       <Filter>Source Files\MVP</Filter>
     </ClCompile>
@@ -276,9 +273,6 @@
     </ClInclude>
     <ClInclude Include="DrawListDecorator.h">
       <Filter>Header Files\DrawLists</Filter>
-    </ClInclude>
-    <ClInclude Include="View.h">
-      <Filter>Header Files\MVP</Filter>
     </ClInclude>
     <ClInclude Include="Projection.h">
       <Filter>Header Files\MVP</Filter>

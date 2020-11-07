@@ -1,13 +1,12 @@
 #pragma once
 
 #include <glm/glm.hpp>
+#include <glm/gtx/quaternion.hpp>
 
 class Transform {
 public:
   Transform(const glm::vec3 &position = glm::vec3(), const glm::vec3 &rotation = glm::vec3(),
             const glm::vec3 &scale = glm::vec3(1.0f, 1.0f, 1.0f));
-
-  friend class View;
 
   // All mutator methods return the current transform to allow for method chaining
   Transform &setPosition(const glm::vec3 &position);
@@ -17,21 +16,30 @@ public:
   Transform &setScale(const glm::vec3 &scale);
   Transform &reScale(const glm::vec3 &scale);
 
-  const glm::vec3 &getPosition();
-  const glm::vec3 &getRotation();
-  const glm::vec3 &getScale();
-  const glm::mat4 &getModel();
+  const glm::vec3 &getPosition() const;
+  const glm::vec3 &getRotation() const;
+  const glm::vec3 &getScale() const;
+  const glm::quat &getOrientation() const;
+  const glm::mat4 &getModel() const;
+  const glm::mat4 &getView() const;
+  glm::vec3 getFront() const;
+  glm::vec3 getRight() const;
+  glm::vec3 getUp() const;
 
 private:
-  void updateModel();
-  void limitRotation();
+  void limitRotation(glm::vec3 &rotation) const;
+  void updateOrientation() const;
+  void updateModel() const;
+  void updateView() const;
 
   glm::vec3 m_position;
   glm::vec3 m_rotation;
   glm::vec3 m_scale;
-  glm::mat4 m_model;
 
-  bool m_positionUpdated;
-  bool m_rotationUpdated;
-  bool m_scaleUpdated;
+  mutable glm::quat m_orientation;
+  mutable glm::mat4 m_model;
+  mutable glm::mat4 m_view;
+  mutable bool m_orientationUpdated;
+  mutable bool m_modelUpdated;
+  mutable bool m_viewUpdated;
 };

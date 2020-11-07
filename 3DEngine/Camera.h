@@ -2,7 +2,7 @@
 
 #include "Error.h"
 #include "Projection.h"
-#include "View.h"
+#include "Transform.h"
 #include "Window.h"
 
 #include <glm/glm.hpp>
@@ -12,7 +12,7 @@ enum class CameraAction { MoveFront, MoveRight, MoveUp, TurnRight, TurnUp, Zoom 
 
 class Camera {
 public:
-  Camera(const View &view, const Projection &projection);
+  Camera(const Transform &transform, const Projection &projection);
   Camera(const Camera &) = delete;
   Camera &operator=(const Camera &) = delete;
 
@@ -28,6 +28,6 @@ public:
   void performAction(CameraAction action, float amount);
 
 private:
-  mutable View m_view;
+  Transform m_transform;
   mutable Projection m_projection;
 };

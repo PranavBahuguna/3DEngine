@@ -1,5 +1,7 @@
 #include "SpotLight.h"
+#include "Projection.h"
 #include "Timer.h"
+#include "Transform.h"
 
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -33,24 +35,8 @@ void SpotLight::setLightSpaceMatrix(const Shader &shader) const {
 
 void SpotLight::update(ERROR &errCode) {
   // Calculate the light space projection matrix
-  float near_plane = 1.0f, far_plane = 20.0f;
-  glm::mat4 lightSpaceProjection =
-      glm::perspective(glm::radians(60.0f), 1.0f, near_plane, far_plane);
+  Transform lsTransform(m_position, glm::vec3(glm::radians(-90.0f), 0.0f, 0.0f));
+  Projection lsProjection(glm::radians(60.0f), 1.0f, 1.0f, 20.0f);
 
-  // TODO: Implement the perspective projection class!
-  /*
-  // Calculate the right and up vectors using the light cone direction
-  glm::vec3 worldUp = glm::vec3(0.0f, 1.0f, 0.0f);
-  glm::vec3 right = glm::normalize(glm::cross(m_coneDir, worldUp));
-  glm::vec3 up = glm::normalize(glm::cross(right, m_coneDir));
-
-  // Calculate the light space view, and the overall MVP light space matrix
-  glm::mat4 lightSpaceView = glm::lookAt(m_position, m_position + m_coneDir, up);
-  */
-  glm::vec3 pos = {-4.0f, 10.0f, 3.0f};
-  glm::vec3 tgt = {-4.0f, 0.0f, 3.0f};
-  glm::vec3 up = {0.0f, 0.0f, 1.0f};
-  glm::mat4 lightSpaceView = glm::lookAt(m_position, tgt, up);
-
-  m_lightSpaceMatrix = lightSpaceProjection * lightSpaceView;
+  m_lightSpaceMatrix = lsProjection.getProjection() * lsTransform.getView();
 }

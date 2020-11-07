@@ -6,6 +6,7 @@ class Projection {
 public:
   Projection(float fovy, float aspectRatio, float zNear, float zFar);
 
+  // All mutator methods return the current Projection to allow for method chaining
   Projection &setFOV(float fovy);
   Projection &zoom(float zoomAmount);
   Projection &setAspectRatio(float aspectRatio);
@@ -18,9 +19,9 @@ public:
   float getFarPlane();
   const glm::mat4 &getProjection();
 
+private:
   void updateProjectionMatrix();
 
-private:
   float m_fovy;
   float m_aspectRatio;
   float m_zNear;

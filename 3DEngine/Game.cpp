@@ -20,10 +20,10 @@ void Game::Init() {
   _window = std::unique_ptr<Window>(new Window("Test window", wMode, WINDOW_WIDTH, WINDOW_HEIGHT));
 
   // Setup camera
-  View cameraView(Transform(CAMERA_SETUP_POS, CAMERA_SETUP_ROTATION));
+  Transform cameraTransform(CAMERA_SETUP_POS, CAMERA_SETUP_ROTATION);
   Projection cameraProjection(CAMERA_SETUP_FOV, _window->getAspectRatio(), CAMERA_NEAR_PLANE,
                               CAMERA_FAR_PLANE);
-  _camera = std::unique_ptr<Camera>(new Camera(cameraView, cameraProjection));
+  _camera = std::unique_ptr<Camera>(new Camera(cameraTransform, cameraProjection));
 
   // Setup UI
   _uiOverlay = std::unique_ptr<UiOverlay>(new UiOverlay());
