@@ -45,8 +45,11 @@ void Skybox::draw(ERROR &errCode, const Shader &shader) const {
   glDepthFunc(GL_LEQUAL);
 
   // Set shader parameters and apply
-  shader.setMat4("view", glm::mat4(glm::mat3(Game::GetCamera().getView()))); // remove translation
-  shader.setMat4("projection", Game::GetCamera().getProjection());
+  const auto &cameraTransform = Game::GetCamera().transform();
+  const auto &cameraProjection = Game::GetCamera().projection();
+
+  shader.setMat4("view", glm::mat4(glm::mat3(cameraTransform.getView()))); // remove translation
+  shader.setMat4("projection", cameraProjection.getProjection());
 
   // Set cubemap texture
   m_cubeMap->use();

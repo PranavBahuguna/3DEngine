@@ -2,39 +2,31 @@
 
 #include <glm/glm.hpp>
 
-enum class ProjectionType {
-  perspective,
-  orthographic
-};
-
 class Projection {
 public:
-  Projection();
-  Projection(float left, float right, float bottom, float top, float zNear, float zFar);
   Projection(float fovy, float aspectRatio, float zNear, float zFar);
 
-  virtual ~Projection();
+  // All mutator methods return the current Projection to allow for method chaining
+  Projection &setFOV(float fovy);
+  Projection &zoom(float zoomAmount);
+  Projection &setAspectRatio(float aspectRatio);
+  Projection &setNearPlane(float zNear);
+  Projection &setFarPlane(float zFar);
 
-  float getFOV() const { return m_fovy; }
-  float getAspectRatio() const { return m_aspectRatio; }
-  float getZNear() const { return m_zNear; }
-  float getZFar() const { return m_zFar; }
-  ProjectionType getProjectionType() const { return m_projectionType; }
-  glm::mat4 getProjectionMatrix() const;
+  float getFOV() const;
+  float getAspectRatio() const;
+  float getNearPlane() const;
+  float getFarPlane() const;
+  const glm::mat4 &getProjection() const;
 
-  void setFOV(float fovy);
-  void setAspectRatio(float aspectRatio);
-  void setZNear(float zNear);
-  void setZFar(float zFar);
-  void setProjectionMatrix(const glm::mat4 &projectionMatrix);
+private:
+  void updateProjection() const;
 
-protected:
   float m_fovy;
   float m_aspectRatio;
   float m_zNear;
   float m_zFar;
-  ProjectionType m_projectionType;
-  
-  mutable bool m_recalcProjectionMatrix;
-  mutable glm::mat4 m_projectionMatrix;
+
+  mutable glm::mat4 m_projection;
+  mutable bool m_projectionUpdated;
 };

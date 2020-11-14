@@ -21,10 +21,11 @@ struct Material {
 
 struct Light {
   vec3 color;
-  vec4 position;
-  float ambientStrength;
-  float diffuseStrength;
-  float specularStrength;
+  vec3 position;
+  bool isDir;
+  float ambient;
+  float diffuse;
+  float specular;
   float constant;
   float linear;
   float quadratic;
@@ -60,9 +61,9 @@ vec3 calcLight(Light light, Material mat, vec3 viewDir, vec3 norm, vec3 fragPos)
   vec3 lightDir;
   float attenuation = 1.0;
 
-  if (light.position.w == 0.0f) {
+  if (light.isDir) {
     // Directional light - no attenuation changes
-    lightDir = normalize(light.position.xyz);
+    lightDir = normalize(-light.position.xyz);
   } else {
     // Point light - attenuation affected by distance
     vec3 distVec = light.position.xyz - fragPos;
@@ -80,16 +81,16 @@ vec3 calcLight(Light light, Material mat, vec3 viewDir, vec3 norm, vec3 fragPos)
   }
 
   // Ambient component
-  vec3 ambient = light.ambientStrength * mat.ambient;
+  vec3 ambient = light.ambient * mat.ambient;
 
   // Diffuse component
   float diffuseFactor = max(dot(norm, lightDir), 0.0);
-  vec3 diffuse = light.diffuseStrength * mat.diffuse * diffuseFactor;
+  vec3 diffuse = light.diffuse * mat.diffuse * diffuseFactor;
 
   // Specular component
   vec3 reflectDir = reflect(-lightDir, norm);
   float specularFactor = pow(max(dot(viewDir, reflectDir), 0.0), mat.shininess);
-  vec3 specular = light.specularStrength * mat.specular * specularFactor;
+  vec3 specular = light.specular * mat.specular * specularFactor;
 
   // Shadow component
   float bias = max(0.05 * (1.0 - dot(norm, lightDir)), 0.005);

@@ -21,13 +21,16 @@ static constexpr float CAMERA_FAR_PLANE = 100.0f;
 
 // Camera setup params
 static constexpr auto CAMERA_SETUP_POS = glm::vec3(0.0f, 0.0f, 0.0f);
-static constexpr float CAMERA_SETUP_YAW = glm::radians(180.0f);
 static constexpr float CAMERA_SETUP_PITCH = glm::radians(0.0f);
+static constexpr float CAMERA_SETUP_YAW = glm::radians(180.0f);
+static constexpr float CAMERA_SETUP_ROLL = glm::radians(0.0f);
+static constexpr auto CAMERA_SETUP_ROTATION =
+    glm::vec3(CAMERA_SETUP_PITCH, CAMERA_SETUP_YAW, CAMERA_SETUP_ROLL);
 static constexpr float CAMERA_SETUP_FOV = glm::radians(45.0f);
 
 // Window statics
-static constexpr int WINDOW_WIDTH = 1600;
-static constexpr int WINDOW_HEIGHT = 1200;
+static constexpr int WINDOW_WIDTH = 2000;
+static constexpr int WINDOW_HEIGHT = 1500;
 #ifdef _DEBUG
 static constexpr bool USE_WINDOWED = true;
 #else

@@ -19,9 +19,12 @@ void IlluminationDrawList::draw(ERROR &errCode) {
       m_lights[i]->setLightSpaceMatrix(*shader);
   }
 
-  shader->setMat4("projection", Game::GetCamera().getProjection());
-  shader->setMat4("view", Game::GetCamera().getView());
-  shader->setVec3("viewPos", Game::GetCamera().getPosition());
+  const auto &cameraTransform = Game::GetCamera().transform();
+  const auto &cameraProjection = Game::GetCamera().projection();
+
+  shader->setMat4("projection", cameraProjection.getProjection());
+  shader->setMat4("view", cameraTransform.getView());
+  shader->setVec3("viewPos", cameraTransform.getPosition());
 
   DrawListDecorator::draw(errCode);
 }

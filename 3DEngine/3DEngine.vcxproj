@@ -180,6 +180,7 @@
     <ClCompile Include="Model.cpp" />
     <ClCompile Include="Mouse.cpp" />
     <ClCompile Include="PointLight.cpp" />
+    <ClCompile Include="Projection.cpp" />
     <ClCompile Include="RenderBuffer.cpp" />
     <ClCompile Include="Script.cpp" />
     <ClCompile Include="Shader.cpp" />
@@ -192,6 +193,7 @@
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Timer.cpp" />
+    <ClCompile Include="Transform.cpp" />
     <ClCompile Include="TransparencyDrawList.cpp" />
     <ClCompile Include="UiOverlay.cpp" />
     <ClCompile Include="Window.cpp" />
@@ -219,6 +221,7 @@
     <ClInclude Include="Model.h" />
     <ClInclude Include="Mouse.h" />
     <ClInclude Include="PointLight.h" />
+    <ClInclude Include="Projection.h" />
     <ClInclude Include="RenderBuffer.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="ResourceManager.h" />
@@ -232,6 +235,7 @@
     <ClInclude Include="Text.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="Timer.h" />
+    <ClInclude Include="Transform.h" />
     <ClInclude Include="TransparencyDrawList.h" />
     <ClInclude Include="UiOverlay.h" />
     <ClInclude Include="Window.h" />

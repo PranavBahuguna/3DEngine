@@ -2,10 +2,10 @@
 #include "ResourceManager.h"
 
 // Constructor
-Text::Text(const std::string &font, const glm::vec2 &pos, const float scale, const glm::vec4 &color,
+Text::Text(const Transform &transform, const std::string &font, float scale, const glm::vec4 &color,
            const std::string &text)
-    : Drawable({pos.x, pos.y, 0.0f}), m_font(ResourceManager<Font>::Get(font)), m_scale(scale),
-      m_color(color), m_text(text) {
+    : Drawable(transform), m_font(ResourceManager<Font>::Get(font)), m_scale(scale), m_color(color),
+      m_text(text) {
 
   // Configure VAO / VBO for texture quads and bind buffer data
   glGenVertexArrays(1, &m_VAO);
@@ -27,7 +27,9 @@ void Text::draw(ERROR &errCode, const Shader &shader) const {
   glActiveTexture(GL_TEXTURE0);
   glBindVertexArray(m_VAO);
 
-  float xStart = m_pos.x; // starting x-position current character in text string
+  // Starting x/y position current character in text string
+  float xStart = m_transform.getPosition().x;
+  float yStart = m_transform.getPosition().y;
 
   // Iterate and draw each character
   for (const char &c : m_text) {
@@ -37,7 +39,7 @@ void Text::draw(ERROR &errCode, const Shader &shader) const {
 
     // Calculate position and size for the given character
     float xPos = xStart + ch->bearing.x * m_scale;
-    float yPos = m_pos.y - (ch->size.y - ch->bearing.y) * m_scale;
+    float yPos = yStart - (ch->size.y - ch->bearing.y) * m_scale;
     float w = ch->size.x * m_scale;
     float h = ch->size.y * m_scale;
 

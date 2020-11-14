@@ -80,8 +80,8 @@ int Window::getHeight() const { return m_height; }
 
 float Window::getAspectRatio() const { return (float)m_width / (float)m_height; }
 
-glm::vec2 Window::relToWinPos(const glm::vec2 &pos) const {
-  return {pos.x * m_width, pos.y * m_height};
+glm::vec3 Window::relToWinPos(const glm::vec2 &pos) const {
+  return {pos.x * m_width, pos.y * m_height, 0.0f};
 }
 
 bool Window::getShouldClose() const { return glfwWindowShouldClose(m_mainWindow); }

@@ -18,17 +18,15 @@ public:
   void update(ERROR &errCode);
 
   // Model properties getters / setters
-  const glm::vec3 &getPos() { return m_model->getPos(); }
-  const glm::vec3 &getEuler() { return m_model->getEuler(); }
-  const glm::vec3 &getScale() { return m_model->getScale(); }
-
-  void setPos(const glm::vec3 &pos) { m_model->setPos(pos); }
-  void setEuler(const glm::vec3 &euler) { m_model->setEuler(euler); }
-  void setScale(const glm::vec3 &scale) { m_model->setScale(scale); }
-
-  void move(const glm::vec3 &moveVec) { m_model->move(moveVec); }
-  void rotate(const glm::vec3 &euler) { m_model->rotate(euler); }
-  void scale(const glm::vec3 &scale) { m_model->scale(scale); }
+  const glm::vec3 &getPos() const;
+  const glm::vec3 &getEuler() const;
+  const glm::vec3 &getScale() const;
+  void setPos(const glm::vec3 &pos);
+  void setEuler(const glm::vec3 &euler);
+  void setScale(const glm::vec3 &scale);
+  void move(const glm::vec3 &moveVec);
+  void rotate(const glm::vec3 &euler);
+  void scale(const glm::vec3 &scale);
 
 private:
   ModelSptr m_model;

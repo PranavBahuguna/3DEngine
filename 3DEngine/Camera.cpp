@@ -4,118 +4,38 @@
 
 #include <glm/gtc/matrix_transform.hpp>
 
-Camera::Camera(const glm::vec3 &pos, const glm::vec3 &up, float yaw, float pitch, float fovy,
-               float zNear, float zFar)
-    : m_position(pos), m_up(up), m_yaw(yaw), m_pitch(pitch), m_fovy(fovy), m_zNear(zNear),
-      m_zFar(zFar), m_recalcView(true), m_recalcProjection(true) {
+Camera::Camera(const Transform &transform, const Projection &projection)
+    : m_transform(transform), m_projection(projection) {}
 
-  updateDirection();
-  updateProjection();
-}
+Transform &Camera::transform() { return m_transform; }
 
-glm::mat4 Camera::getView() const { return m_view; }
-
-glm::mat4 Camera::getProjection() const { return m_projection; }
-
-glm::vec3 Camera::getPosition() const { return m_position; }
-
-float Camera::getPitch() const { return m_pitch; }
-
-float Camera::getYaw() const { return m_yaw; }
-
-float Camera::getFOV() const { return m_fovy; }
-
-float Camera::getZNear() const { return m_zNear; }
-
-float Camera::getZFar() const { return m_zFar; }
+Projection &Camera::projection() { return m_projection; }
 
 void Camera::performAction(CameraAction action, float amount) {
-  // Decide whether the action will require recalculation of the view or projection matrices
   switch (action) {
   case CameraAction::MoveFront:
-  case CameraAction::MoveRight:
-  case CameraAction::MoveUp:
-  case CameraAction::TurnRight:
-  case CameraAction::TurnUp:
-    m_recalcView = true;
-    break;
-  case CameraAction::Zoom:
-    m_recalcProjection = true;
-    break;
-  }
-
-  switch (action) {
-  case CameraAction::MoveFront:
-    m_position += m_front * amount;
+    m_transform.translate(m_transform.getFront() * amount);
     break;
   case CameraAction::MoveRight:
-    m_position += m_right * amount;
+    m_transform.translate(m_transform.getRight() * amount);
     break;
   case CameraAction::MoveUp:
-    m_position += m_up * amount;
+    m_transform.translate(m_transform.getUp() * amount);
     break;
   case CameraAction::TurnRight:
-    m_yaw += amount;
+    m_transform.rotate(glm::vec3(0.0f, amount, 0.0f));
     break;
   case CameraAction::TurnUp:
-    m_pitch += amount;
+    m_transform.rotate(glm::vec3(amount, 0.0f, 0.0f));
     break;
   case CameraAction::Zoom:
-    m_fovy += amount;
+    float newFov = m_projection.zoom(amount).getFOV();
+
+    // Clamp FOV between min and max values
+    if (newFov < CAMERA_MIN_FOV)
+      m_projection.setFOV(CAMERA_MIN_FOV);
+    if (newFov > CAMERA_MAX_FOV)
+      m_projection.setFOV(CAMERA_MAX_FOV);
     break;
   }
-}
-
-void Camera::update() {
-  updateDirection();
-  updateProjection();
-}
-
-// Update the camera's direction
-void Camera::updateDirection() {
-  if (!m_recalcView)
-    return;
-
-  restrictAngle(m_yaw);
-  restrictAngle(m_pitch);
-
-  // Calculate orientation from pitch and yaw
-  glm::quat qPitch = glm::angleAxis(-m_pitch, glm::vec3(1, 0, 0));
-  glm::quat qYaw = glm::angleAxis(m_yaw, glm::vec3(0, 1, 0));
-  m_orientation = qPitch * qYaw;
-
-  // Calculate view matrix
-  m_view = glm::mat4_cast(m_orientation);       // rotation
-  m_view = glm::translate(m_view, -m_position); // translation
-
-  // Calculate the front, right and up vectors
-  glm::quat invOrientation = glm::conjugate(m_orientation);
-  m_front = glm::rotate(invOrientation, glm::vec3(0, 0, -1));
-  m_right = glm::rotate(invOrientation, glm::vec3(1, 0, 0));
-  m_up = glm::rotate(invOrientation, glm::vec3(0, 1, 0));
-
-  m_recalcView = false;
-}
-
-// Update the camera's projection
-void Camera::updateProjection() {
-  if (!m_recalcProjection)
-    return;
-
-  // Clamp FOV between min and max values
-  if (m_fovy < CAMERA_MIN_FOV)
-    m_fovy = CAMERA_MIN_FOV;
-  if (m_fovy > CAMERA_MAX_FOV)
-    m_fovy = CAMERA_MAX_FOV;
-
-  m_projection = glm::perspective(m_fovy, Game::GetWindow().getAspectRatio(), m_zNear, m_zFar);
-  m_recalcProjection = false;
-}
-
-// Restricts an angle between min and max angle, looping if either bound exceeded
-void Camera::restrictAngle(float &angle) const {
-  if (angle > CAMERA_MAX_ANGLE)
-    angle -= TWO_PI_RADIANS;
-  if (angle < CAMERA_MIN_ANGLE)
-    angle += TWO_PI_RADIANS;
 }

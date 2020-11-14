@@ -1,22 +1,20 @@
 #include "PointLight.h"
 
-PointLight::PointLight(const glm::vec3 &position, const glm::vec3 &color, float ambient,
-                       float diffuse, float specular, float constant, float linear, float quadratic,
-                       bool isShadowCaster)
-    : Light(position, false, color, ambient, diffuse, specular, isShadowCaster, constant, linear,
-            quadratic) {}
+PointLight::PointLight(const Transform &transform, const glm::vec3 &color, const Phong &phong,
+                       const Attenuation &attenuation, bool isShadowCaster)
+    : Light(transform, color, phong, isShadowCaster, attenuation) {}
 
 void PointLight::use(const Shader &shader, const std::string &prefix) const {
-  shader.setVec4(prefix + "position",
-                 glm::vec4(m_position.x, m_position.y, m_position.z, m_positionW));
+  shader.setVec3(prefix + "position", m_transform.getPosition());
+  shader.setBool(prefix + "isDir", false);
   shader.setVec3(prefix + "color", m_color);
-  shader.setFloat(prefix + "ambientStrength", m_ambient);
-  shader.setFloat(prefix + "diffuseStrength", m_diffuse);
-  shader.setFloat(prefix + "specularStrength", m_specular);
+  shader.setFloat(prefix + "ambient", m_phong.ambient);
+  shader.setFloat(prefix + "diffuse", m_phong.diffuse);
+  shader.setFloat(prefix + "specular", m_phong.specular);
   shader.setBool(prefix + "isShadowCaster", m_isShadowCaster);
-  shader.setFloat(prefix + "constant", m_constant);
-  shader.setFloat(prefix + "linear", m_linear);
-  shader.setFloat(prefix + "quadratic", m_quadratic);
+  shader.setFloat(prefix + "constant", m_attenuation.constant);
+  shader.setFloat(prefix + "linear", m_attenuation.linear);
+  shader.setFloat(prefix + "quadratic", m_attenuation.quadratic);
 }
 
 void PointLight::setLightSpaceMatrix(const Shader &shader) const {}
