@@ -120,7 +120,7 @@ void Transform::updateModel() const {
   updateOrientation();
 
   // Calculate model from position, orientation and scale
-  m_model = glm::translate(m_model, m_position);
+  m_model = glm::translate(glm::mat4(1.0f), m_position);
   m_model *= glm::mat4_cast(m_orientation);
   m_model = glm::scale(m_model, m_scale);
 

@@ -16,27 +16,27 @@ UiOverlay::UiOverlay() : m_toggleOn(true) {
 
   // Setup HUD elements
   m_fpsLabel =
-      TextSptr(new Text(HUD_FONT, window.relToWinPos({0.7f, 0.95f}), 1.0f, COLOR_SEAWEED, "FPS:"));
-  m_fpsValue = TextSptr(new Text(HUD_FONT, window.relToWinPos({0.8f, 0.95f}), 1.0f, COLOR_SEAWEED));
+      TextSptr(new Text(window.relToWinPos({0.7f, 0.95f}), HUD_FONT, 1.0f, COLOR_SEAWEED, "FPS:"));
+  m_fpsValue = TextSptr(new Text(window.relToWinPos({0.8f, 0.95f}), HUD_FONT, 1.0f, COLOR_SEAWEED));
   m_xPosLabel =
-      TextSptr(new Text(HUD_FONT, window.relToWinPos({0.7f, 0.85f}), 1.0f, COLOR_RED, "X:"));
-  m_xPosValue = TextSptr(new Text(HUD_FONT, window.relToWinPos({0.8f, 0.85f}), 1.0f, COLOR_RED));
+      TextSptr(new Text(window.relToWinPos({0.7f, 0.85f}), HUD_FONT, 1.0f, COLOR_RED, "X:"));
+  m_xPosValue = TextSptr(new Text(window.relToWinPos({0.8f, 0.85f}), HUD_FONT, 1.0f, COLOR_RED));
   m_yPosLabel =
-      TextSptr(new Text(HUD_FONT, window.relToWinPos({0.7f, 0.8f}), 1.0f, COLOR_GREEN, "Y:"));
-  m_yPosValue = TextSptr(new Text(HUD_FONT, window.relToWinPos({0.8f, 0.8f}), 1.0f, COLOR_GREEN));
+      TextSptr(new Text(window.relToWinPos({0.7f, 0.8f}), HUD_FONT, 1.0f, COLOR_GREEN, "Y:"));
+  m_yPosValue = TextSptr(new Text(window.relToWinPos({0.8f, 0.8f}), HUD_FONT, 1.0f, COLOR_GREEN));
   m_zPosLabel =
-      TextSptr(new Text(HUD_FONT, window.relToWinPos({0.7f, 0.75f}), 1.0f, COLOR_BLUE, "Z:"));
-  m_zPosValue = TextSptr(new Text(HUD_FONT, window.relToWinPos({0.8f, 0.75f}), 1.0f, COLOR_BLUE));
+      TextSptr(new Text(window.relToWinPos({0.7f, 0.75f}), HUD_FONT, 1.0f, COLOR_BLUE, "Z:"));
+  m_zPosValue = TextSptr(new Text(window.relToWinPos({0.8f, 0.75f}), HUD_FONT, 1.0f, COLOR_BLUE));
   m_pitchLabel =
-      TextSptr(new Text(HUD_FONT, window.relToWinPos({0.7f, 0.65f}), 1.0f, COLOR_YELLOW, "Pitch:"));
+      TextSptr(new Text(window.relToWinPos({0.7f, 0.65f}), HUD_FONT, 1.0f, COLOR_YELLOW, "Pitch:"));
   m_pitchValue =
-      TextSptr(new Text(HUD_FONT, window.relToWinPos({0.8f, 0.65f}), 1.0f, COLOR_YELLOW));
+      TextSptr(new Text(window.relToWinPos({0.8f, 0.65f}), HUD_FONT, 1.0f, COLOR_YELLOW));
   m_yawLabel =
-      TextSptr(new Text(HUD_FONT, window.relToWinPos({0.7f, 0.6f}), 1.0f, COLOR_VIOLET, "Yaw:"));
-  m_yawValue = TextSptr(new Text(HUD_FONT, window.relToWinPos({0.8f, 0.6f}), 1.0f, COLOR_VIOLET));
+      TextSptr(new Text(window.relToWinPos({0.7f, 0.6f}), HUD_FONT, 1.0f, COLOR_VIOLET, "Yaw:"));
+  m_yawValue = TextSptr(new Text(window.relToWinPos({0.8f, 0.6f}), HUD_FONT, 1.0f, COLOR_VIOLET));
   m_fovLabel =
-      TextSptr(new Text(HUD_FONT, window.relToWinPos({0.7f, 0.5f}), 1.0f, COLOR_GREY, "FOV:"));
-  m_fovValue = TextSptr(new Text(HUD_FONT, window.relToWinPos({0.8f, 0.5f}), 1.0f, COLOR_GREY));
+      TextSptr(new Text(window.relToWinPos({0.7f, 0.5f}), HUD_FONT, 1.0f, COLOR_GREY, "FOV:"));
+  m_fovValue = TextSptr(new Text(window.relToWinPos({0.8f, 0.5f}), HUD_FONT, 1.0f, COLOR_GREY));
 
   m_dlText->addTargets({m_fpsLabel, m_fpsValue, m_xPosLabel, m_xPosValue, m_yPosLabel, m_yPosValue,
                         m_zPosLabel, m_zPosValue, m_pitchLabel, m_pitchValue, m_yawLabel,

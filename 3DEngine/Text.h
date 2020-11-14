@@ -8,7 +8,7 @@ using TextSptr = std::shared_ptr<Text>;
 
 class Text : public Drawable {
 public:
-  Text(const std::string &font, const glm::vec2 &pos, const float scale, const glm::vec4 &color,
+  Text(const Transform &transform, const std::string &font, float scale, const glm::vec4 &color,
        const std::string &text = "");
 
   void draw(ERROR &errCode, const Shader &shader) const override;

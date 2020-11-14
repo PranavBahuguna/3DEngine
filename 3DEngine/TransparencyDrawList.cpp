@@ -16,8 +16,8 @@ void TransparencyDrawList::draw(ERROR &errCode) {
   glm::vec3 camPos = Game::GetCamera().getPosition();
 
   std::sort(targets.begin(), targets.end(), [camPos](const DrawSptr &t1, const DrawSptr &t2) {
-    float dist1 = glm::distance2(camPos, t1->getPos());
-    float dist2 = glm::distance2(camPos, t2->getPos());
+    float dist1 = glm::distance2(camPos, t1->transform().getPosition());
+    float dist2 = glm::distance2(camPos, t2->transform().getPosition());
     return dist1 > dist2;
   });
 

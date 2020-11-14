@@ -117,8 +117,7 @@ int main() {
     ModelSptr earth(new Model("Sphere"));
     ModelSptr starfighter(new Model("Arc170"));
     ModelSptr floor(new Plane("Grass", {5, 5}, {10.0f, 10.0f}));
-    floor->setPos(glm::vec3(0.0f, -3.0f, 0.0f));
-    floor->setEuler(glm::vec3(1.0f));
+    floor->transform().setPosition({0.0f, -3.0f, 0.0f});
     floor->load(errCode);
 
     dlIllum->addTargets({tetrahedron, cube, earth, starfighter, floor});

@@ -4,7 +4,7 @@
 
 #include <glm/gtc/matrix_transform.hpp>
 
-Model::Model(const std::string &name) : m_name(name), m_euler(0.0f), m_scale(1.0f) {
+Model::Model(const std::string &name) : Drawable(Transform()), m_name(name) {
   if (ResourceManager<Texture>::FindOrError("depth-map", m_depthTexture))
     throw std::runtime_error("An error occurred while initializing Model.");
 }
@@ -23,7 +23,7 @@ void Model::draw(ERROR &errCode, const Shader &shader) const {
   }
 
   // Set shader parameters and apply
-  shader.setMat4("model", getMatrix());
+  shader.setMat4("model", m_transform.getModel());
 
   if (shader._name == "Lighting") {
     // Apply depth texture
@@ -41,16 +41,4 @@ void Model::draw(ERROR &errCode, const Shader &shader) const {
 
   for (const auto &mesh : m_meshes)
     mesh->draw();
-}
-
-// Gets the model matrix
-glm::mat4 Model::getMatrix() const {
-  auto matrix = glm::mat4(1.0f);
-  matrix = glm::translate(matrix, m_pos);
-  matrix = glm::rotate(matrix, m_euler.x, {1.0f, 0.0f, 0.0f});
-  matrix = glm::rotate(matrix, m_euler.y, {0.0f, 1.0f, 0.0f});
-  matrix = glm::rotate(matrix, m_euler.z, {0.0f, 0.0f, 1.0f});
-  matrix = glm::scale(matrix, m_scale);
-
-  return matrix;
 }
