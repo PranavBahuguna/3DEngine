@@ -16,14 +16,8 @@ public:
   Camera(const Camera &) = delete;
   Camera &operator=(const Camera &) = delete;
 
-  glm::mat4 getView() const;
-  glm::mat4 getProjection() const;
-  glm::vec3 getPosition() const;
-  float getPitch() const;
-  float getYaw() const;
-  float getFOV() const;
-  float getZNear() const;
-  float getZFar() const;
+  Transform &transform();
+  Projection &projection();
 
   void performAction(CameraAction action, float amount);
 

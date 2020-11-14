@@ -7,21 +7,9 @@
 Camera::Camera(const Transform &transform, const Projection &projection)
     : m_transform(transform), m_projection(projection) {}
 
-glm::mat4 Camera::getView() const { return m_transform.getView(); }
+Transform &Camera::transform() { return m_transform; }
 
-glm::mat4 Camera::getProjection() const { return m_projection.getProjection(); }
-
-glm::vec3 Camera::getPosition() const { return m_transform.getPosition(); }
-
-float Camera::getPitch() const { return m_transform.getRotation().x; }
-
-float Camera::getYaw() const { return m_transform.getRotation().y; }
-
-float Camera::getFOV() const { return m_projection.getFOV(); }
-
-float Camera::getZNear() const { return m_projection.getNearPlane(); }
-
-float Camera::getZFar() const { return m_projection.getFarPlane(); }
+Projection &Camera::projection() { return m_projection; }
 
 void Camera::performAction(CameraAction action, float amount) {
   switch (action) {

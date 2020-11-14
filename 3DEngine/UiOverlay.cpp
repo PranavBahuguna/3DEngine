@@ -74,14 +74,15 @@ void UiOverlay::update(ERROR &errCode) {
     fpsUpdateTime += Timer::GetDeltaTime();
   }
 
-  const auto &camera = Game::GetCamera();
+  const auto &cameraTransform = Game::GetCamera().transform();
+  const auto &cameraProjection = Game::GetCamera().projection();
 
-  m_xPosValue->setText(Game::toStringDp(camera.getPosition().x, 3));
-  m_yPosValue->setText(Game::toStringDp(camera.getPosition().y, 3));
-  m_zPosValue->setText(Game::toStringDp(camera.getPosition().z, 3));
-  m_pitchValue->setText(Game::toStringDp(glm::degrees(camera.getPitch()), 1));
-  m_yawValue->setText(Game::toStringDp(glm::degrees(camera.getYaw()), 1));
-  m_fovValue->setText(Game::toStringDp(glm::degrees(camera.getFOV()), 1));
+  m_xPosValue->setText(Game::toStringDp(cameraTransform.getPosition().x, 3));
+  m_yPosValue->setText(Game::toStringDp(cameraTransform.getPosition().y, 3));
+  m_zPosValue->setText(Game::toStringDp(cameraTransform.getPosition().z, 3));
+  m_pitchValue->setText(Game::toStringDp(glm::degrees(cameraTransform.getRotation().x), 1));
+  m_yawValue->setText(Game::toStringDp(glm::degrees(cameraTransform.getRotation().y), 1));
+  m_fovValue->setText(Game::toStringDp(glm::degrees(cameraProjection.getFOV()), 1));
 
   m_dlText->draw(errCode);
 }
