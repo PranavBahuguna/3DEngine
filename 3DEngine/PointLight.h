@@ -4,9 +4,8 @@
 
 class PointLight : public Light {
 public:
-  PointLight(const glm::vec3 &position, const glm::vec3 &color, float ambient, float diffuse,
-             float specular, float constant, float linear, float quadratic,
-             bool isShadowCaster = false);
+  PointLight(const Transform &transform, const glm::vec3 &color, const Phong &phong,
+             const Attenuation &attenuation, bool isShadowCaster = false);
 
   void setLightSpaceMatrix(const Shader &shader) const override;
   void update(ERROR &errCode) override;

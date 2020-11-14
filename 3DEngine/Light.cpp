@@ -2,20 +2,12 @@
 
 #include <sstream>
 
-Light::Light(const glm::vec3 &position, bool isDir, const glm::vec3 &color, float ambient,
-             float diffuse, float specular, bool isShadowCaster, float constant, float linear,
-             float quadratic, const glm::vec3 &coneDir, float innerConeAngle, float outerConeAngle)
-    : m_position(position), m_color(color), m_ambient(ambient), m_diffuse(diffuse),
-      m_specular(specular), m_isShadowCaster(isShadowCaster), m_constant(constant),
-      m_linear(linear), m_quadratic(quadratic), m_coneDir(coneDir) {
-
-  // The w-value indicates to shader whether the vector provided represents a position (w = 1) or
-  // a direction (w = 0)
-  m_positionW = isDir ? 0.0f : 1.0f;
-
-  m_innerConeAngle = glm::cos(glm::radians(innerConeAngle));
-  m_outerConeAngle = glm::cos(glm::radians(outerConeAngle));
-}
+Light::Light(const Transform &transform, const glm::vec3 &color, const Phong &phong,
+             bool isShadowCaster, const Attenuation &attenuation, float innerConeAngle,
+             float outerConeAngle)
+    : m_transform(transform), m_color(color), m_phong(phong), m_isShadowCaster(isShadowCaster),
+      m_attenuation(attenuation), m_innerConeAngle(glm::cos(innerConeAngle)),
+      m_outerConeAngle(glm::cos(outerConeAngle)) {}
 
 // Use accessor method
 void Light::use(const Shader &shader, size_t index) const {
@@ -25,3 +17,10 @@ void Light::use(const Shader &shader, size_t index) const {
 
   use(shader, ss.str());
 }
+
+// Access to the Light's transform
+Transform &Light::transform() { return m_transform; }
+
+glm::vec3 Light::getColor() const { return m_color; }
+
+bool Light::isShadowCaster() const { return m_isShadowCaster; }

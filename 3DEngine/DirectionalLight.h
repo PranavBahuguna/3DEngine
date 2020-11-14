@@ -4,8 +4,8 @@
 
 class DirectionalLight : public Light {
 public:
-  DirectionalLight(const glm::vec3 &position, const glm::vec3 &color, float ambient, float diffuse,
-                   float specular, bool isShadowCaster = false);
+  DirectionalLight(const Transform &transform, const glm::vec3 &color, const Phong &phong,
+                   bool isShadowCaster = false);
 
   void setLightSpaceMatrix(const Shader &shader) const override;
   void update(ERROR &errCode) override;

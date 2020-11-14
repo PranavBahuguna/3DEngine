@@ -1,12 +1,14 @@
 #pragma once
 
 #include "Light.h"
+#include "Projection.h"
+#include "Transform.h"
 
 class SpotLight : public Light {
 public:
-  SpotLight(const glm::vec3 &position, const glm::vec3 &color, float ambient, float diffuse,
-            float specular, float constant, float linear, float quadratic, const glm::vec3 &coneDir,
-            float innerConeAngle, float outerConeAngle, bool isShadowCaster = false);
+  SpotLight(const Transform &transform, const glm::vec3 &color, const Phong &phong,
+            const Attenuation &attenuation, float innerConeAngle, float outerConeAngle,
+            bool isShadowCaster = false);
 
   void setLightSpaceMatrix(const Shader &shader) const override;
   void update(ERROR &errCode) override;
@@ -14,5 +16,5 @@ public:
 private:
   void use(const Shader &shader, const std::string &prefix) const override;
 
-  glm::mat4 m_lightSpaceMatrix;
+  Projection m_projection;
 };
