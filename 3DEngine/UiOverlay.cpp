@@ -80,9 +80,9 @@ void UiOverlay::update(ERROR &errCode) {
   m_xPosValue->setText(Game::toStringDp(cameraTransform.getPosition().x, 3));
   m_yPosValue->setText(Game::toStringDp(cameraTransform.getPosition().y, 3));
   m_zPosValue->setText(Game::toStringDp(cameraTransform.getPosition().z, 3));
-  m_pitchValue->setText(Game::toStringDp(glm::degrees(cameraTransform.getRotation().x), 1));
-  m_yawValue->setText(Game::toStringDp(glm::degrees(cameraTransform.getRotation().y), 1));
-  m_fovValue->setText(Game::toStringDp(glm::degrees(cameraProjection.getFOV()), 1));
+  m_pitchValue->setText(Game::toStringDp(RAD2DEG(cameraTransform.getRotation().x), 1));
+  m_yawValue->setText(Game::toStringDp(RAD2DEG(cameraTransform.getRotation().y), 1));
+  m_fovValue->setText(Game::toStringDp(RAD2DEG(cameraProjection.getFOV()), 1));
 
   m_dlText->draw(errCode);
 }

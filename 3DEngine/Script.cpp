@@ -1,4 +1,5 @@
 #include "Script.h"
+#include "BasicDefines.h"
 #include "Timer.h"
 
 #include <filesystem>
@@ -28,8 +29,8 @@ Script::Script(const std::string &name, const GameObject &gameObject) : Resource
   lua.set_function("scale", &GameObject::scale, gameObject);
 
   // Math functions
-  lua.set_function("sin", [](float angle) { return sin(glm::radians(angle)); });
-  lua.set_function("cos", [](float angle) { return cos(glm::radians(angle)); });
+  lua.set_function("sin", [](float angle) { return sin(DEG2RAD(angle)); });
+  lua.set_function("cos", [](float angle) { return cos(DEG2RAD(angle)); });
 
   // Timer
   lua.set_function("getDeltaTime", &Timer::GetDeltaTime);

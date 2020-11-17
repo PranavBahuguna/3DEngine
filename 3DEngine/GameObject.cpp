@@ -1,4 +1,5 @@
 #include "GameObject.h"
+#include "BasicDefines.h"
 
 #include <stdexcept>
 
@@ -18,7 +19,7 @@ GameObject::GameObject(ModelSptr model, const std::string &script)
 const glm::vec3 &GameObject::getPos() const { return m_model->transform().getPosition(); }
 
 const glm::vec3 &GameObject::getEuler() const {
-  return glm::radians(m_model->transform().getRotation());
+  return DEG2RAD(m_model->transform().getRotation());
 }
 
 const glm::vec3 &GameObject::getScale() const { return m_model->transform().getScale(); }
@@ -26,16 +27,14 @@ const glm::vec3 &GameObject::getScale() const { return m_model->transform().getS
 void GameObject::setPos(const glm::vec3 &pos) { m_model->transform().setPosition(pos); }
 
 void GameObject::setEuler(const glm::vec3 &euler) {
-  m_model->transform().setRotation(glm::radians(euler));
+  m_model->transform().setRotation(DEG2RAD(euler));
 }
 
 void GameObject::setScale(const glm::vec3 &scale) { m_model->transform().setScale(scale); }
 
 void GameObject::move(const glm::vec3 &moveVec) { m_model->transform().translate(moveVec); }
 
-void GameObject::rotate(const glm::vec3 &euler) {
-  m_model->transform().rotate(glm::radians(euler));
-}
+void GameObject::rotate(const glm::vec3 &euler) { m_model->transform().rotate(DEG2RAD(euler)); }
 
 void GameObject::scale(const glm::vec3 &scale) { m_model->transform().reScale(scale); }
 
