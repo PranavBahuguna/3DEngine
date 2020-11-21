@@ -18,7 +18,6 @@ using MeshSptr = std::shared_ptr<Mesh>;
 
 ERROR errCode = ERROR_OK;
 
-std::vector<ModelSptr> models;
 std::vector<GObjSptr> gameObjects;
 std::vector<LightSptr> lights;
 
@@ -54,7 +53,7 @@ int main() {
     auto skyboxShader = ResourceManager<Shader>::Create("Skybox");
 
     // Setup scene lights
-    auto li01Rot = glm::vec3(glm::radians(-45.0f), glm::radians(-45.0f), 0.0f);
+    auto li01Rot = DEG2RAD(glm::vec3(-45.0f, -45.0f, 0.0f));
     auto li01Transform = Transform(glm::vec3(), li01Rot);
     auto li01Color = glm::vec3(1.0f);
     auto li01Phong = Phong{0.1f, 0.5f, 0.5f};
@@ -67,13 +66,13 @@ int main() {
     LightSptr light02(new PointLight(li02Position, li02Color, li02Phong, li02Att));
 
     auto li03Position = glm::vec3(-4.0f, 10.0f, 3.0f);
-    auto li03Rotation = glm::vec3(glm::radians(-90.0f), 0.0f, 0.0f);
+    auto li03Rotation = DEG2RAD(glm::vec3(-90.0f, 0.0f, 0.0f));
     auto li03Transform = Transform(li03Position, li03Rotation);
     auto li03Color = glm::vec3(1.0f);
     auto li03Phong = Phong{0.1f, 1.0f, 1.0f};
     auto li03Att = Attenuation{1.0f, 0.045f, 0.0075f};
-    auto li03InnerConeAngle = glm::radians(30.0f);
-    auto li03OuterConeAngle = glm::radians(35.0f);
+    auto li03InnerConeAngle = DEG2RAD(30.0f);
+    auto li03OuterConeAngle = DEG2RAD(35.0f);
     auto li03ShadowCaster = true;
     LightSptr light03(new SpotLight(li03Transform, li03Color, li03Phong, li03Att,
                                     li03InnerConeAngle, li03OuterConeAngle, li03ShadowCaster));

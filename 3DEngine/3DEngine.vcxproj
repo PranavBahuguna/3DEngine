@@ -200,6 +200,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AssetLoader.h" />
+    <ClInclude Include="BasicDefines.h" />
     <ClInclude Include="BasicDrawList.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="CubeMap.h" />
