@@ -13,22 +13,34 @@ Script::Script(const std::string &name, const GameObject &gameObject) : Resource
     throw std::runtime_error("An error occurred while loading script (" + filename + ").");
 
   // Add userdata types
-  lua.new_usertype<glm::vec3>("vec3",
-                              sol::constructors<glm::vec3(float), glm::vec3(float, float, float)>(),
-                              "x", &glm::vec3::x, "y", &glm::vec3::y, "z", &glm::vec3::z);
+  auto vec3Type = lua.new_usertype<glm::vec3>(
+      "vec3", sol::constructors<glm::vec3(float), glm::vec3(float, float, float)>(), "x",
+      &glm::vec3::x, "y", &glm::vec3::y, "z", &glm::vec3::z);
+  auto transformType = lua.new_usertype<Transform>(
+      "Transform", sol::constructors<Transform(glm::vec3, glm::vec3, glm::vec3)>());
+
+  transformType["setPosition"] = &Transform::setPosition;
+  transformType["translate"] = &Transform::translate;
+  transformType["setRotation"] = &Transform::setRotation;
+  transformType["rotate"] = &Transform::rotate;
+  transformType["setScale"] = &Transform::setScale;
+  transformType["reScale"] = &Transform::reScale;
+  transformType["getPosition"] = &Transform::getPosition;
+  transformType["getRotation"] = &Transform::getRotation;
+  transformType["getScale"] = &Transform::getScale;
+  transformType["getOrientation"] = &Transform::getOrientation;
+  transformType["getModel"] = &Transform::getModel;
+  transformType["getView"] = &Transform::getView;
+  transformType["getFront"] = &Transform::getFront;
+  transformType["getRight"] = &Transform::getRight;
+  transformType["getUp"] = &Transform::getUp;
 
   // GameObject functions
-  lua.set_function("getPos", &GameObject::getPos, gameObject);
-  lua.set_function("getEuler", &GameObject::getEuler, gameObject);
-  lua.set_function("getScale", &GameObject::getScale, gameObject);
-  lua.set_function("setPos", &GameObject::setPos, gameObject);
-  lua.set_function("setEuler", &GameObject::setEuler, gameObject);
-  lua.set_function("setScale", &GameObject::setScale, gameObject);
-  lua.set_function("move", &GameObject::move, gameObject);
-  lua.set_function("rotate", &GameObject::rotate, gameObject);
-  lua.set_function("scale", &GameObject::scale, gameObject);
+  lua.set_function("getTransform", &GameObject::getTransform, gameObject);
 
   // Math functions
+  lua.set_function("deg2rad", [](float angleDegrees) { return DEG2RAD(angleDegrees); });
+  lua.set_function("rad2deg", [](float angleRadians) { return RAD2DEG(angleRadians); });
   lua.set_function("sin", [](float angle) { return sin(DEG2RAD(angle)); });
   lua.set_function("cos", [](float angle) { return cos(DEG2RAD(angle)); });
 

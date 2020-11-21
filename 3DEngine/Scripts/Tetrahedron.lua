@@ -1,11 +1,11 @@
 ROTATION_SPEED = 60.0
 
 function init()
-  setPos(vec3.new(0.0, 0.0, 3.0))
-	setScale(vec3.new(0.4))
+    getTransform():setPosition(vec3.new(0.0, 0.0, 3.0))
+    getTransform():setScale(vec3.new(0.4))
 end
 
 function update()
-  local angle = ROTATION_SPEED * getDeltaTime()
-  rotate(vec3.new(angle, angle, angle))
+    local angle = deg2rad(ROTATION_SPEED) * getDeltaTime()
+    getTransform():rotate(vec3.new(angle, angle, angle))
 end
