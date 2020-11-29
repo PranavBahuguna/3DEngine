@@ -15,6 +15,7 @@ public:
   void setText(const std::string &text) { m_text = text; }
 
 private:
+  Transform m_transform;
   std::string m_text;
   FontSptr m_font;
   float m_scale;

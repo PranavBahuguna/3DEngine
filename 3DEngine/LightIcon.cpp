@@ -9,15 +9,17 @@
 #define LIGHT_ICON_SIZE 256.0f
 #define LIGHT_ICON_IMAGE "light-icons.png"
 
-LightIcon::LightIcon(LightSptr light) : Drawable(light->transform()) {
+LightIcon::LightIcon(LightSptr light) : Drawable() {
+  auto transform = m_owner->GetComponent<Transform>();
+  transform->setPosition(light->transform().getPosition());
   glm::vec2 texIndices = {1, 1};
   m_lightColor = glm::vec4(light->getColor(), 1.0f);
 
   if (dynamic_cast<DirectionalLight *>(light.get()) != nullptr) {
     // Position for directional lights is in a fixed location (with offset for light direction),
     // rather than at light location itself
-    m_transform.setPosition(m_transform.getFront() * DIRLIGHT_ICON_OFFSET_FACTOR +
-                            glm::vec3(0.0f, DIRLIGHT_ICON_POS_HEIGHT, 0.0f));
+    transform->setPosition(transform->getFront() * DIRLIGHT_ICON_OFFSET_FACTOR +
+                           glm::vec3(0.0f, DIRLIGHT_ICON_POS_HEIGHT, 0.0f));
     texIndices = {0, 0};
   } else if (dynamic_cast<PointLight *>(light.get()) != nullptr) {
     texIndices = {0, 1};
@@ -58,7 +60,8 @@ LightIcon::LightIcon(LightSptr light) : Drawable(light->transform()) {
 void LightIcon::draw(ERROR &errCode, const Shader &shader) const {
   // Pass shader parameters
   shader.setVec4("color", m_lightColor);
-  shader.setMat4("model", glm::translate(glm::mat4(1.0f), m_transform.getPosition()));
+  shader.setMat4(
+      "model", glm::translate(glm::mat4(1.0f), m_owner->GetComponent<Transform>()->getPosition()));
 
   // Use texture and draw vertices
   m_texture->use();

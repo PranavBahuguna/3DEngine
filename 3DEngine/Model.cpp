@@ -4,7 +4,10 @@
 
 #include <glm/gtc/matrix_transform.hpp>
 
-Model::Model(const std::string &name) : Drawable(Transform()), m_name(name) {
+Model::Model(const std::string &name) : Model(nullptr, name) {}
+
+Model::Model(std::shared_ptr<GameObject> owner, const std::string &name)
+    : Drawable(owner), m_name(name) {
   if (ResourceManager<Texture>::FindOrError("depth-map", m_depthTexture))
     throw std::runtime_error("An error occurred while initializing Model.");
 }
@@ -23,7 +26,7 @@ void Model::draw(ERROR &errCode, const Shader &shader) const {
   }
 
   // Set shader parameters and apply
-  shader.setMat4("model", m_transform.getModel());
+  shader.setMat4("model", m_owner->GetComponent<Transform>()->getModel());
 
   if (shader._name == "Lighting") {
     // Apply depth texture

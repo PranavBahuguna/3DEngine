@@ -4,8 +4,10 @@
 // Constructor
 Text::Text(const Transform &transform, const std::string &font, float scale, const glm::vec4 &color,
            const std::string &text)
-    : Drawable(transform), m_font(ResourceManager<Font>::Get(font)), m_scale(scale), m_color(color),
+    : Drawable(), m_font(ResourceManager<Font>::Get(font)), m_scale(scale), m_color(color),
       m_text(text) {
+
+  m_transform = transform;
 
   // Configure VAO / VBO for texture quads and bind buffer data
   glGenVertexArrays(1, &m_VAO);
@@ -28,8 +30,8 @@ void Text::draw(ERROR &errCode, const Shader &shader) const {
   glBindVertexArray(m_VAO);
 
   // Starting x/y position current character in text string
-  float xStart = m_transform.getPosition().x;
-  float yStart = m_transform.getPosition().y;
+  float xStart = m_owner->GetComponent<Transform>()->getPosition().x;
+  float yStart = m_owner->GetComponent<Transform>()->getPosition().y;
 
   // Iterate and draw each character
   for (const char &c : m_text) {

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Error.h"
-#include "GameObject.h"
+#include "Component.h"
+#include "Resource.h"
 
 #define SOL_ALL_SAFETIES_ON 1
 #define SOL_NO_EXCEPTIONS 1
@@ -10,12 +10,13 @@
 // Forward declarations
 class GameObject;
 
-class Script : public Resource {
+class Script : public Component, Resource {
 public:
-  Script(const std::string &name, const GameObject &gameObject);
+  Script(const std::string &name);
+  Script(std::shared_ptr<GameObject> owner, const std::string &name);
 
-  void initFunc(ERROR &errCode) { callFunc(errCode, "init"); }
-  void updateFunc(ERROR &errCode) { callFunc(errCode, "update"); }
+  void init(ERROR &errCode) override;
+  void update(ERROR &errCode) override;
 
 private:
   sol::state lua;

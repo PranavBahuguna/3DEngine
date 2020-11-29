@@ -21,7 +21,11 @@ static constexpr float vertices[] = {
 };
 
 Skybox::Skybox(const std::string &cubeMapFolder, const std::vector<std::string> &files)
-    : Drawable{glm::vec3(0.0f)}, m_cubeMap(ResourceManager<CubeMap>::Get(cubeMapFolder, files)) {
+    : Skybox(nullptr, cubeMapFolder, files) {}
+
+Skybox::Skybox(std::shared_ptr<GameObject> owner, const std::string &cubeMapFolder,
+               const std::vector<std::string> &files)
+    : Drawable(owner), m_cubeMap(ResourceManager<CubeMap>::Get(cubeMapFolder, files)) {
 
   // Configure VAO / VBO for skybox and bind buffer data
   glGenVertexArrays(1, &m_VAO);

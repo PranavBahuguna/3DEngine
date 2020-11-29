@@ -8,6 +8,7 @@
 class Model : public Drawable {
 public:
   Model(const std::string &name);
+  Model(std::shared_ptr<GameObject> owner, const std::string &name);
 
   virtual void load(ERROR &errCode);
 

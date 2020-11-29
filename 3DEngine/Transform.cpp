@@ -4,9 +4,13 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 Transform::Transform(const glm::vec3 &position, const glm::vec3 &rotation, const glm::vec3 &scale)
-    : m_position(position), m_rotation(rotation), m_scale(scale), m_orientation(glm::mat4()),
-      m_model(glm::mat4()), m_view(glm::mat4()), m_orientationUpdated(true), m_modelUpdated(true),
-      m_viewUpdated(true) {}
+    : Transform(nullptr, position, rotation, scale) {}
+
+Transform::Transform(std::shared_ptr<GameObject> owner, const glm::vec3 &position,
+                     const glm::vec3 &rotation, const glm::vec3 &scale)
+    : Component(owner), m_position(position), m_rotation(rotation), m_scale(scale),
+      m_orientation(glm::mat4()), m_model(glm::mat4()), m_view(glm::mat4()),
+      m_orientationUpdated(true), m_modelUpdated(true), m_viewUpdated(true) {}
 
 Transform &Transform::setPosition(const glm::vec3 &position) {
   if (m_position != position) {

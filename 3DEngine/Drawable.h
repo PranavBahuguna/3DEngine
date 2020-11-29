@@ -2,12 +2,14 @@
 
 #include "Shader.h"
 #include "Transform.h"
+#include "Component.h"
 
 static GLuint id = 0;
 
-class Drawable {
+class Drawable : public Component {
 public:
-  Drawable(const Transform &transform);
+  Drawable();
+  Drawable(std::shared_ptr<GameObject> owner);
   virtual ~Drawable() = default;
 
   GLuint _id;
@@ -19,6 +21,5 @@ public:
   virtual void draw(ERROR &errCode, const Shader &shader) const = 0;
 
 protected:
-  Transform m_transform;
   bool m_isActive;
 };
