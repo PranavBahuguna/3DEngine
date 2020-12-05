@@ -2,6 +2,7 @@
 
 #include "Component.h"
 #include "Error.h"
+#include "Shader.h"
 
 #include <memory>
 #include <vector>
@@ -10,9 +11,17 @@ class Component;
 
 class GameObject {
 public:
+  GameObject();
+
   void init(ERROR &errCode);
   void start(ERROR &errCode);
   void update(ERROR &errCode);
+  void draw(ERROR &errCode, const Shader &shader);
+
+  void setActive(bool value);
+  void setVisible(bool value);
+  bool isActive() const;
+  bool isVisible() const;
 
   template <class T, std::enable_if_t<std::is_base_of<Component, T>::value, bool> = true,
             class... Args>
@@ -40,14 +49,12 @@ public:
         return std::dynamic_pointer_cast<T>(component);
     }
 
-    return nullptr;
-  }
-
-  template <class T, std::enable_if_t<std::is_base_of<Component, T>::value, bool> = true>
-  T &GetComponentNoPtr() {
-    return *GetComponent<T>();
+    return nullptr; // component not found
   }
 
 private:
+  bool m_isActive;
+  bool m_isVisible;
+
   std::vector<std::shared_ptr<Component>> m_components;
 };

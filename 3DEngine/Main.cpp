@@ -115,43 +115,45 @@ int main() {
     GObjSptr tetrahedron(new GameObject());
     tetrahedron->AddComponent<Transform>();
     tetrahedron->AddComponent<Script>("Tetrahedron");
-    auto tetrahedronModel = tetrahedron->AddComponent<Model>("Tetrahedron");
-    tetrahedronModel->load(errCode);
+    tetrahedron->AddComponent<Model>("Tetrahedron")->load(errCode);
 
     GObjSptr cube(new GameObject());
     cube->AddComponent<Transform>();
     cube->AddComponent<Script>("Cube");
-    auto cubeModel = cube->AddComponent<Model>("Cube");
-    cubeModel->load(errCode);
+    cube->AddComponent<Model>("Cube")->load(errCode);
 
     GObjSptr earth(new GameObject());
     earth->AddComponent<Transform>();
     earth->AddComponent<Script>("Earth");
-    auto earthModel = earth->AddComponent<Model>("Sphere");
-    earthModel->load(errCode);
+    earth->AddComponent<Model>("Sphere")->load(errCode);
 
     GObjSptr starfighter(new GameObject());
     starfighter->AddComponent<Transform>();
     starfighter->AddComponent<Script>("Starfighter");
-    auto starfighterModel = starfighter->AddComponent<Model>("Arc170");
-    starfighterModel->load(errCode);
+    starfighter->AddComponent<Model>("Arc170")->load(errCode);
 
     GObjSptr floor(new GameObject());
     floor->AddComponent<Transform>(glm::vec3(0.0f, -3.0f, 0.0f));
-    auto floorModel =
-        floor->AddComponent<Plane>("Grass", glm::uvec2(5, 5), glm::vec2(10.0f, 10.0f));
-    floorModel->load(errCode);
+    floor->AddComponent<Plane>("Grass", glm::uvec2(5, 5), glm::vec2(10.0f, 10.0f))->load(errCode);
 
-    dlIllum->addTargets({tetrahedronModel, cubeModel, earthModel, starfighterModel, floorModel});
-    dlShadowMapped->addTargets({tetrahedronModel, cubeModel, earthModel, starfighterModel});
     gameObjects = {tetrahedron, cube, earth, starfighter, floor};
+    dlIllum->addTargets(gameObjects);
+    dlShadowMapped->addTargets({tetrahedron, cube, earth, starfighter});
 
     // Setup light icons
-    //LiSptr li01(new LightIcon(light01));
-    //LiSptr li02(new LightIcon(light02));
-    //LiSptr li03(new LightIcon(light03));
+    GObjSptr li01(new GameObject());
+    li01->AddComponent<Transform>();
+    li01->AddComponent<LightIcon>(light01);
 
-    //dlTrans->addTargets({li01, li02, li03});
+    GObjSptr li02(new GameObject());
+    li02->AddComponent<Transform>();
+    li02->AddComponent<LightIcon>(light02);
+
+    GObjSptr li03(new GameObject());
+    li03->AddComponent<Transform>();
+    li03->AddComponent<LightIcon>(light03);
+
+    dlTrans->addTargets({li01, li02, li03});
 
     // Setup skybox
     GObjSptr skybox(new GameObject());
@@ -160,7 +162,7 @@ int main() {
                                  std::vector<std::string>({"posx.jpg", "negx.jpg", "posy.jpg",
                                                            "negy.jpg", "posz.jpg", "negz.jpg"}));
 
-    dlSkybox->addTarget(skybox->GetComponent<Skybox>());
+    dlSkybox->addTarget(skybox);
 
     // Setup FBO and attach shadow map to it
     FrameBuffer depthMapFBO;

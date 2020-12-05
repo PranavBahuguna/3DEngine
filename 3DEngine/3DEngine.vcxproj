@@ -166,7 +166,6 @@
     <ClCompile Include="Component.cpp" />
     <ClCompile Include="CubeMap.cpp" />
     <ClCompile Include="DirectionalLight.cpp" />
-    <ClCompile Include="Drawable.cpp" />
     <ClCompile Include="BasicDrawList.cpp" />
     <ClCompile Include="DrawListDecorator.cpp" />
     <ClCompile Include="Font.cpp" />
@@ -207,7 +206,6 @@
     <ClInclude Include="Component.h" />
     <ClInclude Include="CubeMap.h" />
     <ClInclude Include="DirectionalLight.h" />
-    <ClInclude Include="Drawable.h" />
     <ClInclude Include="DrawList.h" />
     <ClInclude Include="DrawListDecorator.h" />
     <ClInclude Include="Error.h" />

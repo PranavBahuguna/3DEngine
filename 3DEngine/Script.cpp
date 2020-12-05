@@ -40,7 +40,7 @@ Script::Script(std::shared_ptr<GameObject> owner, const std::string &name)
   transformType["getUp"] = &Transform::getUp;
 
   // GameObject functions
-  lua.set_function("getTransform", &GameObject::GetComponentNoPtr<Transform>, *m_owner);
+  lua.set_function("getTransform", &GameObject::GetComponent<Transform>, m_owner);
 
   // Math functions
   lua.set_function("deg2rad", [](float angleDegrees) { return DEG2RAD(angleDegrees); });

@@ -3,9 +3,6 @@
 #include "Mouse.h"
 #include "Timer.h"
 
-#include <iomanip>
-#include <sstream>
-
 std::unique_ptr<Camera> Game::_camera = nullptr;
 std::unique_ptr<UiOverlay> Game::_uiOverlay = nullptr;
 std::unique_ptr<Window> Game::_window = nullptr;
@@ -67,10 +64,3 @@ Window &Game::GetWindow() { return *_window; }
 UiOverlay &Game::GetUiOverlay() { return *_uiOverlay; }
 
 bool Game::ShouldUpdateScene() { return _updateScene; }
-
-// Converts a float to string with a number of decimal places
-std::string Game::toStringDp(float f, size_t dp) {
-  std::stringstream ss;
-  ss << std::fixed << std::setprecision(dp) << f;
-  return ss.str();
-}

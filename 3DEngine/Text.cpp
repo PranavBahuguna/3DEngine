@@ -1,13 +1,14 @@
 #include "Text.h"
 #include "ResourceManager.h"
+#include "Transform.h"
 
-// Constructor
-Text::Text(const Transform &transform, const std::string &font, float scale, const glm::vec4 &color,
-           const std::string &text)
-    : Drawable(), m_font(ResourceManager<Font>::Get(font)), m_scale(scale), m_color(color),
+Text::Text(const std::string &font, float scale, const glm::vec4 &color, const std::string &text)
+    : Text(nullptr, font, scale, color, text) {}
+
+Text::Text(std::shared_ptr<GameObject> owner, const std::string &font, float scale,
+           const glm::vec4 &color, const std::string &text)
+    : Component(owner), m_font(ResourceManager<Font>::Get(font)), m_scale(scale), m_color(color),
       m_text(text) {
-
-  m_transform = transform;
 
   // Configure VAO / VBO for texture quads and bind buffer data
   glGenVertexArrays(1, &m_VAO);
@@ -23,7 +24,7 @@ Text::Text(const Transform &transform, const std::string &font, float scale, con
 }
 
 // Draws a text string onto the screen
-void Text::draw(ERROR &errCode, const Shader &shader) const {
+void Text::draw(ERROR &errCode, const Shader &shader) {
   // Pass shader parameters and activate
   shader.setVec4("textColor", m_color);
   glActiveTexture(GL_TEXTURE0);

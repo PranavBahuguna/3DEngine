@@ -17,11 +17,12 @@ void TransparencyDrawList::draw(ERROR &errCode) {
   const auto &cameraProjection = Game::GetCamera().projection();
 
   glm::vec3 camPos = cameraTransform.getPosition();
-  std::sort(targets.begin(), targets.end(), [camPos](const DrawSptr &t1, const DrawSptr &t2) {
-    float dist1 = glm::distance2(camPos, t1->transform().getPosition());
-    float dist2 = glm::distance2(camPos, t2->transform().getPosition());
-    return dist1 > dist2;
-  });
+  std::sort(targets.begin(), targets.end(),
+            [camPos](const std::shared_ptr<GameObject> &t1, const std::shared_ptr<GameObject> &t2) {
+              float dist1 = glm::distance2(camPos, t1->GetComponent<Transform>()->getPosition());
+              float dist2 = glm::distance2(camPos, t2->GetComponent<Transform>()->getPosition());
+              return dist1 > dist2;
+            });
 
   ShaderSptr shader = getShader();
   shader->setMat4("view", cameraTransform.getView());

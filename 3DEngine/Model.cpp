@@ -7,7 +7,7 @@
 Model::Model(const std::string &name) : Model(nullptr, name) {}
 
 Model::Model(std::shared_ptr<GameObject> owner, const std::string &name)
-    : Drawable(owner), m_name(name) {
+    : Component(owner), m_name(name) {
   if (ResourceManager<Texture>::FindOrError("depth-map", m_depthTexture))
     throw std::runtime_error("An error occurred while initializing Model.");
 }
@@ -18,7 +18,7 @@ void Model::load(ERROR &errCode) {
 }
 
 // Draws the model to the screen
-void Model::draw(ERROR &errCode, const Shader &shader) const {
+void Model::draw(ERROR &errCode, const Shader &shader) {
   // Check that we have a mesh to use
   if (m_meshes.empty()) {
     errCode = printErrorMsg(ERROR_MISSING_MESH);

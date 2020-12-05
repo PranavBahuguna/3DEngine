@@ -9,7 +9,9 @@
 #define LIGHT_ICON_SIZE 256.0f
 #define LIGHT_ICON_IMAGE "light-icons.png"
 
-LightIcon::LightIcon(LightSptr light) : Drawable() {
+LightIcon::LightIcon(LightSptr light) : LightIcon(nullptr, light) {}
+
+LightIcon::LightIcon(std::shared_ptr<GameObject> owner, LightSptr light) : Component(owner) {
   auto transform = m_owner->GetComponent<Transform>();
   transform->setPosition(light->transform().getPosition());
   glm::vec2 texIndices = {1, 1};
@@ -57,7 +59,7 @@ LightIcon::LightIcon(LightSptr light) : Drawable() {
 }
 
 // Draws a light icon onto the screen
-void LightIcon::draw(ERROR &errCode, const Shader &shader) const {
+void LightIcon::draw(ERROR &errCode, const Shader &shader) {
   // Pass shader parameters
   shader.setVec4("color", m_lightColor);
   shader.setMat4(

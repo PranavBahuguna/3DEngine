@@ -1,18 +1,18 @@
 #pragma once
 
 #include "AssetLoader.h"
-#include "Drawable.h"
+#include "Component.h"
 #include "Light.h"
 #include "Shader.h"
 
-class Model : public Drawable {
+class Model : public Component {
 public:
   Model(const std::string &name);
   Model(std::shared_ptr<GameObject> owner, const std::string &name);
 
   virtual void load(ERROR &errCode);
 
-  void draw(ERROR &errCode, const Shader &shader) const override;
+  void draw(ERROR &errCode, const Shader &shader) override;
 
 protected:
   std::string m_name;

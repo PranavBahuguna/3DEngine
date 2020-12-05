@@ -15,18 +15,18 @@ private:
   bool m_toggleOn;
 
   // UI text elements
-  TextSptr m_fpsLabel;
-  TextSptr m_fpsValue;
-  TextSptr m_xPosLabel;
-  TextSptr m_xPosValue;
-  TextSptr m_yPosLabel;
-  TextSptr m_yPosValue;
-  TextSptr m_zPosLabel;
-  TextSptr m_zPosValue;
-  TextSptr m_pitchLabel;
-  TextSptr m_pitchValue;
-  TextSptr m_yawLabel;
-  TextSptr m_yawValue;
-  TextSptr m_fovLabel;
-  TextSptr m_fovValue;
+  std::shared_ptr<GameObject> m_fpsLabel;
+  std::shared_ptr<GameObject> m_fpsValue;
+  std::shared_ptr<GameObject> m_xPosLabel;
+  std::shared_ptr<GameObject> m_xPosValue;
+  std::shared_ptr<GameObject> m_yPosLabel;
+  std::shared_ptr<GameObject> m_yPosValue;
+  std::shared_ptr<GameObject> m_zPosLabel;
+  std::shared_ptr<GameObject> m_zPosValue;
+  std::shared_ptr<GameObject> m_pitchLabel;
+  std::shared_ptr<GameObject> m_pitchValue;
+  std::shared_ptr<GameObject> m_yawLabel;
+  std::shared_ptr<GameObject> m_yawValue;
+  std::shared_ptr<GameObject> m_fovLabel;
+  std::shared_ptr<GameObject> m_fovValue;
 };
