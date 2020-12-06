@@ -4,12 +4,16 @@
 
 #include <glm/gtc/matrix_transform.hpp>
 
-Model::Model(const std::string &name) : Model(nullptr, name) {}
+Model::Model(const std::string &name, bool loadNow) : Model(nullptr, name, loadNow) {}
 
-Model::Model(std::shared_ptr<GameObject> owner, const std::string &name)
+Model::Model(const std::shared_ptr<GameObject> &owner, const std::string &name, bool loadNow)
     : Component(owner), m_name(name) {
   if (ResourceManager<Texture>::FindOrError("depth-map", m_depthTexture))
     throw std::runtime_error("An error occurred while initializing Model.");
+  if (loadNow) {
+    ERROR errCode = ERROR_OK;
+    load(errCode);
+  }
 }
 
 // Loads model from the given file path

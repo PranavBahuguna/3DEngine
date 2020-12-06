@@ -25,28 +25,30 @@ public:
 
   template <class T, std::enable_if_t<std::is_base_of<Component, T>::value, bool> = true,
             class... Args>
-  std::shared_ptr<T> AddComponent(Args... args) {
+  T *AddComponent(Args... args) {
     // Check that this component has not already been added to this game object. This is to prevent
     // the same component from being added twice.
     for (auto &component : m_components) {
-      if (std::dynamic_pointer_cast<T>(component))
-        return std::dynamic_pointer_cast<T>(component);
+      T *foundComponent = dynamic_cast<T *>(component.get());
+
+      if (foundComponent != nullptr)
+        return foundComponent;
     }
 
     // Game object does not already have this component, so add it
-    std::shared_ptr<T> newComponent(
-        new T(std::make_shared<GameObject>(*this), std::forward<Args>(args)...));
-    m_components.push_back(newComponent);
+    m_components.emplace_back(std::make_unique<T>(std::shared_ptr<GameObject>(this), std::forward<Args>(args)...));
 
-    return newComponent;
+    return dynamic_cast<T*>(m_components.back().get());
   }
 
   template <class T, std::enable_if_t<std::is_base_of<Component, T>::value, bool> = true>
-  std::shared_ptr<T> GetComponent() {
+  T *GetComponent() {
     // Check if we already have this component, and return it if found
     for (auto &component : m_components) {
-      if (std::dynamic_pointer_cast<T>(component))
-        return std::dynamic_pointer_cast<T>(component);
+      T *foundComponent = dynamic_cast<T *>(component.get());
+
+      if (foundComponent != nullptr)
+        return foundComponent;
     }
 
     return nullptr; // component not found
@@ -56,5 +58,5 @@ private:
   bool m_isActive;
   bool m_isVisible;
 
-  std::vector<std::shared_ptr<Component>> m_components;
+  std::vector<std::unique_ptr<Component>> m_components;
 };

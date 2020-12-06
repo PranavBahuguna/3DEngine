@@ -5,7 +5,7 @@
 Text::Text(const std::string &font, float scale, const glm::vec4 &color, const std::string &text)
     : Text(nullptr, font, scale, color, text) {}
 
-Text::Text(std::shared_ptr<GameObject> owner, const std::string &font, float scale,
+Text::Text(const std::shared_ptr<GameObject> &owner, const std::string &font, float scale,
            const glm::vec4 &color, const std::string &text)
     : Component(owner), m_font(ResourceManager<Font>::Get(font)), m_scale(scale), m_color(color),
       m_text(text) {

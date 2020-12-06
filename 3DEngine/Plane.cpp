@@ -4,20 +4,25 @@
 #include <fstream>
 
 Plane::Plane(const std::string &name, const glm::uvec2 &nTiles, const glm::vec2 &tileDimensions,
-             const glm::vec2 &tileTexMapping)
+             const glm::vec2 &tileTexMapping, bool loadNow)
     : Plane(nullptr, name, nTiles, tileDimensions, tileTexMapping) {}
 
-Plane::Plane(std::shared_ptr<GameObject> owner, const std::string &name, const glm::uvec2 &nTiles,
-             const glm::vec2 &tileDimensions, const glm::vec2 &tileTexMapping)
-    : Model(owner, name), m_nTiles(nTiles), m_tileDimensions(tileDimensions),
+Plane::Plane(const std::shared_ptr<GameObject> &owner, const std::string &name,
+             const glm::uvec2 &nTiles, const glm::vec2 &tileDimensions,
+             const glm::vec2 &tileTexMapping, bool loadNow)
+    : Model(owner, name, false), m_nTiles(nTiles), m_tileDimensions(tileDimensions),
       m_tileTexMapping(tileTexMapping) {
 
-  m_meshes.resize(1);
+  if (loadNow) {
+    ERROR errCode = ERROR_OK;
+    load(errCode);
+  }
 }
 
 // Creates the mesh and relevant materials
 void Plane::load(ERROR &errCode) {
   // Use existing mesh if available, otherwise generate the mesh
+  m_meshes.resize(1);
   if (!ResourceManager<Mesh>::Find(m_name, m_meshes[0]))
     generateMesh();
 

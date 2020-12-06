@@ -11,7 +11,7 @@
 
 LightIcon::LightIcon(LightSptr light) : LightIcon(nullptr, light) {}
 
-LightIcon::LightIcon(std::shared_ptr<GameObject> owner, LightSptr light) : Component(owner) {
+LightIcon::LightIcon(const std::shared_ptr<GameObject> &owner, LightSptr light) : Component(owner) {
   auto transform = m_owner->GetComponent<Transform>();
   transform->setPosition(light->transform().getPosition());
   glm::vec2 texIndices = {1, 1};

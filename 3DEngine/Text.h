@@ -9,7 +9,7 @@ using TextSptr = std::shared_ptr<Text>;
 class Text : public Component {
 public:
   Text(const std::string &font, float scale, const glm::vec4 &color, const std::string &text = "");
-  Text(std::shared_ptr<GameObject> owner, const std::string &font, float scale,
+  Text(const std::shared_ptr<GameObject> &owner, const std::string &font, float scale,
        const glm::vec4 &color, const std::string &text = "");
 
   void draw(ERROR &errCode, const Shader &shader) override;

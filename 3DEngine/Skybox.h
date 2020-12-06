@@ -7,7 +7,7 @@
 class Skybox : public Component {
 public:
   Skybox(const std::string &cubeMapFolder, const std::vector<std::string> &files);
-  Skybox(std::shared_ptr<GameObject> owner, const std::string &cubeMapFolder,
+  Skybox(const std::shared_ptr<GameObject> &owner, const std::string &cubeMapFolder,
          const std::vector<std::string> &files);
 
   void draw(ERROR &errCode, const Shader &shader) override;

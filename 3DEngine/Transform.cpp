@@ -6,7 +6,7 @@
 Transform::Transform(const glm::vec3 &position, const glm::vec3 &rotation, const glm::vec3 &scale)
     : Transform(nullptr, position, rotation, scale) {}
 
-Transform::Transform(std::shared_ptr<GameObject> owner, const glm::vec3 &position,
+Transform::Transform(const std::shared_ptr<GameObject> &owner, const glm::vec3 &position,
                      const glm::vec3 &rotation, const glm::vec3 &scale)
     : Component(owner), m_position(position), m_rotation(rotation), m_scale(scale),
       m_orientation(glm::mat4()), m_model(glm::mat4()), m_view(glm::mat4()),

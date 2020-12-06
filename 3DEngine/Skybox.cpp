@@ -23,7 +23,7 @@ static constexpr float vertices[] = {
 Skybox::Skybox(const std::string &cubeMapFolder, const std::vector<std::string> &files)
     : Skybox(nullptr, cubeMapFolder, files) {}
 
-Skybox::Skybox(std::shared_ptr<GameObject> owner, const std::string &cubeMapFolder,
+Skybox::Skybox(const std::shared_ptr<GameObject> &owner, const std::string &cubeMapFolder,
                const std::vector<std::string> &files)
     : Component(owner), m_cubeMap(ResourceManager<CubeMap>::Get(cubeMapFolder, files)) {
 

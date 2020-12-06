@@ -8,7 +8,7 @@
 
 Script::Script(const std::string &name) : Script(nullptr, name) {}
 
-Script::Script(std::shared_ptr<GameObject> owner, const std::string &name)
+Script::Script(const std::shared_ptr<GameObject> &owner, const std::string &name)
     : Component(owner), Resource{name} {
   lua.open_libraries(sol::lib::base, sol::lib::math);
 

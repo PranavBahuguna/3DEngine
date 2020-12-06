@@ -115,26 +115,26 @@ int main() {
     GObjSptr tetrahedron(new GameObject());
     tetrahedron->AddComponent<Transform>();
     tetrahedron->AddComponent<Script>("Tetrahedron");
-    tetrahedron->AddComponent<Model>("Tetrahedron")->load(errCode);
+    tetrahedron->AddComponent<Model>("Tetrahedron");
 
     GObjSptr cube(new GameObject());
     cube->AddComponent<Transform>();
     cube->AddComponent<Script>("Cube");
-    cube->AddComponent<Model>("Cube")->load(errCode);
+    cube->AddComponent<Model>("Cube");
 
     GObjSptr earth(new GameObject());
     earth->AddComponent<Transform>();
     earth->AddComponent<Script>("Earth");
-    earth->AddComponent<Model>("Sphere")->load(errCode);
+    earth->AddComponent<Model>("Sphere");
 
     GObjSptr starfighter(new GameObject());
     starfighter->AddComponent<Transform>();
     starfighter->AddComponent<Script>("Starfighter");
-    starfighter->AddComponent<Model>("Arc170")->load(errCode);
+    starfighter->AddComponent<Model>("Arc170");
 
     GObjSptr floor(new GameObject());
     floor->AddComponent<Transform>(glm::vec3(0.0f, -3.0f, 0.0f));
-    floor->AddComponent<Plane>("Grass", glm::uvec2(5, 5), glm::vec2(10.0f, 10.0f))->load(errCode);
+    floor->AddComponent<Plane>("Grass", glm::uvec2(5, 5), glm::vec2(10.0f, 10.0f));
 
     gameObjects = {tetrahedron, cube, earth, starfighter, floor};
     dlIllum->addTargets(gameObjects);

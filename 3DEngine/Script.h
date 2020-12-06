@@ -13,7 +13,7 @@ class GameObject;
 class Script : public Component, Resource {
 public:
   Script(const std::string &name);
-  Script(std::shared_ptr<GameObject> owner, const std::string &name);
+  Script(const std::shared_ptr<GameObject> &owner, const std::string &name);
 
   void init(ERROR &errCode) override;
   void update(ERROR &errCode) override;

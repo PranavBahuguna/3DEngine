@@ -9,7 +9,7 @@ class Transform : public Component {
 public:
   Transform(const glm::vec3 &position = glm::vec3(), const glm::vec3 &rotation = glm::vec3(),
             const glm::vec3 &scale = glm::vec3(1.0f, 1.0f, 1.0f));
-  Transform(std::shared_ptr<GameObject> owner, const glm::vec3 &position = glm::vec3(),
+  Transform(const std::shared_ptr<GameObject> &owner, const glm::vec3 &position = glm::vec3(),
             const glm::vec3 &rotation = glm::vec3(),
             const glm::vec3 &scale = glm::vec3(1.0f, 1.0f, 1.0f));
 

@@ -7,8 +7,8 @@
 
 class Model : public Component {
 public:
-  Model(const std::string &name);
-  Model(std::shared_ptr<GameObject> owner, const std::string &name);
+  Model(const std::string &name, bool loadNow = true);
+  Model(const std::shared_ptr<GameObject> &owner, const std::string &name, bool loadNow = true);
 
   virtual void load(ERROR &errCode);
 

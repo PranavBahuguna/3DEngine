@@ -15,7 +15,7 @@
 class LightIcon : public Component {
 public:
   LightIcon(LightSptr light);
-  LightIcon(std::shared_ptr<GameObject> owner, LightSptr light);
+  LightIcon(const std::shared_ptr<GameObject> &owner, LightSptr light);
 
   void draw(ERROR &errCode, const Shader &shader) override;
 
