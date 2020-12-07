@@ -21,7 +21,11 @@ static constexpr float vertices[] = {
 };
 
 Skybox::Skybox(const std::string &cubeMapFolder, const std::vector<std::string> &files)
-    : Drawable{glm::vec3(0.0f)}, m_cubeMap(ResourceManager<CubeMap>::Get(cubeMapFolder, files)) {
+    : Skybox(nullptr, cubeMapFolder, files) {}
+
+Skybox::Skybox(const std::shared_ptr<GameObject> &owner, const std::string &cubeMapFolder,
+               const std::vector<std::string> &files)
+    : Component(owner), m_cubeMap(ResourceManager<CubeMap>::Get(cubeMapFolder, files)) {
 
   // Configure VAO / VBO for skybox and bind buffer data
   glGenVertexArrays(1, &m_VAO);
@@ -37,7 +41,7 @@ Skybox::Skybox(const std::string &cubeMapFolder, const std::vector<std::string> 
 }
 
 // Draws the skybox on screen
-void Skybox::draw(ERROR &errCode, const Shader &shader) const {
+void Skybox::draw(ERROR &errCode, const Shader &shader) {
   // Store old depth func mode and change to GL_LEQUAL - this ensures depth test passes when
   // values are equal to depth buffer content
   GLint oldDepthFuncMode;

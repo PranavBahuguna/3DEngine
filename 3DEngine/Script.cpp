@@ -1,11 +1,15 @@
 #include "Script.h"
 #include "BasicDefines.h"
 #include "Timer.h"
+#include "Transform.h"
 
 #include <filesystem>
 #include <stdexcept>
 
-Script::Script(const std::string &name, const GameObject &gameObject) : Resource{name} {
+Script::Script(const std::string &name) : Script(nullptr, name) {}
+
+Script::Script(const std::shared_ptr<GameObject> &owner, const std::string &name)
+    : Component(owner), Resource{name} {
   lua.open_libraries(sol::lib::base, sol::lib::math);
 
   const std::string filename = "Scripts/" + name + ".lua";
@@ -36,7 +40,7 @@ Script::Script(const std::string &name, const GameObject &gameObject) : Resource
   transformType["getUp"] = &Transform::getUp;
 
   // GameObject functions
-  lua.set_function("getTransform", &GameObject::getTransform, gameObject);
+  lua.set_function("getTransform", &GameObject::GetComponent<Transform>, m_owner);
 
   // Math functions
   lua.set_function("deg2rad", [](float angleDegrees) { return DEG2RAD(angleDegrees); });
@@ -63,6 +67,10 @@ ERROR Script::load(const std::string &filename) {
 
   return ERROR_OK;
 }
+
+void Script::init(ERROR &errCode) { callFunc(errCode, "init"); }
+
+void Script::update(ERROR &errCode) { callFunc(errCode, "update"); }
 
 // Calls a lua script function with error handling
 void Script::callFunc(ERROR &errCode, const std::string &funcName) {

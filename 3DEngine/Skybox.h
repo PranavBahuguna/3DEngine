@@ -1,14 +1,16 @@
 #pragma once
 
 #include "Camera.h"
+#include "Component.h"
 #include "CubeMap.h"
-#include "Drawable.h"
 
-class Skybox : public Drawable {
+class Skybox : public Component {
 public:
   Skybox(const std::string &cubeMapFolder, const std::vector<std::string> &files);
+  Skybox(const std::shared_ptr<GameObject> &owner, const std::string &cubeMapFolder,
+         const std::vector<std::string> &files);
 
-  void draw(ERROR &errCode, const Shader &shader) const override;
+  void draw(ERROR &errCode, const Shader &shader) override;
 
 private:
   CbmSptr m_cubeMap;

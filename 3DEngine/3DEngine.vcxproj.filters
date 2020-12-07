@@ -71,9 +71,6 @@
     <ClCompile Include="LightIcon.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Drawable.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="IlluminationDrawList.cpp">
       <Filter>Source Files\DrawLists</Filter>
     </ClCompile>
@@ -161,6 +158,9 @@
     <ClCompile Include="Transform.cpp">
       <Filter>Source Files\MVP</Filter>
     </ClCompile>
+    <ClCompile Include="Component.cpp">
+      <Filter>Source Files\GameObject</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Window.h">
@@ -176,9 +176,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="LightIcon.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Drawable.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="DrawList.h">
@@ -285,6 +282,9 @@
     </ClInclude>
     <ClInclude Include="BasicDefines.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Component.h">
+      <Filter>Header Files\GameObject</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

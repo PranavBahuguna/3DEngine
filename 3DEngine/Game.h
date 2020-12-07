@@ -67,8 +67,6 @@ public:
   static UiOverlay &GetUiOverlay();
   static bool ShouldUpdateScene();
 
-  static std::string toStringDp(float f, size_t dp);
-
 private:
   Game() {} // prevent construction of this class
 

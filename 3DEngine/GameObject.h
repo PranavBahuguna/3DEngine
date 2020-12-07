@@ -1,26 +1,62 @@
 #pragma once
 
-#include "Model.h"
-#include "Script.h"
+#include "Component.h"
+#include "Error.h"
+#include "Shader.h"
 
-// Forward declarations
-class Script;
+#include <memory>
+#include <vector>
 
-using ModelSptr = std::shared_ptr<Model>;
-using ScriptSptr = std::shared_ptr<Script>;
+class Component;
 
 class GameObject {
 public:
-  GameObject(ModelSptr model);
-  GameObject(ModelSptr model, const std::string &scriptName);
+  GameObject();
 
   void init(ERROR &errCode);
+  void start(ERROR &errCode);
   void update(ERROR &errCode);
+  void draw(ERROR &errCode, const Shader &shader);
 
-  // Model properties getters / setters
-  Transform &getTransform();
+  void setActive(bool value);
+  void setVisible(bool value);
+  bool isActive() const;
+  bool isVisible() const;
+
+  template <class T, std::enable_if_t<std::is_base_of<Component, T>::value, bool> = true,
+            class... Args>
+  T *AddComponent(Args... args) {
+    // Check that this component has not already been added to this game object. This is to prevent
+    // the same component from being added twice.
+    for (auto &component : m_components) {
+      T *foundComponent = dynamic_cast<T *>(component.get());
+
+      if (foundComponent != nullptr)
+        return foundComponent;
+    }
+
+    // Game object does not already have this component, so add it
+    m_components.emplace_back(std::make_unique<T>(std::shared_ptr<GameObject>(this), std::forward<Args>(args)...));
+
+    return dynamic_cast<T*>(m_components.back().get());
+  }
+
+  template <class T, std::enable_if_t<std::is_base_of<Component, T>::value, bool> = true>
+  T *GetComponent() {
+    // Check if we already have this component, and return it if found
+    for (auto &component : m_components) {
+      T *foundComponent = dynamic_cast<T *>(component.get());
+
+      if (foundComponent != nullptr)
+        return foundComponent;
+    }
+
+    return nullptr; // component not found
+  }
 
 private:
-  ModelSptr m_model;
-  ScriptSptr m_script;
+  bool m_isActive;
+  bool m_isVisible;
+
+  std::vector<std::unique_ptr<Component>> m_components;
 };

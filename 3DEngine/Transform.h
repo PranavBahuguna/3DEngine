@@ -1,11 +1,16 @@
 #pragma once
 
+#include "Component.h"
+
 #include <glm/glm.hpp>
 #include <glm/gtx/quaternion.hpp>
 
-class Transform {
+class Transform : public Component {
 public:
   Transform(const glm::vec3 &position = glm::vec3(), const glm::vec3 &rotation = glm::vec3(),
+            const glm::vec3 &scale = glm::vec3(1.0f, 1.0f, 1.0f));
+  Transform(const std::shared_ptr<GameObject> &owner, const glm::vec3 &position = glm::vec3(),
+            const glm::vec3 &rotation = glm::vec3(),
             const glm::vec3 &scale = glm::vec3(1.0f, 1.0f, 1.0f));
 
   // All mutator methods return the current transform to allow for method chaining

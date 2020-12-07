@@ -10,8 +10,10 @@ DrawTargets &DrawListDecorator::getTargets() { return m_drawList->getTargets(); 
 
 void DrawListDecorator::draw(ERROR &errCode) { m_drawList->draw(errCode); }
 
-void DrawListDecorator::addTarget(const DrawSptr &target) { m_drawList->addTarget(target); }
+void DrawListDecorator::addTarget(const std::shared_ptr<GameObject> &target) {
+  m_drawList->addTarget(target);
+}
 
 void DrawListDecorator::addTargets(const DrawTargets &targets) { m_drawList->addTargets(targets); }
 
-void DrawListDecorator::setShader(ShaderSptr shader) { m_drawList->setShader(shader); }
+void DrawListDecorator::setShader(const ShaderSptr &shader) { m_drawList->setShader(shader); }

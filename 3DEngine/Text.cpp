@@ -1,10 +1,13 @@
 #include "Text.h"
 #include "ResourceManager.h"
+#include "Transform.h"
 
-// Constructor
-Text::Text(const Transform &transform, const std::string &font, float scale, const glm::vec4 &color,
-           const std::string &text)
-    : Drawable(transform), m_font(ResourceManager<Font>::Get(font)), m_scale(scale), m_color(color),
+Text::Text(const std::string &font, float scale, const glm::vec4 &color, const std::string &text)
+    : Text(nullptr, font, scale, color, text) {}
+
+Text::Text(const std::shared_ptr<GameObject> &owner, const std::string &font, float scale,
+           const glm::vec4 &color, const std::string &text)
+    : Component(owner), m_font(ResourceManager<Font>::Get(font)), m_scale(scale), m_color(color),
       m_text(text) {
 
   // Configure VAO / VBO for texture quads and bind buffer data
@@ -21,15 +24,15 @@ Text::Text(const Transform &transform, const std::string &font, float scale, con
 }
 
 // Draws a text string onto the screen
-void Text::draw(ERROR &errCode, const Shader &shader) const {
+void Text::draw(ERROR &errCode, const Shader &shader) {
   // Pass shader parameters and activate
   shader.setVec4("textColor", m_color);
   glActiveTexture(GL_TEXTURE0);
   glBindVertexArray(m_VAO);
 
   // Starting x/y position current character in text string
-  float xStart = m_transform.getPosition().x;
-  float yStart = m_transform.getPosition().y;
+  float xStart = m_owner->GetComponent<Transform>()->getPosition().x;
+  float yStart = m_owner->GetComponent<Transform>()->getPosition().y;
 
   // Iterate and draw each character
   for (const char &c : m_text) {
