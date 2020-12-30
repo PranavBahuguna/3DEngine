@@ -179,6 +179,9 @@
     <ClCompile Include="ECSEngine.cpp">
       <Filter>Source Files\ECS</Filter>
     </ClCompile>
+    <ClCompile Include="ComponentArray.cpp">
+      <Filter>Source Files\ECS</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Window.h">
@@ -314,6 +317,12 @@
       <Filter>Header Files\ECS</Filter>
     </ClInclude>
     <ClInclude Include="ECSEngine.h">
+      <Filter>Header Files\ECS</Filter>
+    </ClInclude>
+    <ClInclude Include="IComponentArray.h">
+      <Filter>Header Files\ECS</Filter>
+    </ClInclude>
+    <ClInclude Include="ComponentArray.h">
       <Filter>Header Files\ECS</Filter>
     </ClInclude>
   </ItemGroup>

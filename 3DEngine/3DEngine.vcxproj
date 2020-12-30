@@ -164,6 +164,7 @@
     <ClCompile Include="AssetLoader.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Component.cpp" />
+    <ClCompile Include="ComponentArray.cpp" />
     <ClCompile Include="ComponentManager.cpp" />
     <ClCompile Include="CubeMap.cpp" />
     <ClCompile Include="DirectionalLight.cpp" />
@@ -208,6 +209,7 @@
     <ClInclude Include="BasicDrawList.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Component.h" />
+    <ClInclude Include="ComponentArray.h" />
     <ClInclude Include="ComponentManager.h" />
     <ClInclude Include="CubeMap.h" />
     <ClInclude Include="DirectionalLight.h" />
@@ -221,6 +223,7 @@
     <ClInclude Include="FrameBuffer.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="GameObject.h" />
+    <ClInclude Include="IComponentArray.h" />
     <ClInclude Include="IlluminationDrawList.h" />
     <ClInclude Include="Keyboard.h" />
     <ClInclude Include="Light.h" />

@@ -48,10 +48,10 @@ void EntityManager::setId(Entity entity, EntityId id, ERROR &errCode) {
   m_ids[entity] = id;
 }
 
-EntityId EntityManager::getId(Entity entity) {
+EntityId EntityManager::getId(Entity entity, ERROR &errCode) {
   // Check we have a valid entity
   if (entity >= MAX_ENTITIES) {
-    printErrorMsg(ERROR_INVALID_ENTITY, entity);
+    errCode = printErrorMsg(ERROR_INVALID_ENTITY, entity);
     return INVALID_ENTITY;
   }
 
