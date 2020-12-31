@@ -313,9 +313,6 @@
     <ClInclude Include="ComponentManager.h">
       <Filter>Header Files\ECS</Filter>
     </ClInclude>
-    <ClInclude Include="SystermManager.h">
-      <Filter>Header Files\ECS</Filter>
-    </ClInclude>
     <ClInclude Include="ECSEngine.h">
       <Filter>Header Files\ECS</Filter>
     </ClInclude>
@@ -323,6 +320,9 @@
       <Filter>Header Files\ECS</Filter>
     </ClInclude>
     <ClInclude Include="ComponentArray.h">
+      <Filter>Header Files\ECS</Filter>
+    </ClInclude>
+    <ClInclude Include="SystemManager.h">
       <Filter>Header Files\ECS</Filter>
     </ClInclude>
   </ItemGroup>

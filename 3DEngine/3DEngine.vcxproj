@@ -243,7 +243,7 @@
     <ClInclude Include="ShadowMappingDrawList.h" />
     <ClInclude Include="Skybox.h" />
     <ClInclude Include="SpotLight.h" />
-    <ClInclude Include="SystermManager.h" />
+    <ClInclude Include="SystemManager.h" />
     <ClInclude Include="Text.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="Timer.h" />

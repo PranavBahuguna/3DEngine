@@ -33,27 +33,27 @@ void EntityManager::destroy(Entity entity, ERROR &errCode) {
   }
 
   // Invalidate the destroyed entity id, and push it to the back of the queue
-  m_ids[entity].reset();
+  m_signatures[entity].reset();
   m_availableEntities.push(entity);
   --m_nLivingEntities;
 }
 
-void EntityManager::setId(Entity entity, EntityId id, ERROR &errCode) {
+void EntityManager::setSignature(Entity entity, Signature id, ERROR &errCode) {
   // Check we have a valid entity
   if (entity >= MAX_ENTITIES) {
     errCode = printErrorMsg(ERROR_INVALID_ENTITY, entity);
     return;
   }
 
-  m_ids[entity] = id;
+  m_signatures[entity] = id;
 }
 
-EntityId EntityManager::getId(Entity entity, ERROR &errCode) {
+Signature EntityManager::getSignature(Entity entity, ERROR &errCode) {
   // Check we have a valid entity
   if (entity >= MAX_ENTITIES) {
     errCode = printErrorMsg(ERROR_INVALID_ENTITY, entity);
     return INVALID_ENTITY;
   }
 
-  return m_ids[entity];
+  return m_signatures[entity];
 }

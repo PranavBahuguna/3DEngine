@@ -1,5 +1,7 @@
 #include "ComponentManager.h"
 
+ComponentManager::ComponentManager() : m_nextComponentType(0) {}
+
 template <typename T> void ComponentManager::registerComponent(ERROR &errCode) {
   errCode = ERROR_OK;
 
@@ -57,11 +59,11 @@ template <typename T> T &ComponentManager::getComponent(Entity entity, ERROR &er
     componentArray->get(entity, errCode);
 }
 
-template <typename T> void ComponentManager::entityDestroyed(Entity entity) {
+void ComponentManager::entityDestroyed(Entity entity) {
   // Notify each component array that an entity has been destroyed. If the array has a component for
   // that entity, the entity will be removed.
-  for (const auto &[key, componentArray] : m_componentArrays)
-    componentArray->entityDestroyed(entity);
+  std::for_each(m_componentArrays.begin(), m_componentArrays.end(),
+                [entity](const auto &pair) { pair.second->entityDestroyed(entity); });
 }
 
 template <typename T>

@@ -8,12 +8,14 @@
 
 class ComponentManager {
 public:
+  ComponentManager();
+
   template <typename T> void registerComponent(ERROR &errCode);
   template <typename T> ComponentType getComponentType(ERROR &errCode);
   template <typename T> void addComponent(Entity entity, T &component, ERROR &errCode);
   template <typename T> void removeComponent(Entity entity, ERROR &errCode);
   template <typename T> T &getComponent(Entity entity, ERROR &errCode);
-  template <typename T> void entityDestroyed(Entity entity);
+  void entityDestroyed(Entity entity);
 
 private:
   template <typename T> std::shared_ptr<ComponentArray<T>> getComponentArray(ERROR &errCode);

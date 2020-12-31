@@ -34,6 +34,8 @@ typedef uint32_t ERROR;
 #define ERROR_COMPONENT_NOT_FOUND               23
 #define ERROR_COMPONENT_ALREADY_REGISTERED      24
 #define ERROR_COMPONENT_NOT_REGISTERED          25
+#define ERROR_SYSTEM_ALREADY_REGISTERED         26
+#define ERROR_SYSTEM_NOT_REGISTERED             27
 // clang-format on
 
 // If error reference is not required for a function, this macro may be used as a placeholder
@@ -127,6 +129,12 @@ static ERROR printErrorMsg(ERROR errCode, ...) {
     break;
   case ERROR_COMPONENT_NOT_REGISTERED:
     errBody = "Attempted usage of unregistered component (%s).";
+    break;
+  case ERROR_SYSTEM_ALREADY_REGISTERED:
+    errBody = "System (%s) has already been registered.";
+    break;
+  case ERROR_SYSTEM_NOT_REGISTERED:
+    errBody = "Attempted usage of unregistered system (%s).";
     break;
   default:
     errBody = "Unknown error.";
