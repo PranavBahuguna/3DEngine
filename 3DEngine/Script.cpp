@@ -2,14 +2,14 @@
 #include "BasicDefines.h"
 #include "Timer.h"
 #include "Transform.h"
+#include "ECSEngine.hpp"
 
 #include <filesystem>
 #include <stdexcept>
 
-Script::Script(const std::string &name) : Script(nullptr, name) {}
+static sol::state lua;
 
-Script::Script(const std::shared_ptr<GameObject> &owner, const std::string &name)
-    : Component(owner), Resource{name} {
+Script::Script(const std::string &name) : Resource{name} {
   lua.open_libraries(sol::lib::base, sol::lib::math);
 
   const std::string filename = "Scripts/" + name + ".lua";
@@ -40,7 +40,8 @@ Script::Script(const std::shared_ptr<GameObject> &owner, const std::string &name
   transformType["getUp"] = &Transform::getUp;
 
   // GameObject functions
-  lua.set_function("getTransform", &GameObject::GetComponent<Transform>, m_owner);
+  lua.set_function("getTransform",
+                   []() { return ECSEngine::GetComponent<Transform>(1, error_placeholder); });
 
   // Math functions
   lua.set_function("deg2rad", [](float angleDegrees) { return DEG2RAD(angleDegrees); });

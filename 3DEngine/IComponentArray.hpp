@@ -5,5 +5,5 @@
 class IComponentArray {
 public:
   virtual ~IComponentArray() = default;
-  virtual void entityDestroyed(Entity entity) = 0;
+  virtual void entityDestroyed(Entity entity, ERROR &errCode) = 0;
 };

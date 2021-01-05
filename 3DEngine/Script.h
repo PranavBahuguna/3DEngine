@@ -7,20 +7,14 @@
 #define SOL_NO_EXCEPTIONS 1
 #include "sol.hpp"
 
-// Forward declarations
-class GameObject;
-
-class Script : public Component, Resource {
+class Script : public Resource {
 public:
   Script(const std::string &name);
-  Script(const std::shared_ptr<GameObject> &owner, const std::string &name);
 
-  void init(ERROR &errCode) override;
-  void update(ERROR &errCode) override;
+  void init(ERROR &errCode);
+  void update(ERROR &errCode);
 
 private:
-  sol::state lua;
-
   ERROR load(const std::string &filename);
   void callFunc(ERROR &errCode, const std::string &funcName);
 };
