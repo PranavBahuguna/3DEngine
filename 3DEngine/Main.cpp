@@ -13,7 +13,6 @@
 
 #include <iomanip>
 
-using LiSptr = std::shared_ptr<LightIcon>;
 using GObjSptr = std::shared_ptr<GameObject>;
 using MeshSptr = std::shared_ptr<Mesh>;
 
@@ -34,7 +33,7 @@ DrawListUptr dlSkybox;
 int main() {
   try {
     // Setup game
-    Game::Init();
+    Game::Init(errCode);
     Camera &camera = Game::GetCamera();
     Window &window = Game::GetWindow();
 
@@ -114,22 +113,22 @@ int main() {
     // Setup scene objects
     GObjSptr tetrahedron(new GameObject());
     tetrahedron->AddComponent<Transform>();
-    //tetrahedron->AddComponent<Script>("Tetrahedron");
+    // tetrahedron->AddComponent<Script>("Tetrahedron");
     tetrahedron->AddComponent<Model>("Tetrahedron");
 
     GObjSptr cube(new GameObject());
     cube->AddComponent<Transform>();
-    //cube->AddComponent<Script>("Cube");
+    // cube->AddComponent<Script>("Cube");
     cube->AddComponent<Model>("Cube");
 
     GObjSptr earth(new GameObject());
     earth->AddComponent<Transform>();
-    //earth->AddComponent<Script>("Earth");
+    // earth->AddComponent<Script>("Earth");
     earth->AddComponent<Model>("Sphere");
 
     GObjSptr starfighter(new GameObject());
     starfighter->AddComponent<Transform>();
-    //starfighter->AddComponent<Script>("Starfighter");
+    // starfighter->AddComponent<Script>("Starfighter");
     starfighter->AddComponent<Model>("Arc170");
 
     GObjSptr floor(new GameObject());
@@ -184,7 +183,7 @@ int main() {
 
     // Main program loop
     while (!window.getShouldClose()) {
-      Game::Update();
+      Game::Update(errCode);
 
       // Update all gameobjects and lights
       if (Game::ShouldUpdateScene()) {

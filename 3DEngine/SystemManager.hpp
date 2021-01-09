@@ -1,6 +1,6 @@
 #pragma once
 
-#include "EntityManager.h"
+#include "EntityManager.hpp"
 
 #include <memory>
 #include <set>
@@ -15,7 +15,7 @@ struct System {
 
 class SystemManager {
 public:
-  template <typename T> std::shared_ptr<T> registerSystem(ERROR& errCode) {
+  template <typename T> std::shared_ptr<T> registerSystem(ERROR &errCode) {
     errCode = ERROR_OK;
 
     // Check if the system has already been registered
@@ -32,7 +32,7 @@ public:
     return system;
   }
 
-  template <typename T> void setSignature(Signature signature, ERROR& errCode) {
+  template <typename T> void setSignature(Signature signature, ERROR &errCode) {
     errCode = ERROR_OK;
 
     // Check if the system is registered

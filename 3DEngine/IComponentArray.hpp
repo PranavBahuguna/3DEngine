@@ -1,6 +1,6 @@
 #pragma once
 
-#include "EntityManager.h"
+#include "EntityManager.hpp"
 
 class IComponentArray {
 public:

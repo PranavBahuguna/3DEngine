@@ -2,6 +2,8 @@
 
 #include "BasicDefines.h"
 #include "Camera.h"
+#include "Script.h"
+#include "ScriptSystem.h"
 #include "UiOverlay.h"
 #include "Window.h"
 
@@ -57,10 +59,10 @@ static constexpr auto COLOR_GREY = glm::vec4(0.6667f, 0.6627f, 0.6784f, 1.0f);
 
 class Game {
 public:
-  static void Init();
+  static void Init(ERROR &errCode);
   static void Exit();
   static void ToggleSceneUpdateStatus();
-  static void Update();
+  static void Update(ERROR &errCode);
 
   static Camera &GetCamera();
   static Window &GetWindow();
@@ -73,6 +75,9 @@ private:
   static std::unique_ptr<Camera> _camera;
   static std::unique_ptr<UiOverlay> _uiOverlay;
   static std::unique_ptr<Window> _window;
+
+  // ECS systems
+  static std::shared_ptr<ScriptSystem> _scriptSystem;
 
   static bool _updateScene;
 };

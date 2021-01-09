@@ -54,9 +54,6 @@
     <Filter Include="Header Files\ECS">
       <UniqueIdentifier>{5c2a3bc8-8033-438d-b7b3-5e327b470b17}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\ECS">
-      <UniqueIdentifier>{bb15089e-f74a-45b3-b207-a3d1a67c4d7c}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Window.cpp">
@@ -87,9 +84,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="GameObject.cpp">
-      <Filter>Source Files\GameObject</Filter>
-    </ClCompile>
-    <ClCompile Include="Script.cpp">
       <Filter>Source Files\GameObject</Filter>
     </ClCompile>
     <ClCompile Include="Plane.cpp">
@@ -167,14 +161,8 @@
     <ClCompile Include="Component.cpp">
       <Filter>Source Files\GameObject</Filter>
     </ClCompile>
-    <ClCompile Include="EntityManager.cpp">
-      <Filter>Source Files\ECS</Filter>
-    </ClCompile>
     <ClCompile Include="ScriptSystem.cpp">
       <Filter>Source Files\GameObject</Filter>
-    </ClCompile>
-    <ClCompile Include="ECSEngine.cpp">
-      <Filter>Source Files\ECS</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -316,10 +304,10 @@
     <ClInclude Include="SystemManager.hpp">
       <Filter>Header Files\ECS</Filter>
     </ClInclude>
-    <ClInclude Include="EntityManager.h">
+    <ClInclude Include="IComponentArray.hpp">
       <Filter>Header Files\ECS</Filter>
     </ClInclude>
-    <ClInclude Include="IComponentArray.hpp">
+    <ClInclude Include="EntityManager.hpp">
       <Filter>Header Files\ECS</Filter>
     </ClInclude>
   </ItemGroup>

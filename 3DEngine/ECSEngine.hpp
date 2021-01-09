@@ -1,7 +1,7 @@
 #pragma once
 
 #include "ComponentManager.hpp"
-#include "EntityManager.h"
+#include "EntityManager.hpp"
 #include "SystemManager.hpp"
 
 class ECSEngine {
@@ -23,7 +23,8 @@ public:
     m_componentManager->registerComponent<T>(errCode);
   }
 
-  template <typename T> static void AddComponent(Entity entity, T &component, ERROR &errCode) {
+  template <typename T>
+  static void AddComponent(Entity entity, const T &component, ERROR &errCode) {
     m_componentManager->addComponent<T>(entity, component, errCode);
     if (errCode != ERROR_OK)
       return;
@@ -38,7 +39,7 @@ public:
     if (errCode != ERROR_OK)
       return;
 
-    m_systemManager->entitySignatureChanged(entity, signature, errCode);
+    m_systemManager->entitySignatureChanged(entity, signature);
   }
 
   template <typename T> static void RemoveComponent(Entity entity, ERROR &errCode) {
@@ -73,7 +74,7 @@ public:
   }
 
   template <typename T> static void SetSystemSignature(Signature signature, ERROR &errCode) {
-    m_systemManager->setSignature(errCode);
+    m_systemManager->setSignature<T>(signature, errCode);
   }
 
 private:
@@ -81,7 +82,8 @@ private:
   ECSEngine(const ECSEngine &){};
   ECSEngine &operator=(const ECSEngine &){};
 
-  static std::unique_ptr<EntityManager> m_entityManager;
-  static std::unique_ptr<ComponentManager> m_componentManager;
-  static std::unique_ptr<SystemManager> m_systemManager;
+  inline static std::unique_ptr<EntityManager> m_entityManager = std::make_unique<EntityManager>();
+  inline static std::unique_ptr<ComponentManager> m_componentManager =
+      std::make_unique<ComponentManager>();
+  inline static std::unique_ptr<SystemManager> m_systemManager = std::make_unique<SystemManager>();
 };

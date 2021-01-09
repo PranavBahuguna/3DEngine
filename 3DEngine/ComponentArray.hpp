@@ -8,7 +8,7 @@ template <typename T> class ComponentArray : public IComponentArray {
 public:
   ComponentArray() : m_size(0) {}
 
-  void add(Entity entity, T &component, ERROR &errCode) {
+  void add(Entity entity, const T &component, ERROR &errCode) {
     errCode = ERROR_OK;
 
     // Check if component is already contained in this array

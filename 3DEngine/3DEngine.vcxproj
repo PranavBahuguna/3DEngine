@@ -168,8 +168,6 @@
     <ClCompile Include="DirectionalLight.cpp" />
     <ClCompile Include="BasicDrawList.cpp" />
     <ClCompile Include="DrawListDecorator.cpp" />
-    <ClCompile Include="ECSEngine.cpp" />
-    <ClCompile Include="EntityManager.cpp" />
     <ClCompile Include="Font.cpp" />
     <ClCompile Include="FrameBuffer.cpp" />
     <ClCompile Include="Game.cpp" />
@@ -184,7 +182,6 @@
     <ClCompile Include="PointLight.cpp" />
     <ClCompile Include="Projection.cpp" />
     <ClCompile Include="RenderBuffer.cpp" />
-    <ClCompile Include="Script.cpp" />
     <ClCompile Include="ScriptSystem.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="Mesh.cpp" />
@@ -214,7 +211,7 @@
     <ClInclude Include="DrawList.h" />
     <ClInclude Include="DrawListDecorator.h" />
     <ClInclude Include="ECSEngine.hpp" />
-    <ClInclude Include="EntityManager.h" />
+    <ClInclude Include="EntityManager.hpp" />
     <ClInclude Include="Error.h" />
     <ClInclude Include="Font.h" />
     <ClInclude Include="DrawListBuilder.h" />

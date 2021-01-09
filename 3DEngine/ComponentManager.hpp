@@ -1,7 +1,7 @@
 #pragma once
 
 #include "ComponentArray.hpp"
-#include "EntityManager.h"
+#include "EntityManager.hpp"
 
 #include <memory>
 #include <unordered_map>
@@ -39,7 +39,7 @@ public:
     return m_componentTypes[typeName];
   }
 
-  template <typename T> void addComponent(Entity entity, T &component, ERROR &errCode) {
+  template <typename T> void addComponent(Entity entity, const T &component, ERROR &errCode) {
     errCode = ERROR_OK;
 
     auto componentArray = getComponentArray<T>(errCode);
@@ -62,12 +62,9 @@ public:
   void entityDestroyed(Entity entity, ERROR &errCode) {
     // Notify each component array that an entity has been destroyed. If the array has a component
     // for that entity, the entity will be removed.
-    for (const auto &[key, componentArray] : m_componentArrays) {
-      if (errCode != ERROR_OK)
-        break;
-
-      componentArray->entityDestroyed(entity, errCode);
-    }
+    for (auto it = m_componentArrays.begin(); it != m_componentArrays.end() && errCode != ERROR_OK;
+         ++it)
+      it->second->entityDestroyed(entity, errCode);
   }
 
 private:
